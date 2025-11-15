@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
-import { Menu, X } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { useState } from 'react';
 
 interface HeaderProps {
@@ -16,7 +16,6 @@ interface HeaderProps {
 
 export function Header({ dictionary, locale }: HeaderProps) {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
     { href: `/${locale}`, label: dictionary.nav.home },
@@ -26,26 +25,21 @@ export function Header({ dictionary, locale }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-20 items-center justify-between">
         {/* Logo */}
         <Link href={`/${locale}`} className="flex items-center space-x-3">
-          <img 
-            src="/logo.png" 
-            alt="DNA Web App Logo" 
-            width={40} 
-            height={40} 
-            className="rounded-lg"
-          />
-          <span className="font-bold text-xl">DNA Web App</span>
+          <div className="text-4xl font-black bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#E8A12D] bg-clip-text text-transparent">
+            DNA
+          </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="hidden md:flex items-center space-x-8">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`text-sm font-medium transition-colors hover:text-primary ${
+              className={`text-base font-medium transition-colors hover:text-primary ${
                 pathname === item.href
                   ? 'text-primary'
                   : 'text-muted-foreground'
@@ -60,61 +54,24 @@ export function Header({ dictionary, locale }: HeaderProps) {
         <div className="hidden md:flex items-center space-x-4">
           <LanguageSwitcher />
           <Link href={`/${locale}/auth/login`}>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="text-base">
               {dictionary.auth.login}
             </Button>
           </Link>
           <Link href={`/${locale}/auth/register`}>
-            <Button size="sm">
+            <Button size="sm" className="bg-[#F2574C] hover:bg-[#F2574C]/90 text-base">
               {dictionary.auth.register}
             </Button>
           </Link>
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-background border-b md:hidden">
-            <div className="container py-4 space-y-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`block text-sm font-medium transition-colors hover:text-primary ${
-                    pathname === item.href
-                      ? 'text-primary'
-                      : 'text-muted-foreground'
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <div className="pt-4 border-t space-y-2">
-                <LanguageSwitcher />
-                <div className="flex space-x-2">
-                  <Link href={`/${locale}/auth/login`} className="flex-1">
-                    <Button variant="ghost" size="sm" className="w-full">
-                      {dictionary.auth.login}
-                    </Button>
-                  </Link>
-                  <Link href={`/${locale}/auth/register`} className="flex-1">
-                    <Button size="sm" className="w-full">
-                      {dictionary.auth.register}
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Mobile Actions */}
+        <div className="flex md:hidden items-center space-x-3">
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-5 w-5" />
+          </Button>
+          <LanguageSwitcher />
+        </div>
       </div>
     </header>
   );

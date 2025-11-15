@@ -153,10 +153,10 @@
   "pages": {
     "home": {
       "hero": {
-        "title": "LET'S BUILD CHAMPIONS TOGETHER",
-        "subtitle": "Transform your fitness journey into an exciting adventure with gamified training, personalized athletic profiles, and smart progress tracking",
-        "cta": "Start Your Journey",
-        "loginCta": "Access Dashboard"
+        "title": "DNA",
+        "subtitle": "Be a Champion!",
+        "cta": "Start Now",
+        "loginCta": "Login"
       },
       "features": {
         "title": "Discover The Moment",
@@ -237,13 +237,13 @@
     }
   },
   "footer": {
-    "description": "A modern web application with dynamic access control and internationalization support.",
+    "description": "Be a Champion!",
     "quickLinks": "Quick Links",
     "contact": "Contact",
     "legal": "Legal",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "rights": "All rights reserved.",
-    "copyright": "© {year} DNA Web App. All rights reserved."
+    "copyright": "© {year} DNA. All rights reserved."
   }
 }
