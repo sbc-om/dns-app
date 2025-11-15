@@ -1,6 +1,7 @@
 'use client';
 
 import { LogOut, User } from 'lucide-react';
+import { useRouter, useParams } from 'next/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import {
   DropdownMenu,
@@ -12,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Dictionary } from '@/lib/i18n/getDictionary';
+import { Locale } from '@/config/i18n';
 
 export interface DashboardHeaderProps {
   dictionary: Dictionary;
@@ -19,10 +21,31 @@ export interface DashboardHeaderProps {
     fullName?: string;
     email: string;
   };
-  onLogout: () => void;
 }
 
-export function DashboardHeader({ dictionary, user, onLogout }: DashboardHeaderProps) {
+export function DashboardHeader({ dictionary, user }: DashboardHeaderProps) {
+  const router = useRouter();
+  const params = useParams();
+  const locale = (params.locale as Locale) || 'en';
+
+  const handleLogout = async () => {
+    try {
+      console.log('🔓 Logging out...');
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        console.log('✅ Logout successful, redirecting...');
+        router.push(`/${locale}/auth/login`);
+        router.refresh();
+      } else {
+        console.error('❌ Logout failed:', await response.text());
+      }
+    } catch (error) {
+      console.error('❌ Logout error:', error);
+    }
+  };
   return (
     <header className="border-b bg-card">
       <div className="flex h-16 items-center justify-between px-6">
@@ -50,7 +73,7 @@ export function DashboardHeader({ dictionary, user, onLogout }: DashboardHeaderP
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onLogout}>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>{dictionary.common.logout}</span>
               </DropdownMenuItem>

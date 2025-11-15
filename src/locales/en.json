@@ -102,42 +102,66 @@
   "pages": {
     "home": {
       "hero": {
-        "title": "Welcome to DNA Web App",
-        "subtitle": "A powerful web application with dynamic access control, multi-language support, and modern technology stack",
-        "cta": "Get Started",
-        "loginCta": "Login to Dashboard"
+        "title": "LET'S BUILD CHAMPIONS TOGETHER",
+        "subtitle": "Transform your fitness journey into an exciting adventure with gamified training, personalized athletic profiles, and smart progress tracking",
+        "cta": "Start Your Journey",
+        "loginCta": "Access Dashboard"
       },
       "features": {
-        "title": "Key Features",
-        "subtitle": "Everything you need for a modern web application",
-        "userManagement": {
-          "title": "User Management",
-          "description": "Complete user management system with roles and permissions"
+        "title": "Discover The Moment",
+        "subtitle": "An innovative educational system that combines fitness training with engaging gamification",
+        "gamification": {
+          "title": "Interactive Challenges & Rewards",
+          "description": "Keep the energy alive with fun challenges, daily competitions, and live demonstrations that turn every training moment into an unforgettable experience"
         },
-        "accessControl": {
-          "title": "Dynamic Access Control",
-          "description": "Fine-grained permissions system for secure resource access"
+        "athleticProfile": {
+          "title": "Personalized Athletic Profiles",
+          "description": "Generate beautiful, printable profiles that showcase your journey, achievements, and growth—designed to inspire and celebrate every milestone"
         },
-        "multilingual": {
-          "title": "Multi-language Support",
-          "description": "Built-in internationalization with RTL support"
+        "progressTracking": {
+          "title": "Smart Progress Dashboard",
+          "description": "Track your training stages in real-time, see how many sessions remain, and watch your journey unfold with automatic updates synchronized to your training calendar"
         },
-        "modernTech": {
-          "title": "Modern Technology",
-          "description": "Built with Next.js, TypeScript, and LMDB for optimal performance"
+        "rewardSystem": {
+          "title": "Earn & Collect Rewards",
+          "description": "Collect coins and points after each training session—pre-programmed rewards that motivate consistent effort and celebrate dedication"
         }
+      },
+      "philosophy": {
+        "title": "Making Fitness Fun & Empowering",
+        "subtitle": "High appeal: Tap into the growing love for physical challenges and movement, inspired by Discover's philosophy of making fitness fun and empowering",
+        "forEveryone": "Fun for everyone: Courses and activities are designed to engage and challenge all ages and abilities – from young kids to adults seeking excitement"
       }
     },
     "about": {
-      "title": "About DNA Web App",
-      "subtitle": "Learn more about our mission and technology",
+      "title": "About The Moment",
+      "subtitle": "An Innovative Sports Concept by Mini Dacri Studio",
       "mission": {
-        "title": "Our Mission",
-        "description": "To provide a comprehensive, secure, and user-friendly web application platform that scales with your needs."
+        "title": "Our Vision",
+        "description": "We believe that fitness should be exciting, engaging, and accessible to everyone. The Moment transforms traditional training into an interactive journey where every session brings new challenges, achievements, and growth."
       },
-      "technology": {
-        "title": "Technology Stack",
-        "description": "Built with cutting-edge technologies for performance, security, and maintainability."
+      "system": {
+        "title": "The Educational System",
+        "gamification": {
+          "title": "Gamified Learning Experience",
+          "description": "We've revolutionized fitness education by integrating game mechanics into every aspect of training. Through interactive challenges, daily competitions, and live demonstrations, participants stay motivated and engaged throughout their journey."
+        },
+        "athleticProfile": {
+          "title": "Athletic Profile Generation",
+          "description": "Every participant receives a personalized athletic profile—a beautifully designed visual representation of their journey. Simply input basic information, and our system generates a professional, printable profile that celebrates achievements and tracks growth milestones."
+        },
+        "progressTracking": {
+          "title": "Intelligent Progress Tracking",
+          "description": "Parents and participants can log in anytime to see exactly where they are in their training journey. Our smart dashboard shows current training stages, upcoming sessions, and remaining milestones—all automatically synchronized with the structured training calendar."
+        },
+        "rewardSystem": {
+          "title": "Automated Reward System",
+          "description": "After each training session, participants earn coins and points that appear instantly in the parent dashboard. These rewards are pre-programmed based on the training calendar, ensuring consistent recognition of effort and dedication without manual intervention."
+        }
+      },
+      "approach": {
+        "title": "Our Approach",
+        "description": "The Moment reaches up to 60 participants per session from Discover Academy, divided into three teams. We've designed the system to suit all ages and abilities—from young children to adults seeking excitement. Every course and activity is crafted to challenge and engage, making fitness an adventure rather than a routine."
       }
     },
     "contact": {

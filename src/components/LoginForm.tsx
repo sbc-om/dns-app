@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,7 @@ interface LoginFormProps {
 
 export function LoginForm({ dictionary, locale }: LoginFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -28,13 +29,40 @@ export function LoginForm({ dictionary, locale }: LoginFormProps) {
     setIsSubmitting(true);
     setError('');
 
+    console.log('🔐 Attempting login with:', formData.email);
+
     try {
-      // TODO: Implement actual authentication
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      console.log('📡 Response status:', response.status);
+
+      const data = await response.json();
+      console.log('📦 Response data:', data);
+
+      if (!response.ok) {
+        console.error('❌ Login failed:', data.error);
+        setError(data.error || dictionary.errors.serverError);
+        return;
+      }
+
+      // Get redirect URL from query params or default to dashboard
+      const redirectUrl = searchParams.get('redirect') || `/${locale}/dashboard`;
+      console.log('✅ Login successful! Redirecting to:', redirectUrl);
       
-      // Redirect to dashboard
-      router.push(`/${locale}/dashboard`);
+      // Redirect on success
+      router.push(redirectUrl);
+      router.refresh();
     } catch (err) {
+      console.error('💥 Login error:', err);
       setError(dictionary.errors.serverError);
     } finally {
       setIsSubmitting(false);

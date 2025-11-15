@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
@@ -15,9 +16,18 @@ interface RegisterPageClientProps {
 export default function RegisterPageClient({ dictionary, locale }: RegisterPageClientProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <Link href={`/${locale}`} className="flex items-center justify-center space-x-2 mb-4">
+      <div className="w-full max-w-md">
+        <Link 
+          href={`/${locale}`}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {dictionary.nav.home}
+        </Link>
+        
+        <Card className="w-full">
+          <CardHeader className="text-center">
+            <Link href={`/${locale}`} className="flex items-center justify-center space-x-2 mb-4">
             <Image 
               src="/logo.png" 
               alt="DNA Logo" 
@@ -47,6 +57,7 @@ export default function RegisterPageClient({ dictionary, locale }: RegisterPageC
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
