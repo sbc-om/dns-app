@@ -55,17 +55,17 @@ export default function ContactPage({ dictionary, locale }: { dictionary: any; l
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-pink-900/20">
       <Header dictionary={dictionary} locale={locale} />
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 px-4 text-center bg-gradient-to-b from-background to-muted/20">
+        <section className="py-20 px-4 text-center">
           <div className="container max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
               {dictionary.pages.contact.title}
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-xl text-gray-600 dark:text-gray-300">
               {dictionary.pages.contact.subtitle}
             </p>
           </div>
@@ -76,12 +76,12 @@ export default function ContactPage({ dictionary, locale }: { dictionary: any; l
           <div className="container max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* Contact Form */}
-              <Card>
+              <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-lg dark:bg-gray-900/80">
                 <CardHeader>
-                  <CardTitle className="text-2xl">
+                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     {dictionary.pages.contact.form.submit}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-gray-600 dark:text-gray-400">
                     Fill out the form below and we'll get back to you as soon as possible.
                   </CardDescription>
                 </CardHeader>
@@ -141,7 +141,7 @@ export default function ContactPage({ dictionary, locale }: { dictionary: any; l
 
                     <Button 
                       type="submit" 
-                      className="w-full" 
+                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg" 
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? dictionary.common.loading : dictionary.pages.contact.form.submit}
@@ -152,34 +152,40 @@ export default function ContactPage({ dictionary, locale }: { dictionary: any; l
 
               {/* Contact Information */}
               <div className="space-y-8">
-                <Card>
+                <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-lg dark:bg-gray-900/80">
                   <CardHeader>
-                    <CardTitle className="text-2xl">
+                    <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                       {dictionary.pages.contact.info.title}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="flex items-center space-x-4">
-                      <Mail className="h-6 w-6 text-primary" />
+                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                      <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                        <Mail className="h-6 w-6 text-purple-600" />
+                      </div>
                       <div>
-                        <p className="font-medium">Email</p>
-                        <p className="text-muted-foreground">contact@dnawebapp.com</p>
+                        <p className="font-semibold text-gray-900 dark:text-gray-100">Email</p>
+                        <p className="text-gray-600 dark:text-gray-400">contact@dnawebapp.com</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-4">
-                      <Phone className="h-6 w-6 text-primary" />
+                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                      <div className="p-3 rounded-full bg-pink-100 dark:bg-pink-900/30">
+                        <Phone className="h-6 w-6 text-pink-600" />
+                      </div>
                       <div>
-                        <p className="font-medium">Phone</p>
-                        <p className="text-muted-foreground">+1 (555) 123-4567</p>
+                        <p className="font-semibold text-gray-900 dark:text-gray-100">Phone</p>
+                        <p className="text-gray-600 dark:text-gray-400">+1 (555) 123-4567</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-4">
-                      <MapPin className="h-6 w-6 text-primary" />
+                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                      <div className="p-3 rounded-full bg-orange-100 dark:bg-orange-900/30">
+                        <MapPin className="h-6 w-6 text-orange-600" />
+                      </div>
                       <div>
-                        <p className="font-medium">Address</p>
-                        <p className="text-muted-foreground">
+                        <p className="font-semibold text-gray-900 dark:text-gray-100">Address</p>
+                        <p className="text-gray-600 dark:text-gray-400">
                           123 Tech Street<br />
                           Innovation City, IC 12345
                         </p>
@@ -188,23 +194,23 @@ export default function ContactPage({ dictionary, locale }: { dictionary: any; l
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-lg dark:bg-gray-900/80">
                   <CardHeader>
-                    <CardTitle>Office Hours</CardTitle>
+                    <CardTitle className="font-bold text-gray-900 dark:text-gray-100">Office Hours</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span>Monday - Friday:</span>
-                        <span>9:00 AM - 6:00 PM</span>
+                    <div className="space-y-3">
+                      <div className="flex justify-between p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20">
+                        <span className="font-medium">Monday - Friday:</span>
+                        <span className="text-purple-600 dark:text-purple-400 font-semibold">9:00 AM - 6:00 PM</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Saturday:</span>
-                        <span>10:00 AM - 4:00 PM</span>
+                      <div className="flex justify-between p-3 rounded-lg bg-pink-50 dark:bg-pink-900/20">
+                        <span className="font-medium">Saturday:</span>
+                        <span className="text-pink-600 dark:text-pink-400 font-semibold">10:00 AM - 4:00 PM</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Sunday:</span>
-                        <span>Closed</span>
+                      <div className="flex justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                        <span className="font-medium">Sunday:</span>
+                        <span className="text-gray-600 dark:text-gray-400 font-semibold">Closed</span>
                       </div>
                     </div>
                   </CardContent>

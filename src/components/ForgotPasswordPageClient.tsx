@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -68,9 +69,14 @@ export default function ForgotPasswordPageClient({ dictionary, locale }: ForgotP
     <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <Link href={`/${locale}`} className="flex items-center justify-center space-x-2 mb-4">
-            <div className="h-8 w-8 rounded-full bg-primary"></div>
-            <span className="font-bold text-xl">DNA</span>
+          <Link href={`/${locale}`} className="flex items-center justify-center mb-4">
+            <Image 
+              src="/logo.png" 
+              alt="DNA Logo" 
+              width={60} 
+              height={60}
+              className="h-15 w-15 object-contain"
+            />
           </Link>
           <CardTitle className="text-2xl">{dictionary.auth.forgotPassword}</CardTitle>
           <CardDescription>

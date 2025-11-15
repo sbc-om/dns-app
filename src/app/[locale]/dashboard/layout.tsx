@@ -3,11 +3,10 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { getDictionary } from '@/lib/i18n/getDictionary';
 import { Locale, localeDirections } from '@/config/i18n';
-import { DashboardSidebar } from '@/components/DashboardSidebar';
-import { DashboardHeader } from '@/components/DashboardHeader';
 import { getUserAccessibleResources } from '@/lib/access-control/checkAccess';
 import { jwtVerify } from 'jose';
 import { findUserById } from '@/lib/db/repositories/userRepository';
+import { DashboardLayoutClient } from '@/components/DashboardLayoutClient';
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'default-secret-change-in-production'
@@ -61,23 +60,14 @@ export default async function DashboardLayout({
   };
 
   return (
-    <div className="flex h-screen" dir={direction}>
-      <DashboardSidebar
-        dictionary={dictionary}
-        accessibleResources={accessibleResources}
-        locale={locale}
-      />
-
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <DashboardHeader
-          dictionary={dictionary}
-          user={headerUser}
-        />
-
-        <main className="flex-1 overflow-y-auto p-6 bg-background">
-          {children}
-        </main>
-      </div>
-    </div>
+    <DashboardLayoutClient
+      dictionary={dictionary}
+      user={headerUser}
+      accessibleResources={accessibleResources}
+      locale={locale}
+      direction={direction}
+    >
+      {children}
+    </DashboardLayoutClient>
   );
 }

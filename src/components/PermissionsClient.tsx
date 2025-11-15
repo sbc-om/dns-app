@@ -25,8 +25,10 @@ export function PermissionsClient({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{dictionary.permissions.title}</h1>
-          <p className="text-muted-foreground mt-2">{dictionary.permissions.permissionList}</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            {dictionary.permissions.title}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">{dictionary.permissions.permissionList}</p>
         </div>
       </div>
 

@@ -24,13 +24,20 @@ export default async function HomePage({ params }: PageProps) {
           <div className="max-w-5xl mx-auto space-y-8 md:space-y-12 py-8">
             {/* Logo/Brand */}
             <div className="flex justify-center mb-8">
-              <div className="text-8xl md:text-9xl font-black bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#E8A12D] bg-clip-text text-transparent drop-shadow-2xl">
-                {dictionary.pages.home.hero.title}
-              </div>
+              <img 
+                src="/logo.png" 
+                alt={dictionary.pages.home.hero.title}
+                className="w-48 h-48 md:w-64 md:h-64 object-contain drop-shadow-2xl"
+              />
             </div>
             
+            {/* Title */}
+            {/* <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#E8A12D] bg-clip-text text-transparent">
+              {dictionary.pages.home.hero.title}
+            </h1> */}
+            
             {/* Slogan */}
-            <p className="text-3xl md:text-5xl text-muted-foreground font-bold">
+            <p className="text-2xl md:text-4xl text-muted-foreground font-bold">
               {dictionary.pages.home.hero.subtitle}
             </p>
             

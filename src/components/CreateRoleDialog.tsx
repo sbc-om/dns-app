@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dictionary } from '@/lib/i18n/getDictionary';
+import { Plus } from 'lucide-react';
 
 export interface RoleFormData {
   name: string;
@@ -77,7 +78,10 @@ export function CreateRoleDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>{dictionary.roles.createRole}</Button>
+        <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg">
+          <Plus className="mr-2 h-4 w-4" />
+          {dictionary.roles.createRole}
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>

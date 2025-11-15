@@ -46,6 +46,20 @@ export const BUILT_IN_RESOURCES: ResourceRegistration[] = [
     defaultActions: ['read'],
   },
   {
+    key: 'dashboard.schedules',
+    type: 'module',
+    displayNameKey: 'nav.schedules',
+    defaultActions: ['read', 'write', 'manage'],
+    parentKey: 'dashboard',
+  },
+  {
+    key: 'dashboard.appointments',
+    type: 'module',
+    displayNameKey: 'nav.appointments',
+    defaultActions: ['read', 'write', 'manage'],
+    parentKey: 'dashboard',
+  },
+  {
     key: 'dashboard.users',
     type: 'module',
     displayNameKey: 'resources.users',

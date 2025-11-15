@@ -43,10 +43,12 @@ export function RolesClient({ dictionary, initialRoles, resources }: RolesClient
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">{dictionary.roles.title}</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            {dictionary.roles.title}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
             Manage roles and assign permissions to control access
           </p>
         </div>
@@ -57,7 +59,7 @@ export function RolesClient({ dictionary, initialRoles, resources }: RolesClient
         />
       </div>
 
-      <Card className="p-6">
+      <Card className="p-6 shadow-xl border-0 bg-white/80 backdrop-blur-lg dark:bg-gray-900/80">
         <RolesTable
           dictionary={dictionary}
           roles={roles}
