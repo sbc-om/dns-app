@@ -33,18 +33,27 @@
     "resources": "الموارد"
   },
   "auth": {
+    "login": "تسجيل الدخول",
+    "register": "التسجيل",
     "loginTitle": "تسجيل الدخول إلى حسابك",
     "signupTitle": "إنشاء حساب جديد",
     "emailPlaceholder": "أدخل بريدك الإلكتروني",
     "passwordPlaceholder": "أدخل كلمة المرور",
-    "usernamePlaceholder": "اختر اسم مستخدم",
+    "usernamePlaceholder": "اختر اسم المستخدم",
     "fullNamePlaceholder": "أدخل اسمك الكامل",
-    "phoneNumberPlaceholder": "أدخل رقم هاتفك",
+    "phoneNumberPlaceholder": "أدخل رقم الهاتف",
     "loginButton": "تسجيل الدخول",
-    "signupButton": "إنشاء حساب",
+    "signupButton": "التسجيل",
     "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
     "dontHaveAccount": "ليس لديك حساب؟",
-    "forgotPassword": "نسيت كلمة المرور؟"
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "emailSent": "تم إرسال البريد الإلكتروني",
+    "resetEmailSent": "لقد أرسلنا رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد.",
+    "backToLogin": "العودة إلى تسجيل الدخول",
+    "resetPasswordDescription": "أدخل عنوان بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.",
+    "sendResetLink": "إرسال رابط إعادة التعيين",
+    "registerDescription": "إنشاء حساب جديد للبدء",
+    "createAccount": "إنشاء حساب"
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -89,5 +98,77 @@
     "notFound": "المورد المطلوب غير موجود",
     "serverError": "حدث خطأ في الخادم",
     "validationError": "يرجى التحقق من المدخلات والمحاولة مرة أخرى"
+  },
+  "pages": {
+    "home": {
+      "hero": {
+        "title": "مرحباً بك في تطبيق DNA",
+        "subtitle": "تطبيق ويب قوي مع نظام تحكم ديناميكي في الوصول ودعم متعدد اللغات وتقنيات حديثة",
+        "cta": "ابدأ الآن",
+        "loginCta": "تسجيل الدخول إلى لوحة التحكم"
+      },
+      "features": {
+        "title": "الميزات الرئيسية",
+        "subtitle": "كل ما تحتاجه لتطبيق ويب حديث",
+        "userManagement": {
+          "title": "إدارة المستخدمين",
+          "description": "نظام إدارة مستخدمين شامل مع الأدوار والصلاحيات"
+        },
+        "accessControl": {
+          "title": "التحكم الديناميكي في الوصول",
+          "description": "نظام صلاحيات دقيق للوصول الآمن للموارد"
+        },
+        "multilingual": {
+          "title": "دعم متعدد اللغات",
+          "description": "تدويل مدمج مع دعم الكتابة من اليمين إلى اليسار"
+        },
+        "modernTech": {
+          "title": "تقنية حديثة",
+          "description": "مبني بـ Next.js و TypeScript و LMDB للأداء الأمثل"
+        }
+      }
+    },
+    "about": {
+      "title": "حول تطبيق DNA",
+      "subtitle": "تعرف على المزيد حول مهمتنا وتقنيتنا",
+      "mission": {
+        "title": "مهمتنا",
+        "description": "توفير منصة تطبيق ويب شاملة وآمنة وسهلة الاستخدام تنمو مع احتياجاتك."
+      },
+      "technology": {
+        "title": "مجموعة التقنيات",
+        "description": "مبني بأحدث التقنيات للأداء والأمان وسهولة الصيانة."
+      }
+    },
+    "contact": {
+      "title": "اتصل بنا",
+      "subtitle": "تواصل مع فريقنا",
+      "form": {
+        "name": "الاسم",
+        "email": "البريد الإلكتروني",
+        "message": "الرسالة",
+        "namePlaceholder": "اسمك",
+        "emailPlaceholder": "your.email@example.com",
+        "messagePlaceholder": "رسالتك...",
+        "submit": "إرسال الرسالة",
+        "success": "شكراً لك! تم إرسال رسالتك.",
+        "error": "عذراً، حدث خطأ في إرسال رسالتك."
+      },
+      "info": {
+        "title": "معلومات الاتصال",
+        "email": "البريد الإلكتروني: contact@dnawebapp.com",
+        "phone": "الهاتف: +1 (555) 123-4567"
+      }
+    }
+  },
+  "footer": {
+    "description": "تطبيق ويب حديث مع نظام تحكم ديناميكي في الوصول ودعم التدويل.",
+    "quickLinks": "روابط سريعة",
+    "contact": "اتصل بنا",
+    "legal": "قانوني",
+    "privacy": "سياسة الخصوصية",
+    "terms": "شروط الخدمة",
+    "rights": "جميع الحقوق محفوظة.",
+    "copyright": "© {year} DNA Web App. جميع الحقوق محفوظة."
   }
 }

@@ -33,6 +33,8 @@
     "resources": "Resources"
   },
   "auth": {
+    "login": "Login",
+    "register": "Register",
     "loginTitle": "Login to your account",
     "signupTitle": "Create a new account",
     "emailPlaceholder": "Enter your email",
@@ -44,7 +46,14 @@
     "signupButton": "Sign up",
     "alreadyHaveAccount": "Already have an account?",
     "dontHaveAccount": "Don't have an account?",
-    "forgotPassword": "Forgot password?"
+    "forgotPassword": "Forgot password?",
+    "emailSent": "Email Sent",
+    "resetEmailSent": "We've sent a password reset link to your email address. Please check your inbox.",
+    "backToLogin": "Back to Login",
+    "resetPasswordDescription": "Enter your email address and we will send you a link to reset your password.",
+    "sendResetLink": "Send Reset Link",
+    "registerDescription": "Create a new account to get started",
+    "createAccount": "Create Account"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -89,5 +98,77 @@
     "notFound": "The requested resource was not found",
     "serverError": "An error occurred on the server",
     "validationError": "Please check your input and try again"
+  },
+  "pages": {
+    "home": {
+      "hero": {
+        "title": "Welcome to DNA Web App",
+        "subtitle": "A powerful web application with dynamic access control, multi-language support, and modern technology stack",
+        "cta": "Get Started",
+        "loginCta": "Login to Dashboard"
+      },
+      "features": {
+        "title": "Key Features",
+        "subtitle": "Everything you need for a modern web application",
+        "userManagement": {
+          "title": "User Management",
+          "description": "Complete user management system with roles and permissions"
+        },
+        "accessControl": {
+          "title": "Dynamic Access Control",
+          "description": "Fine-grained permissions system for secure resource access"
+        },
+        "multilingual": {
+          "title": "Multi-language Support",
+          "description": "Built-in internationalization with RTL support"
+        },
+        "modernTech": {
+          "title": "Modern Technology",
+          "description": "Built with Next.js, TypeScript, and LMDB for optimal performance"
+        }
+      }
+    },
+    "about": {
+      "title": "About DNA Web App",
+      "subtitle": "Learn more about our mission and technology",
+      "mission": {
+        "title": "Our Mission",
+        "description": "To provide a comprehensive, secure, and user-friendly web application platform that scales with your needs."
+      },
+      "technology": {
+        "title": "Technology Stack",
+        "description": "Built with cutting-edge technologies for performance, security, and maintainability."
+      }
+    },
+    "contact": {
+      "title": "Contact Us",
+      "subtitle": "Get in touch with our team",
+      "form": {
+        "name": "Name",
+        "email": "Email",
+        "message": "Message",
+        "namePlaceholder": "Your name",
+        "emailPlaceholder": "your.email@example.com",
+        "messagePlaceholder": "Your message...",
+        "submit": "Send Message",
+        "success": "Thank you! Your message has been sent.",
+        "error": "Sorry, there was an error sending your message."
+      },
+      "info": {
+        "title": "Contact Information",
+        "email": "Email: contact@dnawebapp.com",
+        "phone": "Phone: +1 (555) 123-4567"
+      }
+    }
+  },
+  "footer": {
+    "description": "A modern web application with dynamic access control and internationalization support.",
+    "quickLinks": "Quick Links",
+    "contact": "Contact",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "rights": "All rights reserved.",
+    "copyright": "© {year} DNA Web App. All rights reserved."
   }
 }
