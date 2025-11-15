@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { getDictionary } from '@/lib/i18n/getDictionary';
 import { Locale, localeDirections } from '@/config/i18n';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 
 export default async function LocaleLayout({
   children,
@@ -16,6 +17,7 @@ export default async function LocaleLayout({
   return (
     <div dir={direction}>
       {children}
+      <PWAInstallPrompt />
     </div>
   );
 }
