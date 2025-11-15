@@ -126,15 +126,15 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
 
   const AppointmentCard = ({ appointment }: { appointment: Appointment }) => (
     <Card
-      className="border-2 border-purple-200 dark:border-purple-700 rounded-3xl overflow-hidden hover:shadow-xl transition-all cursor-pointer"
+      className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer"
       onClick={() => {
         setSelectedAppointment(appointment);
         setDetailsOpen(true);
       }}
     >
-      <CardHeader className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/50 dark:to-pink-900/50 pb-3">
+      <CardHeader className="bg-white dark:bg-gray-950 pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-bold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+          <CardTitle className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <User className="h-5 w-5" />
             {appointment.fullName}
           </CardTitle>
@@ -142,7 +142,7 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
         </div>
       </CardHeader>
       <CardContent className="pt-4 space-y-3">
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
           <Calendar className="h-4 w-4" />
           {new Date(appointment.appointmentDate).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
             weekday: 'short',
@@ -151,15 +151,15 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
             day: 'numeric',
           })}
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
           <Clock className="h-4 w-4" />
           {appointment.appointmentTime}
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
           <Mail className="h-4 w-4" />
           {appointment.email}
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
           <Phone className="h-4 w-4" />
           {appointment.mobileNumber}
         </div>
@@ -171,7 +171,7 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           {dictionary.nav.appointments}
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -181,7 +181,7 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 rounded-2xl p-1 bg-purple-100 dark:bg-purple-900/30">
+        <TabsList className="grid w-full grid-cols-4 rounded-xl p-1 bg-gray-100 dark:bg-gray-800">
           <TabsTrigger value="pending" className="rounded-xl">
             {dictionary.appointment.pending} ({filterAppointments('pending').length})
           </TabsTrigger>
@@ -234,14 +234,14 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
 
       {/* Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="sm:max-w-[500px] rounded-3xl">
+        <DialogContent className="sm:max-w-[560px] rounded-xl">
           {selectedAppointment && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-purple-800 dark:text-purple-200">
+                <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
                   {dictionary.appointment.appointmentDetails}
                 </DialogTitle>
-                <DialogDescription>
+                <DialogDescription className="mt-2">
                   {getStatusBadge(selectedAppointment.status)}
                 </DialogDescription>
               </DialogHeader>
@@ -250,7 +250,7 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
                   <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
                     {dictionary.appointment.fullName}
                   </p>
-                  <p className="text-lg font-bold text-purple-800 dark:text-purple-200">
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
                     {selectedAppointment.fullName}
                   </p>
                 </div>
@@ -259,7 +259,7 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
                     <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
                       {dictionary.appointment.email}
                     </p>
-                    <p className="text-sm text-purple-800 dark:text-purple-200">
+                    <p className="text-sm text-gray-900 dark:text-white">
                       {selectedAppointment.email}
                     </p>
                   </div>
@@ -267,7 +267,7 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
                     <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
                       {dictionary.appointment.mobileNumber}
                     </p>
-                    <p className="text-sm text-purple-800 dark:text-purple-200">
+                    <p className="text-sm text-gray-900 dark:text-white">
                       {selectedAppointment.mobileNumber}
                     </p>
                   </div>
@@ -277,7 +277,7 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
                     <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
                       {dictionary.appointment.appointmentDate}
                     </p>
-                    <p className="text-sm text-purple-800 dark:text-purple-200">
+                    <p className="text-sm text-gray-900 dark:text-white">
                       {new Date(selectedAppointment.appointmentDate).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US')}
                     </p>
                   </div>
@@ -285,21 +285,21 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
                     <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
                       {dictionary.appointment.appointmentTime}
                     </p>
-                    <p className="text-sm text-purple-800 dark:text-purple-200">
+                    <p className="text-sm text-gray-900 dark:text-white">
                       {selectedAppointment.appointmentTime}
                     </p>
                   </div>
                 </div>
               </div>
-              <DialogFooter className="flex flex-col gap-2">
+              <DialogFooter className="mt-2">
                 {selectedAppointment.status === 'pending' && (
-                  <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
                     <Button
                       onClick={() => {
                         handleStatusUpdate(selectedAppointment.id, 'confirmed');
                         setDetailsOpen(false);
                       }}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
+                      className="w-full bg-[#30B2D2] hover:bg-[#2799B5] text-white font-semibold"
                     >
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Confirm Appointment
@@ -310,24 +310,26 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
                         handleStatusUpdate(selectedAppointment.id, 'cancelled');
                         setDetailsOpen(false);
                       }}
-                      className="w-full rounded-xl"
+                      className="w-full font-semibold"
                     >
                       <XCircle className="h-4 w-4 mr-2" />
                       Cancel Appointment
                     </Button>
-                  </>
+                  </div>
                 )}
                 {selectedAppointment.status === 'confirmed' && (
-                  <Button
-                    onClick={() => {
-                      handleRegisterUser(selectedAppointment);
-                      setDetailsOpen(false);
-                    }}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl"
-                  >
-                    <Users className="h-4 w-4 mr-2" />
-                    {dictionary.appointment.createAccounts}
-                  </Button>
+                  <div className="w-full">
+                    <Button
+                      onClick={() => {
+                        handleRegisterUser(selectedAppointment);
+                        setDetailsOpen(false);
+                      }}
+                      className="w-full bg-[#F2574C] hover:bg-[#D84B40] text-white font-semibold"
+                    >
+                      <Users className="h-4 w-4 mr-2" />
+                      {dictionary.appointment.createAccounts}
+                    </Button>
+                  </div>
                 )}
               </DialogFooter>
             </>
