@@ -1,0 +1,93 @@
+{
+  "common": {
+    "appName": "تطبيق DNA",
+    "welcome": "مرحباً",
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "signup": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "username": "اسم المستخدم",
+    "fullName": "الاسم الكامل",
+    "phoneNumber": "رقم الهاتف",
+    "submit": "إرسال",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "search": "بحث",
+    "actions": "الإجراءات",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "about": "عن البرنامج",
+    "contact": "اتصل بنا",
+    "dashboard": "لوحة التحكم",
+    "users": "المستخدمون",
+    "roles": "الأدوار",
+    "permissions": "الصلاحيات",
+    "resources": "الموارد"
+  },
+  "auth": {
+    "loginTitle": "تسجيل الدخول إلى حسابك",
+    "signupTitle": "إنشاء حساب جديد",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "passwordPlaceholder": "أدخل كلمة المرور",
+    "usernamePlaceholder": "اختر اسم مستخدم",
+    "fullNamePlaceholder": "أدخل اسمك الكامل",
+    "phoneNumberPlaceholder": "أدخل رقم هاتفك",
+    "loginButton": "تسجيل الدخول",
+    "signupButton": "إنشاء حساب",
+    "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+    "dontHaveAccount": "ليس لديك حساب؟",
+    "forgotPassword": "نسيت كلمة المرور؟"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcomeMessage": "مرحباً بك في لوحة التحكم"
+  },
+  "users": {
+    "title": "المستخدمون",
+    "createUser": "إنشاء مستخدم",
+    "editUser": "تعديل مستخدم",
+    "deleteUser": "حذف مستخدم",
+    "userDetails": "تفاصيل المستخدم",
+    "noUsers": "لا يوجد مستخدمون"
+  },
+  "roles": {
+    "title": "الأدوار",
+    "createRole": "إنشاء دور",
+    "editRole": "تعديل دور",
+    "deleteRole": "حذف دور",
+    "roleDetails": "تفاصيل الدور",
+    "noRoles": "لا يوجد أدوار",
+    "roleName": "اسم الدور",
+    "description": "الوصف",
+    "permissions": "الصلاحيات",
+    "assignPermissions": "تعيين الصلاحيات"
+  },
+  "resources": {
+    "dashboard": "لوحة التحكم",
+    "users": "إدارة المستخدمين",
+    "roles": "إدارة الأدوار",
+    "resources": "إدارة الموارد",
+    "permissions": "إدارة الصلاحيات"
+  },
+  "permissions": {
+    "read": "قراءة",
+    "write": "كتابة",
+    "manage": "إدارة",
+    "delete": "حذف",
+    "create": "إنشاء"
+  },
+  "errors": {
+    "unauthorized": "ليس لديك صلاحية لتنفيذ هذا الإجراء",
+    "notFound": "المورد المطلوب غير موجود",
+    "serverError": "حدث خطأ في الخادم",
+    "validationError": "يرجى التحقق من المدخلات والمحاولة مرة أخرى"
+  }
+}

@@ -1,7 +1,3 @@
-Here’s a complete `copilot-instructions.md` you can put in the root of your project:
-
----
-
 # Copilot Instructions – DNA Web App
 
 You are helping build a **modular, bilingual web application** using **Next.js 16**, **LMDB** as the database, and **shadcn/ui** for the UI.
@@ -11,6 +7,8 @@ The project has:
 * A **public landing area** (Home, About, Contact, etc.).
 * An **authenticated panel/dashboard** area.
 * A **dynamic access control system** where permissions can be assigned to users and groups for any resource created in the app.
+
+**ALL code, comments, variable names, function names, and documentation MUST be in English.**
 
 > Important: **Do not use Persian or Arabic text in the codebase.**
 > All code (identifiers, comments, strings in code) must be in English.

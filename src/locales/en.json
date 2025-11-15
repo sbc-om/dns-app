@@ -1,0 +1,93 @@
+{
+  "common": {
+    "appName": "DNA Web App",
+    "welcome": "Welcome",
+    "login": "Login",
+    "logout": "Logout",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "username": "Username",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "actions": "Actions",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "roles": "Roles",
+    "permissions": "Permissions",
+    "resources": "Resources"
+  },
+  "auth": {
+    "loginTitle": "Login to your account",
+    "signupTitle": "Create a new account",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "usernamePlaceholder": "Choose a username",
+    "fullNamePlaceholder": "Enter your full name",
+    "phoneNumberPlaceholder": "Enter your phone number",
+    "loginButton": "Log in",
+    "signupButton": "Sign up",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "forgotPassword": "Forgot password?"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcomeMessage": "Welcome to your dashboard"
+  },
+  "users": {
+    "title": "Users",
+    "createUser": "Create User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User",
+    "userDetails": "User Details",
+    "noUsers": "No users found"
+  },
+  "roles": {
+    "title": "Roles",
+    "createRole": "Create Role",
+    "editRole": "Edit Role",
+    "deleteRole": "Delete Role",
+    "roleDetails": "Role Details",
+    "noRoles": "No roles found",
+    "roleName": "Role Name",
+    "description": "Description",
+    "permissions": "Permissions",
+    "assignPermissions": "Assign Permissions"
+  },
+  "resources": {
+    "dashboard": "Dashboard",
+    "users": "Users Management",
+    "roles": "Roles Management",
+    "resources": "Resources Management",
+    "permissions": "Permissions Management"
+  },
+  "permissions": {
+    "read": "Read",
+    "write": "Write",
+    "manage": "Manage",
+    "delete": "Delete",
+    "create": "Create"
+  },
+  "errors": {
+    "unauthorized": "You are not authorized to perform this action",
+    "notFound": "The requested resource was not found",
+    "serverError": "An error occurred on the server",
+    "validationError": "Please check your input and try again"
+  }
+}
