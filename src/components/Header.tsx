@@ -17,59 +17,33 @@ interface HeaderProps {
 export function Header({ dictionary, locale }: HeaderProps) {
   const pathname = usePathname();
 
-  const navItems = [
-    { href: `/${locale}`, label: dictionary.nav.home },
-    { href: `/${locale}/about`, label: dictionary.nav.about },
-    { href: `/${locale}/contact`, label: dictionary.nav.contact },
-  ];
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-20 items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-24 items-center justify-between">
         {/* Logo */}
         <Link href={`/${locale}`} className="flex items-center space-x-3">
-          <div className="text-4xl font-black bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#E8A12D] bg-clip-text text-transparent">
+          <div className="text-5xl md:text-6xl font-black bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#E8A12D] bg-clip-text text-transparent">
             DNA
           </div>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`text-base font-medium transition-colors hover:text-primary ${
-                pathname === item.href
-                  ? 'text-primary'
-                  : 'text-muted-foreground'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-4">
+          <Link href={`/${locale}/notifications`}>
+            <Button variant="ghost" size="lg" className="relative p-6">
+              <Bell className="text-[#F2574C]" style={{ width: '36px', height: '36px' }} />
+            </Button>
+          </Link>
           <LanguageSwitcher />
-          <Link href={`/${locale}/auth/login`}>
-            <Button variant="ghost" size="sm" className="text-base">
-              {dictionary.auth.login}
-            </Button>
-          </Link>
-          <Link href={`/${locale}/auth/register`}>
-            <Button size="sm" className="bg-[#F2574C] hover:bg-[#F2574C]/90 text-base">
-              {dictionary.auth.register}
-            </Button>
-          </Link>
         </div>
 
         {/* Mobile Actions */}
         <div className="flex md:hidden items-center space-x-3">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-          </Button>
+          <Link href={`/${locale}/notifications`}>
+            <Button variant="ghost" size="lg" className="relative p-6">
+              <Bell className="text-[#F2574C]" style={{ width: '36px', height: '36px' }} />
+            </Button>
+          </Link>
           <LanguageSwitcher />
         </div>
       </div>

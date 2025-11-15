@@ -41,8 +41,8 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9">
-          <Globe className="h-4 w-4" />
+        <Button variant="ghost" size="lg" className="p-6">
+          <Globe className="text-[#30B2D2]" style={{ width: '36px', height: '36px' }} />
           <span className="sr-only">Switch language</span>
         </Button>
       </DropdownMenuTrigger>

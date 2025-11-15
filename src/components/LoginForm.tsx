@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Mail, Lock, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
-import Link from 'next/link';
 
 interface LoginFormProps {
   dictionary: Dictionary;
@@ -70,47 +70,67 @@ export function LoginForm({ dictionary, locale }: LoginFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">{dictionary.common.email}</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder={dictionary.auth.emailPlaceholder}
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          required
-        />
+        <Label htmlFor="email" className="text-sm font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+          <Mail className="w-4 h-4 text-pink-500" />
+          {dictionary.common.email}
+        </Label>
+        <div className="relative">
+          <Input
+            id="email"
+            type="email"
+            placeholder={dictionary.auth.emailPlaceholder}
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            required
+            className="h-11 text-base rounded-xl border-2 border-purple-300 dark:border-purple-600 focus:border-pink-400 dark:focus:border-pink-500 focus:ring-2 focus:ring-pink-200 dark:focus:ring-pink-900/50 pl-10 transition-all"
+          />
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400" />
+        </div>
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">{dictionary.common.password}</Label>
-          <Link
-            href={`/${locale}/auth/forgot-password`}
-            className="text-sm text-primary hover:underline"
-          >
-            {dictionary.auth.forgotPassword}
-          </Link>
+        <Label htmlFor="password" className="text-sm font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2">
+          <Lock className="w-4 h-4 text-pink-500" />
+          {dictionary.common.password}
+        </Label>
+        <div className="relative">
+          <Input
+            id="password"
+            type="password"
+            placeholder={dictionary.auth.passwordPlaceholder}
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            required
+            className="h-11 text-base rounded-xl border-2 border-purple-300 dark:border-purple-600 focus:border-pink-400 dark:focus:border-pink-500 focus:ring-2 focus:ring-pink-200 dark:focus:ring-pink-900/50 pl-10 transition-all"
+          />
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400" />
         </div>
-        <Input
-          id="password"
-          type="password"
-          placeholder={dictionary.auth.passwordPlaceholder}
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          required
-        />
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-          <p className="text-red-800 dark:text-red-200 text-sm">{error}</p>
+        <div className="p-3 bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-700 rounded-xl animate-shake">
+          <p className="text-red-800 dark:text-red-200 text-sm font-semibold text-center">{error}</p>
         </div>
       )}
 
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? dictionary.common.loading : dictionary.auth.loginButton}
+      <Button 
+        type="submit" 
+        className="w-full h-11 text-base font-bold rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl transition-all" 
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? (
+          <span className="flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            {dictionary.common.loading}
+          </span>
+        ) : (
+          <span className="flex items-center gap-2">
+            <LogIn className="w-5 h-5" />
+            {dictionary.auth.loginButton}
+          </span>
+        )}
       </Button>
     </form>
   );

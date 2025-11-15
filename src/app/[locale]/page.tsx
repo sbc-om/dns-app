@@ -18,7 +18,7 @@ export default async function HomePage({ params }: PageProps) {
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Header dictionary={dictionary} locale={locale} />
       
-      <main className="flex-1 bg-gradient-to-br from-[#F2574C]/10 via-[#30B2D2]/10 to-[#E8A12D]/10 overflow-y-auto">
+      <main className="flex-1 bg-gradient-to-br from-[#F2574C]/10 via-[#30B2D2]/10 to-[#E8A12D]/10 overflow-y-auto pb-20 md:pb-0">
         {/* Hero Section */}
         <section className="w-full h-full flex items-center justify-center px-4 text-center">
           <div className="max-w-5xl mx-auto space-y-8 md:space-y-12 py-8">
@@ -34,7 +34,8 @@ export default async function HomePage({ params }: PageProps) {
               {dictionary.pages.home.hero.subtitle}
             </p>
             
-            <div className="flex flex-row gap-4 md:gap-6 justify-center items-center pt-8 flex-wrap">
+            {/* Desktop Buttons */}
+            <div className="hidden md:flex flex-row gap-4 md:gap-6 justify-center items-center pt-8 flex-wrap">
               <Link href={`/${locale}/auth/register`}>
                 <Button size="lg" className="bg-[#F2574C] hover:bg-[#F2574C]/90 text-white px-8 md:px-12 py-6 md:py-8 text-lg md:text-xl rounded-full shadow-xl hover:shadow-2xl transition-all">
                   {dictionary.pages.home.hero.cta}
@@ -49,6 +50,22 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 md:hidden bg-background border-t shadow-lg z-50">
+        <div className="flex gap-3 p-4">
+          <Link href={`/${locale}/auth/register`} className="flex-1">
+            <Button size="lg" className="w-full bg-[#F2574C] hover:bg-[#F2574C]/90 text-white py-6 text-base rounded-lg shadow-lg">
+              {dictionary.pages.home.hero.cta}
+            </Button>
+          </Link>
+          <Link href={`/${locale}/auth/login`} className="flex-1">
+            <Button size="lg" className="w-full bg-[#30B2D2] hover:bg-[#30B2D2]/90 text-white py-6 text-base rounded-lg shadow-lg">
+              {dictionary.pages.home.hero.loginCta}
+            </Button>
+          </Link>
+        </div>
+      </div>
 
       <Footer dictionary={dictionary} locale={locale} />
     </div>

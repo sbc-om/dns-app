@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { User, AtSign, Mail, Phone, Lock, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,74 +45,123 @@ export function RegisterForm({ dictionary, locale }: RegisterFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="fullName">{dictionary.common.fullName}</Label>
-        <Input
-          id="fullName"
-          type="text"
-          placeholder={dictionary.auth.fullNamePlaceholder}
-          value={formData.fullName}
-          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-          required
-        />
+        <Label htmlFor="fullName" className="text-base font-bold text-blue-800 dark:text-blue-200 flex items-center gap-2">
+          <User className="w-5 h-5 text-purple-500" />
+          {dictionary.common.fullName}
+        </Label>
+        <div className="relative">
+          <Input
+            id="fullName"
+            type="text"
+            placeholder={dictionary.auth.fullNamePlaceholder}
+            value={formData.fullName}
+            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+            required
+            className="h-12 text-base rounded-2xl border-3 border-blue-300 dark:border-blue-600 focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-200 dark:focus:ring-purple-900/50 pl-11 font-medium transition-all"
+          />
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
+        </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="username">{dictionary.common.username}</Label>
-        <Input
-          id="username"
-          type="text"
-          placeholder={dictionary.auth.usernamePlaceholder}
-          value={formData.username}
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-          required
-        />
+        <Label htmlFor="username" className="text-base font-bold text-blue-800 dark:text-blue-200 flex items-center gap-2">
+          <AtSign className="w-5 h-5 text-purple-500" />
+          {dictionary.common.username}
+        </Label>
+        <div className="relative">
+          <Input
+            id="username"
+            type="text"
+            placeholder={dictionary.auth.usernamePlaceholder}
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            required
+            className="h-12 text-base rounded-2xl border-3 border-blue-300 dark:border-blue-600 focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-200 dark:focus:ring-purple-900/50 pl-11 font-medium transition-all"
+          />
+          <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
+        </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">{dictionary.common.email}</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder={dictionary.auth.emailPlaceholder}
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          required
-        />
+        <Label htmlFor="email" className="text-base font-bold text-blue-800 dark:text-blue-200 flex items-center gap-2">
+          <Mail className="w-5 h-5 text-purple-500" />
+          {dictionary.common.email}
+        </Label>
+        <div className="relative">
+          <Input
+            id="email"
+            type="email"
+            placeholder={dictionary.auth.emailPlaceholder}
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            required
+            className="h-12 text-base rounded-2xl border-3 border-blue-300 dark:border-blue-600 focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-200 dark:focus:ring-purple-900/50 pl-11 font-medium transition-all"
+          />
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
+        </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phoneNumber">{dictionary.common.phoneNumber}</Label>
-        <Input
-          id="phoneNumber"
-          type="tel"
-          placeholder={dictionary.auth.phoneNumberPlaceholder}
-          value={formData.phoneNumber}
-          onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-        />
+        <Label htmlFor="phoneNumber" className="text-base font-bold text-blue-800 dark:text-blue-200 flex items-center gap-2">
+          <Phone className="w-5 h-5 text-purple-500" />
+          {dictionary.common.phoneNumber}
+        </Label>
+        <div className="relative">
+          <Input
+            id="phoneNumber"
+            type="tel"
+            placeholder={dictionary.auth.phoneNumberPlaceholder}
+            value={formData.phoneNumber}
+            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+            className="h-12 text-base rounded-2xl border-3 border-blue-300 dark:border-blue-600 focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-200 dark:focus:ring-purple-900/50 pl-11 font-medium transition-all"
+          />
+          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
+        </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">{dictionary.common.password}</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder={dictionary.auth.passwordPlaceholder}
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          required
-        />
+        <Label htmlFor="password" className="text-base font-bold text-blue-800 dark:text-blue-200 flex items-center gap-2">
+          <Lock className="w-5 h-5 text-purple-500" />
+          {dictionary.common.password}
+        </Label>
+        <div className="relative">
+          <Input
+            id="password"
+            type="password"
+            placeholder={dictionary.auth.passwordPlaceholder}
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            required
+            className="h-12 text-base rounded-2xl border-3 border-blue-300 dark:border-blue-600 focus:border-purple-400 dark:focus:border-purple-500 focus:ring-4 focus:ring-purple-200 dark:focus:ring-purple-900/50 pl-11 font-medium transition-all"
+          />
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
+        </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-          <p className="text-red-800 dark:text-red-200 text-sm">{error}</p>
+        <div className="p-4 bg-red-100 dark:bg-red-900/30 border-3 border-red-300 dark:border-red-700 rounded-2xl animate-shake">
+          <p className="text-red-800 dark:text-red-200 text-sm font-bold text-center">😞 {error}</p>
         </div>
       )}
 
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? dictionary.common.loading : dictionary.auth.signupButton}
+      <Button 
+        type="submit" 
+        className="w-full h-14 text-lg font-black rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95" 
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? (
+          <span className="flex items-center gap-2">
+            <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
+            {dictionary.common.loading}
+          </span>
+        ) : (
+          <span className="flex items-center gap-2">
+            <UserPlus className="w-6 h-6" />
+            {dictionary.auth.signupButton}
+          </span>
+        )}
       </Button>
     </form>
   );

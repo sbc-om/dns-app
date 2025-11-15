@@ -16,54 +16,56 @@ interface LoginPageClientProps {
 
 export default function LoginPageClient({ dictionary, locale }: LoginPageClientProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 dark:from-purple-950 dark:via-pink-950 dark:to-blue-950">
       <div className="w-full max-w-md">
         <Link 
           href={`/${locale}`}
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium text-purple-700 dark:text-purple-300 hover:text-purple-900 dark:hover:text-purple-100 mb-6 transition-all hover:gap-3"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-5 w-5" />
           {dictionary.nav.home}
         </Link>
         
-        <Card className="w-full">
-          <CardHeader className="text-center">
-            <Link href={`/${locale}`} className="flex items-center justify-center space-x-2 mb-4">
+        <Card className="w-full shadow-2xl border-3 border-purple-200 dark:border-purple-700 rounded-3xl overflow-hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur">
+          <CardHeader className="text-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/50 dark:to-pink-900/50 py-6">
+            <Link href={`/${locale}`} className="flex items-center justify-center space-x-3 mb-3">
               <Image 
                 src="/logo.png" 
                 alt="DNA Logo" 
-                width={32} 
-                height={32}
-                className="h-8 w-8"
+                width={36} 
+                height={36}
+                className="h-9 w-9"
               />
-              <span className="font-bold text-xl">DNA</span>
+              <span className="font-black text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">DNA</span>
             </Link>
-            <CardTitle className="text-2xl">{dictionary.auth.loginTitle}</CardTitle>
-            <CardDescription>
-              Enter your credentials to access your account
+            <CardTitle className="text-2xl font-bold text-purple-800 dark:text-purple-200">
+              {dictionary.auth.loginTitle}
+            </CardTitle>
+            <CardDescription className="text-sm font-medium text-purple-600 dark:text-purple-400 mt-1">
+              Enter your credentials
             </CardDescription>
           </CardHeader>
           
-          <CardContent>
-            <Suspense fallback={<div>Loading...</div>}>
+          <CardContent className="p-6">
+            <Suspense fallback={<div className="text-center text-purple-600">Loading...</div>}>
               <LoginForm dictionary={dictionary} locale={locale} />
             </Suspense>
 
-            <div className="mt-6 text-center">
+            <div className="mt-4 text-center">
               <Link 
                 href={`/${locale}/auth/forgot-password`}
-                className="text-sm text-muted-foreground hover:text-primary"
+                className="text-sm font-semibold text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 transition-colors"
               >
                 {dictionary.auth.forgotPassword}
               </Link>
             </div>
 
-            <div className="mt-4 text-center">
-              <p className="text-sm text-muted-foreground">
+            <div className="mt-5 text-center p-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-2xl border-2 border-purple-200 dark:border-purple-700">
+              <p className="text-sm font-medium text-purple-800 dark:text-purple-200">
                 {dictionary.auth.dontHaveAccount}{' '}
                 <Link 
                   href={`/${locale}/auth/register`}
-                  className="text-primary hover:underline font-medium"
+                  className="text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 font-bold underline underline-offset-2 transition-colors"
                 >
                   {dictionary.auth.signupButton}
                 </Link>

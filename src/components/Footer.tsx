@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
-import { Github, Twitter, Linkedin } from 'lucide-react';
+import { Instagram, Twitter, Linkedin } from 'lucide-react';
 
 interface FooterProps {
   dictionary: Dictionary;
@@ -14,7 +14,7 @@ export function Footer({ dictionary, locale }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t bg-gradient-to-r from-[#F2574C]/5 via-[#30B2D2]/5 to-[#E8A12D]/5">
+    <footer className="border-t bg-gradient-to-r from-[#F2574C]/5 via-[#30B2D2]/5 to-[#E8A12D]/5 pb-20 md:pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex flex-col items-center space-y-8">
           {/* Logo */}
@@ -49,13 +49,13 @@ export function Footer({ dictionary, locale }: FooterProps) {
           {/* Social Links */}
           <div className="flex space-x-6">
             <a
-              href="https://github.com"
+              href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-[#F2574C] transition-colors"
-              aria-label="GitHub"
+              aria-label="Instagram"
             >
-              <Github className="h-6 w-6" />
+              <Instagram className="h-6 w-6" />
             </a>
             <a
               href="https://twitter.com"
@@ -75,11 +75,6 @@ export function Footer({ dictionary, locale }: FooterProps) {
             >
               <Linkedin className="h-6 w-6" />
             </a>
-          </div>
-
-          {/* Copyright */}
-          <div className="pt-8 border-t w-full text-center">
-            <p className="text-sm text-muted-foreground">{dictionary.footer.copyright.replace('{year}', currentYear.toString())}</p>
           </div>
         </div>
       </div>
