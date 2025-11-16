@@ -29,9 +29,9 @@ export function Header({ dictionary, locale }: HeaderProps) {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-4">
-          <Link href={`/${locale}/notifications`}>
+          <Link href={`/${locale}/dashboard/notifications`}>
             <Button variant="ghost" size="lg" className="relative p-6">
-              <Bell className="text-[#F2574C]" style={{ width: '36px', height: '36px' }} />
+              <Bell className="text-[#F2574C]" style={{ width: '24px', height: '24px' }} />
             </Button>
           </Link>
           <LanguageSwitcher />
@@ -39,9 +39,9 @@ export function Header({ dictionary, locale }: HeaderProps) {
 
         {/* Mobile Actions */}
         <div className="flex md:hidden items-center space-x-3">
-          <Link href={`/${locale}/notifications`}>
+          <Link href={`/${locale}/dashboard/notifications`}>
             <Button variant="ghost" size="lg" className="relative p-6">
-              <Bell className="text-[#F2574C]" style={{ width: '36px', height: '36px' }} />
+              <Bell className="text-[#F2574C]" style={{ width: '24px', height: '24px' }} />
             </Button>
           </Link>
           <LanguageSwitcher />

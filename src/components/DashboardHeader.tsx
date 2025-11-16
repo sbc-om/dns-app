@@ -76,19 +76,16 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
             <span className="sr-only">Toggle menu</span>
           </Button>
 
-          {/* Page Title - Hidden on mobile */}
-          <h1 className="hidden sm:block text-xl font-bold" style={{
-            background: 'linear-gradient(to right, #F2574C, #30B2D2, #E8A12D)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
-          }}>
-            {dictionary.dashboard.title}
-          </h1>
-
-          {/* Logo for mobile */}
-          <div className="sm:hidden h-8 w-8 rounded-lg bg-[#F2574C] flex items-center justify-center text-white font-bold text-sm">
-            DNA
+          {/* Logo & Title */}
+          <div className="flex items-center gap-3">
+            <img 
+              src="/logo.png" 
+              alt="DNA Logo" 
+              className="h-8 w-8 object-contain"
+            />
+            <h1 className="hidden sm:block text-xl font-bold bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#F2574C] bg-clip-text text-transparent">
+              DNA Program
+            </h1>
           </div>
         </div>
 

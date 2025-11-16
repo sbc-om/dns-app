@@ -6,7 +6,6 @@ import { CreateRoleDialog, RoleFormData } from '@/components/CreateRoleDialog';
 import { RolesTable } from '@/components/RolesTable';
 import { createRoleAction, deleteRoleAction } from '@/lib/actions/roleActions';
 import { Dictionary } from '@/lib/i18n/getDictionary';
-import { Card } from '@/components/ui/card';
 
 export interface RolesClientProps {
   dictionary: Dictionary;
@@ -59,14 +58,12 @@ export function RolesClient({ dictionary, initialRoles, resources }: RolesClient
         />
       </div>
 
-      <Card className="p-6 shadow-xl border-0 bg-white/80 backdrop-blur-lg dark:bg-gray-900/80">
-        <RolesTable
-          dictionary={dictionary}
-          roles={roles}
-          onEditRole={handleEditRole}
-          onDeleteRole={handleDeleteRole}
-        />
-      </Card>
+      <RolesTable
+        dictionary={dictionary}
+        roles={roles}
+        onEditRole={handleEditRole}
+        onDeleteRole={handleDeleteRole}
+      />
     </div>
   );
 }

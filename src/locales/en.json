@@ -33,7 +33,8 @@
     "permissions": "Permissions",
     "resources": "Resources",
     "appointments": "Appointments",
-    "schedules": "Schedules"
+    "schedules": "Schedules",
+    "notifications": "Notifications"
   },
   "auth": {
     "login": "Login",

@@ -33,7 +33,8 @@
     "permissions": "الصلاحيات",
     "resources": "الموارد",
     "appointments": "المواعيد",
-    "schedules": "الجداول"
+    "schedules": "الجداول",
+    "notifications": "الإشعارات"
   },
   "auth": {
     "login": "تسجيل الدخول",

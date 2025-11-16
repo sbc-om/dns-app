@@ -10,6 +10,7 @@ import {
   Key,
   Calendar,
   CalendarClock,
+  Bell,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -46,6 +47,13 @@ const menuItems: MenuItem[] = [
     labelKey: 'appointments',
     href: '/dashboard/appointments',
     icon: CalendarClock,
+  },
+  {
+    key: 'notifications',
+    resourceKey: 'dashboard.notifications',
+    labelKey: 'notifications',
+    href: '/dashboard/notifications',
+    icon: Bell,
   },
   {
     key: 'users',
@@ -114,16 +122,23 @@ export function DashboardSidebar({
         "p-6 border-b border-gray-200 dark:border-gray-700",
         isCollapsed && "lg:px-3"
       )}>
-        <Link href={`/${locale}/dashboard`} className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-[#F2574C] flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
-            DNA
+        <Link href={`/${locale}/dashboard`} className={cn(
+          "flex items-center gap-3 group",
+          isCollapsed && "lg:justify-center"
+        )}>
+          <div className="h-10 w-10 flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-105">
+            <img 
+              src="/logo.png" 
+              alt="DNA Logo" 
+              className="h-10 w-10 object-contain"
+            />
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white truncate">
-                {dictionary.dashboard.title}
+              <h2 className="text-xl font-bold bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#F2574C] bg-clip-text text-transparent truncate">
+                DNA Program
               </h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Admin Panel</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">Management System</p>
             </div>
           )}
         </Link>
@@ -139,35 +154,26 @@ export function DashboardSidebar({
             : pathname === href || pathname.startsWith(`${href}/`);
           
           return (
-            <Link
-              key={item.key}
-              href={href}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative",
-                isActive 
-                  ? "bg-[#F2574C] text-white" 
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
-                isCollapsed && "lg:justify-center lg:px-3"
-              )}
-            >
-              <Icon className="h-5 w-5 flex-shrink-0" />
-              
-              {!isCollapsed && (
-                <span className="font-medium truncate flex-1">
-                  {dictionary.nav[item.labelKey]}
-                </span>
-              )}
-
-              {/* Tooltip for collapsed state */}
-              {isCollapsed && (
-                <div className={cn(
-                  "absolute top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm px-3 py-2 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50",
-                  isRTL ? "right-full mr-2" : "left-full ml-2"
-                )}>
-                  {dictionary.nav[item.labelKey]}
-                </div>
-              )}
-            </Link>
+            <div key={item.key} className="relative group/item">
+              <Link
+                href={href}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
+                  isActive 
+                    ? "bg-[#F2574C] text-white" 
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
+                  isCollapsed && "lg:justify-center lg:px-3"
+                )}
+              >
+                <Icon className="h-5 w-5 flex-shrink-0" />
+                
+                {!isCollapsed && (
+                  <span className="font-medium truncate flex-1">
+                    {dictionary.nav[item.labelKey]}
+                  </span>
+                )}
+              </Link>
+            </div>
           );
         })}
       </nav>
@@ -181,7 +187,7 @@ export function DashboardSidebar({
           "text-xs text-center text-gray-500 dark:text-gray-400",
           isCollapsed && "lg:hidden"
         )}>
-          <p>© 2024 DNA Program</p>
+          <p>© 2025 DNA Program</p>
           <p className="mt-1">v1.0.0</p>
         </div>
         {isCollapsed && (

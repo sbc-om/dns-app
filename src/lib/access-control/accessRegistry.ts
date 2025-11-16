@@ -60,6 +60,13 @@ export const BUILT_IN_RESOURCES: ResourceRegistration[] = [
     parentKey: 'dashboard',
   },
   {
+    key: 'dashboard.notifications',
+    type: 'module',
+    displayNameKey: 'nav.notifications',
+    defaultActions: ['read', 'write', 'manage'],
+    parentKey: 'dashboard',
+  },
+  {
     key: 'dashboard.users',
     type: 'module',
     displayNameKey: 'resources.users',

@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Locale, locales, localeNames } from '@/config/i18n';
+import { cn } from '@/lib/utils';
 
 export function LanguageSwitcher() {
   const pathname = usePathname();
@@ -41,18 +42,28 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="lg" className="p-6">
-          <Globe className="text-[#30B2D2]" style={{ width: '36px', height: '36px' }} />
-          <span className="sr-only">Switch language</span>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="h-10 gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        >
+          <Globe className="h-5 w-5 text-[#30B2D2]" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {currentLocale.toUpperCase()}
+          </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-40">
         {locales.map((locale: Locale) => (
           <DropdownMenuItem
             key={locale}
             onClick={() => switchLocale(locale)}
-            className={currentLocale === locale ? 'bg-accent' : ''}
+            className={cn(
+              "cursor-pointer gap-2 py-2.5",
+              currentLocale === locale && 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 font-semibold'
+            )}
           >
+            <Globe className="h-4 w-4" />
             {localeNames[locale]}
           </DropdownMenuItem>
         ))}
