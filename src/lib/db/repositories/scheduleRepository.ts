@@ -1,4 +1,5 @@
 import { getDatabase, generateId } from '../lmdb';
+import { SimpleCache } from '@/lib/cache/simpleCache';
 
 export interface Schedule {
   id: string;
@@ -18,6 +19,12 @@ export interface TimeSlot {
 const SCHEDULE_PREFIX = 'schedules:';
 const SCHEDULE_BY_DATE_PREFIX = 'schedules_by_date:';
 const BOOKED_SLOTS_PREFIX = 'booked_slots:'; // booked_slots:{date}:{time}
+
+const scheduleCache = new SimpleCache();
+const ALL_SCHEDULES_KEY = 'schedule:all';
+const AVAILABLE_DATES_KEY = 'schedule:available-dates';
+const getSchedulesKey = (date: string) => `schedule:by-date:${date}`;
+const getTimeSlotsCacheKey = (date: string) => `schedule:time-slots:${date}`;
 
 /**
  * Generate 10-minute time slots between start and end time
@@ -67,6 +74,8 @@ export async function createSchedule(data: {
   // Store by date for quick lookup
   await db.put(`${SCHEDULE_BY_DATE_PREFIX}${data.date}:${id}`, schedule);
 
+  invalidateScheduleCache(data.date);
+
   return schedule;
 }
 
@@ -74,111 +83,131 @@ export async function createSchedule(data: {
  * Get all schedules
  */
 export async function getAllSchedules(): Promise<Schedule[]> {
-  const schedules: Schedule[] = [];
-  const db = getDatabase();
-  
-  try {
-    // Use synchronous iteration for LMDB
-    for (const { key, value } of db.getRange({ start: SCHEDULE_PREFIX, end: SCHEDULE_PREFIX + '~' })) {
-      if (value && typeof value === 'object' && 'id' in value && typeof key === 'string' && key.startsWith(SCHEDULE_PREFIX)) {
-        // Skip index entries
-        if (key === 'schedules:index') continue;
-        schedules.push(value as Schedule);
+  return scheduleCache.getOrSet(ALL_SCHEDULES_KEY, async () => {
+    const schedules: Schedule[] = [];
+    const db = getDatabase();
+
+    try {
+      // Use synchronous iteration for LMDB
+      for (const { key, value } of db.getRange({ start: SCHEDULE_PREFIX, end: SCHEDULE_PREFIX + '~' })) {
+        if (value && typeof value === 'object' && 'id' in value && typeof key === 'string' && key.startsWith(SCHEDULE_PREFIX)) {
+          // Skip index entries
+          if (key === 'schedules:index') continue;
+          schedules.push(value as Schedule);
+        }
       }
+    } catch (error) {
+      // If no schedules exist, return empty array
+      console.log('No schedules found in database');
+      return [];
     }
-  } catch (error) {
-    // If no schedules exist, return empty array
-    console.log('No schedules found in database');
-    return [];
-  }
-  
-  return schedules.sort((a, b) => a.date.localeCompare(b.date));
+
+    return schedules.sort((a, b) => a.date.localeCompare(b.date));
+  }, 30_000);
 }
 
 /**
  * Get schedules by date
  */
 export async function getSchedulesByDate(date: string): Promise<Schedule[]> {
-  const schedules: Schedule[] = [];
-  const prefix = `${SCHEDULE_BY_DATE_PREFIX}${date}:`;
-  const db = getDatabase();
-  
-  try {
-    for (const { value } of db.getRange({ start: prefix, end: prefix + '~' })) {
-      if (value && typeof value === 'object' && 'id' in value) {
-        schedules.push(value as Schedule);
+  const cacheKey = getSchedulesKey(date);
+  return scheduleCache.getOrSet(cacheKey, async () => {
+    const schedules: Schedule[] = [];
+    const prefix = `${SCHEDULE_BY_DATE_PREFIX}${date}:`;
+    const db = getDatabase();
+
+    try {
+      for (const { value } of db.getRange({ start: prefix, end: prefix + '~' })) {
+        if (value && typeof value === 'object' && 'id' in value) {
+          schedules.push(value as Schedule);
+        }
       }
+    } catch (error) {
+      // If no schedules exist for this date, return empty array
+      console.log(`No schedules found for date: ${date}`);
+      return [];
     }
-  } catch (error) {
-    // If no schedules exist for this date, return empty array
-    console.log(`No schedules found for date: ${date}`);
-    return [];
-  }
-  
-  return schedules;
+
+    return schedules;
+  }, 15_000);
 }
 
 /**
  * Get all available dates (dates that have schedules)
  */
 export async function getAvailableDates(): Promise<string[]> {
-  const dates = new Set<string>();
-  const today = new Date().toISOString().split('T')[0];
-  const db = getDatabase();
-  
-  try {
-    for (const { key, value } of db.getRange({ start: SCHEDULE_PREFIX, end: SCHEDULE_PREFIX + '~' })) {
-      if (value && typeof value === 'object' && 'date' in value && typeof key === 'string' && key.startsWith(SCHEDULE_PREFIX)) {
-        // Skip index entries
-        if (key === 'schedules:index') continue;
-        const schedule = value as Schedule;
-        // Only include dates that are today or in the future
-        if (schedule.date >= today) {
-          dates.add(schedule.date);
+  return scheduleCache.getOrSet(AVAILABLE_DATES_KEY, async () => {
+    const dates = new Set<string>();
+    const today = new Date().toISOString().split('T')[0];
+    const db = getDatabase();
+
+    try {
+      for (const { key, value } of db.getRange({ start: SCHEDULE_PREFIX, end: SCHEDULE_PREFIX + '~' })) {
+        if (value && typeof value === 'object' && 'date' in value && typeof key === 'string' && key.startsWith(SCHEDULE_PREFIX)) {
+          // Skip index entries
+          if (key === 'schedules:index') continue;
+          const schedule = value as Schedule;
+          // Only include dates that are today or in the future
+          if (schedule.date >= today) {
+            dates.add(schedule.date);
+          }
         }
       }
+    } catch (error) {
+      // If no schedules exist, return empty array
+      console.log('No schedules found in database');
+      return [];
     }
-  } catch (error) {
-    // If no schedules exist, return empty array
-    console.log('No schedules found in database');
-    return [];
-  }
-  
-  return Array.from(dates).sort();
+
+    return Array.from(dates).sort();
+  }, 25_000);
 }
 
 /**
  * Get available time slots for a specific date
  */
 export async function getAvailableTimeSlots(date: string): Promise<TimeSlot[]> {
-  const schedules = await getSchedulesByDate(date);
-  
-  if (schedules.length === 0) {
-    return [];
+  const cacheKey = getTimeSlotsCacheKey(date);
+  return scheduleCache.getOrSet(cacheKey, async () => {
+    const schedules = await getSchedulesByDate(date);
+
+    if (schedules.length === 0) {
+      return [];
+    }
+
+    const allSlots = new Set<string>();
+    for (const schedule of schedules) {
+      const slots = generateTimeSlots(schedule.startTime, schedule.endTime);
+      slots.forEach(slot => allSlots.add(slot));
+    }
+
+    const timeSlots: TimeSlot[] = [];
+    const db = getDatabase();
+    for (const time of Array.from(allSlots).sort()) {
+      const bookedKey = `${BOOKED_SLOTS_PREFIX}${date}:${time}`;
+      const isBooked = await db.get(bookedKey);
+
+      timeSlots.push({
+        time,
+        isBooked: !!isBooked,
+        appointmentId: isBooked || undefined,
+      });
+    }
+
+    return timeSlots;
+  }, 8_000);
+}
+
+/**
+ * Invalidate cached schedule data when schedules or bookings change.
+ */
+export function invalidateScheduleCache(date?: string) {
+  scheduleCache.invalidate(ALL_SCHEDULES_KEY);
+  scheduleCache.invalidate(AVAILABLE_DATES_KEY);
+  if (date) {
+    scheduleCache.invalidate(getSchedulesKey(date));
+    scheduleCache.invalidate(getTimeSlotsCacheKey(date));
   }
-  
-  // Collect all time slots from all schedules for this date
-  const allSlots = new Set<string>();
-  for (const schedule of schedules) {
-    const slots = generateTimeSlots(schedule.startTime, schedule.endTime);
-    slots.forEach(slot => allSlots.add(slot));
-  }
-  
-  // Check which slots are booked
-  const timeSlots: TimeSlot[] = [];
-  const db = getDatabase();
-  for (const time of Array.from(allSlots).sort()) {
-    const bookedKey = `${BOOKED_SLOTS_PREFIX}${date}:${time}`;
-    const isBooked = await db.get(bookedKey);
-    
-    timeSlots.push({
-      time,
-      isBooked: !!isBooked,
-      appointmentId: isBooked || undefined,
-    });
-  }
-  
-  return timeSlots;
 }
 
 /**
@@ -192,6 +221,8 @@ export async function bookTimeSlot(
   const key = `${BOOKED_SLOTS_PREFIX}${date}:${time}`;
   const db = getDatabase();
   await db.put(key, appointmentId);
+
+  invalidateScheduleCache(date);
 }
 
 /**
@@ -217,6 +248,8 @@ export async function deleteSchedule(id: string): Promise<void> {
     
     // Delete date index
     await db.remove(`${SCHEDULE_BY_DATE_PREFIX}${schedule.date}:${id}`);
+
+    invalidateScheduleCache(schedule.date);
   }
 }
 

@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 import withPWA from '@ducanh2912/next-pwa';
 
+const lowResourceMode = process.env.LOW_RESOURCE_MODE === 'true';
+
 const nextConfig: NextConfig = {
   // Next.js automatically detects src/ directory
   // Set turbopack root to current project directory
@@ -12,7 +14,7 @@ const nextConfig: NextConfig = {
 
 export default withPWA({
   dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
+  disable: lowResourceMode || process.env.NODE_ENV === 'development',
   register: true,
   reloadOnOnline: true,
   fallbacks: {

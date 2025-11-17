@@ -1,5 +1,5 @@
 import { getDatabase, generateId } from '../lmdb';
-import { bookTimeSlot, isTimeSlotAvailable } from './scheduleRepository';
+import { bookTimeSlot, isTimeSlotAvailable, invalidateScheduleCache } from './scheduleRepository';
 
 export interface Appointment {
   id: string;
@@ -169,15 +169,20 @@ export async function updateAppointment(id: string, updates: Partial<Appointment
 
   db.put(`${APPOINTMENTS_PREFIX}${id}`, updatedAppointment);
   
-  // Update by date record if date changed
+  const appointmentDateKey = updates.appointmentDate && updates.appointmentDate !== existing.appointmentDate
+    ? updatedAppointment.appointmentDate
+    : existing.appointmentDate;
+
   if (updates.appointmentDate && updates.appointmentDate !== existing.appointmentDate) {
-    // Remove old date record
     db.remove(`${APPOINTMENTS_BY_DATE_PREFIX}${existing.appointmentDate}:${id}`);
-    // Add new date record
-    db.put(`${APPOINTMENTS_BY_DATE_PREFIX}${updates.appointmentDate}:${id}`, updatedAppointment);
+    db.put(`${APPOINTMENTS_BY_DATE_PREFIX}${updatedAppointment.appointmentDate}:${id}`, updatedAppointment);
   } else {
-    // Update existing date record
     db.put(`${APPOINTMENTS_BY_DATE_PREFIX}${existing.appointmentDate}:${id}`, updatedAppointment);
+  }
+
+  invalidateScheduleCache(existing.appointmentDate);
+  if (appointmentDateKey !== existing.appointmentDate) {
+    invalidateScheduleCache(appointmentDateKey);
   }
 
   return updatedAppointment;
@@ -202,6 +207,8 @@ export async function deleteAppointment(id: string): Promise<boolean> {
   
   // Delete by date record
   db.remove(`${APPOINTMENTS_BY_DATE_PREFIX}${appointment.appointmentDate}:${id}`);
+  
+  invalidateScheduleCache(appointment.appointmentDate);
   
   return true;
 }
