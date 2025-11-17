@@ -7,9 +7,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  output: 'standalone',
 };
 
-const pwaConfig = withPWA({
+export default withPWA({
   dest: 'public',
   disable: process.env.NODE_ENV === 'development',
   register: true,
@@ -21,6 +22,4 @@ const pwaConfig = withPWA({
     disableDevLogs: true,
     skipWaiting: true,
   },
-});
-
-export default pwaConfig(nextConfig);
+})(nextConfig);

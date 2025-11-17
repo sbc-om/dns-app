@@ -6,6 +6,7 @@ import {
   updateAppointment,
   type Appointment,
 } from '@/lib/db/repositories/appointmentRepository';
+import { getAvailableDates, getSchedulesByDate } from '@/lib/db/repositories/scheduleRepository';
 
 export async function createAppointmentAction(data: {
   fullName: string;
@@ -48,5 +49,25 @@ export async function updateAppointmentAction(id: string, updates: Partial<Appoi
   } catch (error) {
     console.error('Error updating appointment:', error);
     return { success: false, error: 'Failed to update appointment' };
+  }
+}
+
+export async function getAvailableDatesAction() {
+  try {
+    const dates = await getAvailableDates();
+    return { success: true, dates };
+  } catch (error) {
+    console.error('Error fetching available dates:', error);
+    return { success: false, error: 'Failed to fetch available dates' };
+  }
+}
+
+export async function getScheduleByDateAction(date: string) {
+  try {
+    const schedules = await getSchedulesByDate(date);
+    return { success: true, schedules };
+  } catch (error) {
+    console.error('Error fetching schedule:', error);
+    return { success: false, error: 'Failed to fetch schedule' };
   }
 }

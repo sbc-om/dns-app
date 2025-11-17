@@ -9,12 +9,12 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
-import {
-  createAppointmentAction,
-  getAvailableDatesAction,
-  getScheduleByDateAction,
-} from '@/lib/actions/appointmentActions';
-import type { TimeSlot } from '@/lib/db/repositories/appointmentRepository';
+import { createAppointmentAction } from '@/lib/actions/appointmentActions';
+interface TimeSlot {
+  time: string;
+  isBooked: boolean;
+  appointmentId?: string;
+}
 
 interface AppointmentBookingFormProps {
   dictionary: Dictionary;
@@ -57,20 +57,32 @@ export function AppointmentBookingForm({ dictionary, locale }: AppointmentBookin
 
   const loadAvailableDates = async () => {
     setLoadingDates(true);
-    const result = await getAvailableDatesAction();
-    if (result.success && result.dates) {
-      setAvailableDates(result.dates);
+    try {
+      const response = await fetch('/api/schedules');
+      const data = await response.json();
+      
+      if (data.success && data.dates) {
+        setAvailableDates(data.dates);
+      }
+    } catch (error) {
+      console.error('Error loading available dates:', error);
     }
     setLoadingDates(false);
   };
 
   const loadTimeSlots = async (date: string) => {
     setLoadingSlots(true);
-    const result = await getScheduleByDateAction(date);
-    if (result.success && result.schedule) {
-      const available = result.schedule.timeSlots.filter(slot => slot.isAvailable);
-      setAvailableTimeSlots(available);
-    } else {
+    try {
+      const response = await fetch(`/api/schedules?date=${date}`);
+      const data = await response.json();
+      
+      if (data.success && data.timeSlots) {
+        setAvailableTimeSlots(data.timeSlots);
+      } else {
+        setAvailableTimeSlots([]);
+      }
+    } catch (error) {
+      console.error('Error loading time slots:', error);
       setAvailableTimeSlots([]);
     }
     setLoadingSlots(false);
