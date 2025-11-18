@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
   output: 'standalone',
+  serverExternalPackages: ['lmdb', 'argon2', 'cbor-x', 'msgpackr'],
+
 };
 
 export default withPWA({
