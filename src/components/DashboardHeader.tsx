@@ -1,8 +1,9 @@
 'use client';
 
-import { LogOut, User, Menu, X } from 'lucide-react';
+import { LogOut, User, Menu, X, Download } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { useEffect, useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +15,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
-import { useState } from 'react';
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
 
 export interface DashboardHeaderProps {
   dictionary: Dictionary;
@@ -30,6 +35,20 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
   const params = useParams();
   const locale = (params.locale as Locale) || 'en';
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e as BeforeInstallPromptEvent);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -55,6 +74,19 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
     if (onMobileMenuToggle) {
       onMobileMenuToggle();
     }
+  };
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+
+    await installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('PWA installed');
+    }
+    
+    setInstallPrompt(null);
   };
 
   return (
@@ -91,6 +123,20 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
 
         <div className="flex items-center gap-2 sm:gap-3">
           <LanguageSwitcher />
+
+          {/* Install App Button */}
+          {installPrompt && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleInstall}
+              className="h-10 w-10 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20"
+              title="Install App"
+            >
+              <Download className="h-5 w-5 text-green-600" />
+              <span className="sr-only">Install App</span>
+            </Button>
+          )}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

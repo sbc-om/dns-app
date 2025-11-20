@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, Mail, Phone, User, CheckCircle, XCircle, Users } from 'lucide-react';
+import { Calendar, Clock, Mail, Phone, User, CheckCircle, XCircle, Users, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 import {
   Dialog,
   DialogContent,
@@ -170,13 +171,21 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          {dictionary.nav.appointments}
-        </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          {dictionary.appointment.viewAppointments}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            {dictionary.nav.appointments}
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            {dictionary.appointment.viewAppointments}
+          </p>
+        </div>
+        <Link href={`/${locale}/dashboard/schedules`}>
+          <Button className="bg-[#F2574C] hover:bg-[#d94841] text-white flex items-center gap-2">
+            <CalendarDays className="h-5 w-5" />
+            {dictionary.nav.schedules}
+          </Button>
+        </Link>
       </div>
 
       {/* Tabs */}
