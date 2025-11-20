@@ -40,25 +40,11 @@ const menuItems: MenuItem[] = [
     icon: CalendarClock,
   },
   {
-    key: 'notifications',
-    resourceKey: 'dashboard.notifications',
-    labelKey: 'notifications',
-    href: '/dashboard/notifications',
-    icon: Bell,
-  },
-  {
     key: 'users',
     resourceKey: 'dashboard.users',
     labelKey: 'users',
     href: '/dashboard/users',
     icon: Users,
-  },
-  {
-    key: 'roles',
-    resourceKey: 'dashboard.roles',
-    labelKey: 'roles',
-    href: '/dashboard/roles',
-    icon: Shield,
   },
 ];
 

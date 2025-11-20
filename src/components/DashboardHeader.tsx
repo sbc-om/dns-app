@@ -1,9 +1,10 @@
 'use client';
 
-import { LogOut, User, Menu, X, Download } from 'lucide-react';
+import { LogOut, User, Menu, X, Download, Bell } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -137,6 +138,19 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
               <span className="sr-only">Install App</span>
             </Button>
           )}
+
+          {/* Notifications Button */}
+          <Link href={`/${locale}/dashboard/notifications`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 relative"
+              title={dictionary.nav.notifications}
+            >
+              <Bell className="h-5 w-5 text-blue-600" />
+              <span className="sr-only">{dictionary.nav.notifications}</span>
+            </Button>
+          </Link>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

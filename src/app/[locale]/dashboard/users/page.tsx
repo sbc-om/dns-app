@@ -21,6 +21,7 @@ export default async function UsersPage({
     <UsersClient
       dictionary={dictionary}
       initialUsers={users}
+      locale={locale}
     />
   );
 }
