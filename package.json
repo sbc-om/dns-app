@@ -32,6 +32,7 @@
     "cbor-x": "^1.6.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "emoji-picker-react": "^4.15.1",
     "html2canvas": "^1.4.1",
     "jose": "^6.1.2",
     "lmdb": "^3.4.4",

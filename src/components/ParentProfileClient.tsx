@@ -173,29 +173,31 @@ export function ParentProfileClient({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {children.map((child) => (
-              <Card key={child.id} className="border-2 border-gray-200 hover:border-[#30B2D2] transition-colors">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <User className="h-5 w-5 text-[#30B2D2]" />
-                    {child.fullName || child.username}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div>
-                    <p className="text-sm text-muted-foreground">{dictionary.users.nationalId || 'National ID'}</p>
-                    <p className="font-semibold">{child.nationalId || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{dictionary.users.createdAt || 'Created At'}</p>
-                    <p className="text-sm">
-                      {new Date(child.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US')}
-                    </p>
-                  </div>
-                  <Badge variant={child.isActive ? 'default' : 'destructive'} className="mt-2">
-                    {child.isActive ? (dictionary.users.active || 'Active') : (dictionary.users.inactive || 'Inactive')}
-                  </Badge>
-                </CardContent>
-              </Card>
+              <Link key={child.id} href={`/${locale}/dashboard/kids/${child.id}`}>
+                <Card className="border-2 border-gray-200 hover:border-[#30B2D2] hover:shadow-lg transition-all cursor-pointer">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                      <User className="h-5 w-5 text-[#30B2D2]" />
+                      {child.fullName || child.username}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div>
+                      <p className="text-sm text-muted-foreground">{dictionary.users.nationalId || 'National ID'}</p>
+                      <p className="font-semibold">{child.nationalId || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">{dictionary.users.createdAt || 'Created At'}</p>
+                      <p className="text-sm">
+                        {new Date(child.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US')}
+                      </p>
+                    </div>
+                    <Badge variant={child.isActive ? 'default' : 'destructive'} className="mt-2">
+                      {child.isActive ? (dictionary.users.active || 'Active') : (dictionary.users.inactive || 'Inactive')}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         )}

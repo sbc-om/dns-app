@@ -94,3 +94,35 @@ export async function updateOwnProfileAction(input: {
     return { success: false, error: error instanceof Error ? error.message : 'Failed to update profile' };
   }
 }
+
+export async function updateUserProfilePictureAction(userId: string, profilePicture: string) {
+  'use server';
+  
+  try {
+    const { getCurrentUser } = await import('@/lib/auth/auth');
+    const currentUser = await getCurrentUser();
+    
+    if (!currentUser) {
+      return { success: false, error: 'Not authenticated' };
+    }
+    
+    // Only admin can update other users' profile pictures
+    if (currentUser.role !== 'admin') {
+      return { success: false, error: 'Not authorized' };
+    }
+    
+    const user = await updateUser(userId, { profilePicture });
+    
+    if (!user) {
+      return { success: false, error: 'User not found' };
+    }
+    
+    revalidatePath(`/dashboard/kids/${userId}`);
+    revalidatePath('/dashboard/users');
+    
+    return { success: true, user };
+  } catch (error) {
+    console.error('Update profile picture error:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to update profile picture' };
+  }
+}

@@ -37,6 +37,8 @@
     "schedules": "الجداول",
     "notifications": "الإشعارات",
     "messages": "الرسائل",
+    "courses": "الدورات",
+    "payments": "المدفوعات",
     "settings": "الإعدادات"
   },
   "auth": {
@@ -398,6 +400,70 @@
     "admins": "المدراء",
     "coaches": "المدربون",
     "parents": "أولياء الأمور"
+  },
+  "playerCard": {
+    "title": "بطاقة اللاعب",
+    "createCard": "إنشاء بطاقة اللاعب",
+    "updateCard": "تحديث بطاقة اللاعب",
+    "basicInfo": "المعلومات الأساسية",
+    "physicalTests": "الاختبارات البدنية",
+    "playerName": "اسم اللاعب",
+    "age": "العمر",
+    "position": "المركز",
+    "preferredFoot": "القدم المفضلة",
+    "height": "الطول (سم)",
+    "weight": "الوزن (كجم)",
+    "photo": "الصورة",
+    "uploadPhoto": "رفع صورة",
+    "next": "التالي",
+    "previous": "السابق",
+    "generate": "إنشاء البطاقة",
+    "download": "تحميل البطاقة",
+    "share": "مشاركة البطاقة",
+    "overallRating": "التقييم الإجمالي",
+    "physicalStats": "الإحصائيات البدنية",
+    "speed": "السرعة",
+    "agility": "الرشاقة",
+    "physicalStrength": "القوة البدنية",
+    "upperBodyStrength": "قوة الجزء العلوي",
+    "motorControl": "التحكم الحركي",
+    "endurance": "القدرة على التحمل",
+    "tests": {
+      "verticalJump": "القفز العمودي (سم)",
+      "broadJump": "القفز الطويل (سم)",
+      "sprint10m": "عدو 10 متر (ثانية)",
+      "sprint20m": "عدو 20 متر (ثانية)",
+      "sprint30m": "عدو 30 متر (ثانية)",
+      "agilityTest": "اختبار الرشاقة (ثانية)",
+      "balanceTest": "اختبار التوازن (ثانية)",
+      "cooperTest": "اختبار كوبر (متر)",
+      "pushUps": "تمرين الضغط (عدد)",
+      "sitUps": "تمرين البطن (عدد)",
+      "pullUps": "تمرين العقلة (عدد)"
+    },
+    "positions": {
+      "goalkeeper": "حارس مرمى",
+      "defender": "مدافع",
+      "midfielder": "لاعب وسط",
+      "forward": "مهاجم",
+      "winger": "جناح"
+    },
+    "foot": {
+      "left": "اليسرى",
+      "right": "اليمنى",
+      "both": "كلاهما"
+    },
+    "cardColors": {
+      "bronze": "برونزي",
+      "silver": "فضي",
+      "gold": "ذهبي",
+      "platinum": "بلاتيني",
+      "diamond": "ماسي"
+    },
+    "cardCreated": "تم إنشاء بطاقة اللاعب بنجاح",
+    "cardUpdated": "تم تحديث بطاقة اللاعب بنجاح",
+    "loadingCard": "جاري تحميل بطاقة اللاعب...",
+    "noCard": "لا توجد بطاقة لاعب بعد"
   },
   "footer": {
     "description": "كن بطلاً!",

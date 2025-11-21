@@ -12,7 +12,9 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
-  Settings
+  Settings,
+  BookOpen,
+  DollarSign
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Dictionary } from '@/lib/i18n/getDictionary';
@@ -54,6 +56,20 @@ const menuItems: MenuItem[] = [
     labelKey: 'messages',
     href: '/dashboard/messages',
     icon: MessageSquare,
+  },
+  {
+    key: 'courses',
+    resourceKey: 'dashboard.courses',
+    labelKey: 'courses',
+    href: '/dashboard/courses',
+    icon: BookOpen,
+  },
+  {
+    key: 'payments',
+    resourceKey: 'dashboard.payments',
+    labelKey: 'payments',
+    href: '/dashboard/payments',
+    icon: DollarSign,
   },
   {
     key: 'settings',

@@ -66,10 +66,18 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
         const fullName = row.getValue('fullName') as string;
         const user = row.original;
         
-        // Make parent names clickable
+        // Make parent and kid names clickable
         if (user.role === 'parent') {
           return (
             <Link href={`/${locale}/dashboard/users/${user.id}`} className="font-semibold text-[#30B2D2] hover:text-[#1E3A8A] hover:underline">
+              {fullName || '-'}
+            </Link>
+          );
+        }
+        
+        if (user.role === 'kid') {
+          return (
+            <Link href={`/${locale}/dashboard/kids/${user.id}`} className="font-semibold text-[#F2574C] hover:text-[#E8A12D] hover:underline">
               {fullName || '-'}
             </Link>
           );

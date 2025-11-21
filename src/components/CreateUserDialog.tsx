@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User } from '@/lib/db/repositories/userRepository';
 import { ROLES, UserRole } from '@/config/roles';
 import { Dictionary } from '@/lib/i18n/getDictionary';
@@ -17,12 +17,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { createUserAction } from '@/lib/actions/userActions';
+import { getActiveCoursesAction } from '@/lib/actions/courseActions';
+import { createEnrollmentAction } from '@/lib/actions/enrollmentActions';
+import type { Course } from '@/lib/db/repositories/courseRepository';
 
 export interface CreateUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   dictionary: Dictionary;
   onUserCreated: (user: User) => void;
+  parents?: User[];
+  locale: string;
 }
 
 export function CreateUserDialog({
@@ -30,8 +35,11 @@ export function CreateUserDialog({
   onOpenChange,
   dictionary,
   onUserCreated,
+  parents = [],
+  locale,
 }: CreateUserDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -39,17 +47,48 @@ export function CreateUserDialog({
     fullName: '',
     phoneNumber: '',
     role: ROLES.KID as UserRole,
+    parentId: '',
+    courseId: '',
   });
+
+  useEffect(() => {
+    if (open) {
+      loadCourses();
+    }
+  }, [open]);
+
+  const loadCourses = async () => {
+    const result = await getActiveCoursesAction();
+    if (result.success && result.courses) {
+      setCourses(result.courses);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const result = await createUserAction(formData);
-
-    setIsSubmitting(false);
+    // Create user
+    const result = await createUserAction({
+      email: formData.email,
+      username: formData.username,
+      password: formData.password,
+      fullName: formData.fullName,
+      phoneNumber: formData.phoneNumber,
+      role: formData.role,
+      parentId: formData.role === ROLES.KID && formData.parentId ? formData.parentId : undefined,
+    });
 
     if (result.success && result.user) {
+      // If kid with course selected, create enrollment
+      if (formData.role === ROLES.KID && formData.courseId && formData.parentId) {
+        await createEnrollmentAction({
+          studentId: result.user.id,
+          courseId: formData.courseId,
+          parentId: formData.parentId,
+        });
+      }
+
       onUserCreated(result.user);
       onOpenChange(false);
       setFormData({
@@ -59,10 +98,14 @@ export function CreateUserDialog({
         fullName: '',
         phoneNumber: '',
         role: ROLES.KID,
+        parentId: '',
+        courseId: '',
       });
     } else {
       alert(result.error || 'Failed to create user');
     }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -145,6 +188,61 @@ export function CreateUserDialog({
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Show parent selection for kids */}
+            {formData.role === ROLES.KID && parents.length > 0 && (
+              <div className="grid gap-2">
+                <Label htmlFor="parentId">
+                  {locale === 'ar' ? 'ولي الأمر' : 'Parent'}
+                </Label>
+                <Select
+                  value={formData.parentId}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, parentId: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={locale === 'ar' ? 'اختر ولي الأمر' : 'Select Parent'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {parents.map((parent) => (
+                      <SelectItem key={parent.id} value={parent.id}>
+                        {parent.fullName} ({parent.email})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Show course selection for kids */}
+            {formData.role === ROLES.KID && courses.length > 0 && (
+              <div className="grid gap-2">
+                <Label htmlFor="courseId">
+                  {locale === 'ar' ? 'الدورة التدريبية' : 'Course'}
+                </Label>
+                <Select
+                  value={formData.courseId}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, courseId: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={locale === 'ar' ? 'اختر الدورة (اختياري)' : 'Select Course (Optional)'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">
+                      {locale === 'ar' ? 'بدون دورة' : 'No Course'}
+                    </SelectItem>
+                    {courses.map((course) => (
+                      <SelectItem key={course.id} value={course.id}>
+                        {locale === 'ar' ? course.nameAr : course.name} - {course.price} {course.currency}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <DialogFooter>

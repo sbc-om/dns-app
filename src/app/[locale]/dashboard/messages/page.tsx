@@ -24,12 +24,14 @@ export default async function MessagesPage({
   const allUsers = currentUser.role === 'admin' ? await getAllUsers() : [];
 
   return (
-    <MessagesClient 
-      dictionary={dictionary} 
-      locale={locale} 
-      currentUser={currentUser}
-      allUsers={allUsers}
-      permissions={rolePermissions.permissions}
-    />
+    <div className="h-full">
+      <MessagesClient 
+        dictionary={dictionary} 
+        locale={locale} 
+        currentUser={currentUser}
+        allUsers={allUsers}
+        permissions={rolePermissions.permissions}
+      />
+    </div>
   );
 }

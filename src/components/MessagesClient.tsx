@@ -218,7 +218,7 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
 
   return (
     <>
-      <div className="h-[calc(100vh-4rem)] flex flex-col">
+      <div className="h-full flex flex-col">
         {/* Header */}
         <div className="p-6 border-b bg-white">
           <div className="flex items-center justify-between">
