@@ -12,6 +12,7 @@ export interface Course {
   startDate?: string; // ISO date string
   endDate?: string; // ISO date string
   courseImage?: string; // base64 image string
+  coachId?: string; // ID of the assigned coach
   isActive: boolean;
   maxStudents?: number;
   createdAt: string;
@@ -29,6 +30,7 @@ export interface CreateCourseInput {
   startDate?: string; // ISO date string
   endDate?: string; // ISO date string
   courseImage?: string; // base64 image string
+  coachId?: string; // ID of the assigned coach
   maxStudents?: number;
 }
 
@@ -79,6 +81,7 @@ export async function createCourse(input: CreateCourseInput): Promise<Course> {
     startDate: input.startDate,
     endDate: input.endDate,
     courseImage: input.courseImage,
+    coachId: input.coachId,
     maxStudents: input.maxStudents,
     isActive: true,
     createdAt: new Date().toISOString(),

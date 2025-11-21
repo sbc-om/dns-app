@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save, Image as ImageIcon } from 'lucide-react';
 import { Button } from './ui/button';
@@ -8,8 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ImageUpload } from '@/components/ImageUpload';
 import { updateCourseAction } from '@/lib/actions/courseActions';
+import { getCoachesAction } from '@/lib/actions/userActions';
 import { Course } from '@/lib/db/repositories/courseRepository';
 
 interface EditCourseClientProps {
@@ -21,6 +23,7 @@ interface EditCourseClientProps {
 export default function EditCourseClient({ locale, dict, course }: EditCourseClientProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [coaches, setCoaches] = useState<Array<{ id: string; fullName?: string; username: string; email: string }>>([]);
   const [formData, setFormData] = useState({
     name: course.name || '',
     nameAr: course.nameAr || '',
@@ -33,8 +36,20 @@ export default function EditCourseClient({ locale, dict, course }: EditCourseCli
     startDate: course.startDate ? course.startDate.split('T')[0] : '',
     endDate: course.endDate ? course.endDate.split('T')[0] : '',
     courseImage: course.courseImage || '',
+    coachId: course.coachId || '',
     isActive: course.isActive,
   });
+
+  // Load coaches on mount
+  useEffect(() => {
+    async function loadCoaches() {
+      const result = await getCoachesAction();
+      if (result.success && result.coaches) {
+        setCoaches(result.coaches);
+      }
+    }
+    loadCoaches();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +67,7 @@ export default function EditCourseClient({ locale, dict, course }: EditCourseCli
       startDate: formData.startDate || undefined,
       endDate: formData.endDate || undefined,
       courseImage: formData.courseImage || undefined,
+      coachId: formData.coachId && formData.coachId !== 'none' ? formData.coachId : undefined,
       isActive: formData.isActive,
     });
 
@@ -250,6 +266,36 @@ export default function EditCourseClient({ locale, dict, course }: EditCourseCli
                   min={formData.startDate}
                 />
               </div>
+            </div>
+
+            {/* Coach Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="coach">
+                {locale === 'ar' ? 'المدرب' : 'Coach'}
+              </Label>
+              <Select
+                value={formData.coachId || 'none'}
+                onValueChange={(value) => setFormData({ ...formData, coachId: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={locale === 'ar' ? 'اختر مدرباً' : 'Select a coach'} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">
+                    {locale === 'ar' ? 'بدون مدرب' : 'No coach'}
+                  </SelectItem>
+                  {coaches.map((coach) => (
+                    <SelectItem key={coach.id} value={coach.id}>
+                      {coach.fullName || coach.username} ({coach.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-foreground">
+                {locale === 'ar' 
+                  ? 'اختر المدرب المسؤول عن هذه الدورة'
+                  : 'Select the coach responsible for this course'}
+              </p>
             </div>
 
             {/* Max Students */}

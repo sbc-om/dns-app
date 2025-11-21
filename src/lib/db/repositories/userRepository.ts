@@ -327,6 +327,12 @@ export async function listUsers(): Promise<User[]> {
   return users;
 }
 
+// Get all coaches
+export async function getCoaches(): Promise<User[]> {
+  const allUsers = await listUsers();
+  return allUsers.filter(user => user.role === 'coach' && user.isActive);
+}
+
 /**
  * Get all users (alias for listUsers for consistency)
  */

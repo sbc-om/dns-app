@@ -126,3 +126,14 @@ export async function updateUserProfilePictureAction(userId: string, profilePict
     return { success: false, error: error instanceof Error ? error.message : 'Failed to update profile picture' };
   }
 }
+
+export async function getCoachesAction() {
+  try {
+    const { getCoaches } = await import('@/lib/db/repositories/userRepository');
+    const coaches = await getCoaches();
+    return { success: true, coaches };
+  } catch (error) {
+    console.error('Get coaches error:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to fetch coaches' };
+  }
+}
