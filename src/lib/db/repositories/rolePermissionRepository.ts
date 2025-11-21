@@ -25,6 +25,7 @@ export interface RolePermission {
     canCreateGroup: boolean;
     canSendPushNotifications: boolean;
     canManageCourses: boolean;
+    canViewPayments: boolean;
   };
   updatedAt: string;
   updatedBy: string;
@@ -104,6 +105,7 @@ export async function initializeDefaultRolePermissions(): Promise<void> {
       canCreateGroup: true,
       canSendPushNotifications: true,
       canManageCourses: true,
+      canViewPayments: true,
     },
     [ROLES.COACH]: {
       canAccessDashboard: true,
@@ -121,6 +123,7 @@ export async function initializeDefaultRolePermissions(): Promise<void> {
       canCreateGroup: true,
       canSendPushNotifications: true,
       canManageCourses: false,
+      canViewPayments: false,
     },
     [ROLES.PARENT]: {
       canAccessDashboard: true,
@@ -138,6 +141,7 @@ export async function initializeDefaultRolePermissions(): Promise<void> {
       canCreateGroup: false,
       canSendPushNotifications: false,
       canManageCourses: false,
+      canViewPayments: true,
     },
     [ROLES.KID]: {
       canAccessDashboard: true,
@@ -155,6 +159,7 @@ export async function initializeDefaultRolePermissions(): Promise<void> {
       canCreateGroup: false,
       canSendPushNotifications: false,
       canManageCourses: false,
+      canViewPayments: false,
     },
   };
 

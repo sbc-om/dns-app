@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth/auth';
 import { getDictionary } from '@/lib/i18n/getDictionary';
+import { hasRolePermission } from '@/lib/db/repositories/rolePermissionRepository';
 import PaymentsClient from '@/components/PaymentsClient';
 
 interface PageProps {
@@ -15,12 +16,18 @@ export default async function PaymentsPage({ params }: PageProps) {
     redirect(`/${locale}/auth/login`);
   }
 
-  // Only parents can access payments
-  if (currentUser.role !== 'parent') {
+  // Check if user has permission to view payments
+  const canViewPayments = await hasRolePermission(currentUser.role, 'canViewPayments');
+  
+  if (!canViewPayments) {
     redirect(`/${locale}/dashboard/forbidden`);
   }
 
   const dict = await getDictionary(locale as 'en' | 'ar');
 
-  return <PaymentsClient locale={locale} dict={dict} currentUser={currentUser} />;
+  return (
+    <div className="container mx-auto py-6 px-4 max-w-7xl">
+      <PaymentsClient locale={locale} dict={dict} currentUser={currentUser} />
+    </div>
+  );
 }

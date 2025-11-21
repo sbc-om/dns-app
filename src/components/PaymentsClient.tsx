@@ -29,7 +29,12 @@ interface EnrollmentWithDetails extends Enrollment {
 interface PaymentsClientProps {
   locale: string;
   dict: any;
-  currentUser: User;
+  currentUser: {
+    id: string;
+    email: string;
+    role: string;
+    fullName?: string;
+  };
 }
 
 export default function PaymentsClient({ locale, dict, currentUser }: PaymentsClientProps) {

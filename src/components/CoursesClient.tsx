@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, DollarSign, Clock, Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Plus, Edit, Trash2, Clock, Users } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -14,10 +15,8 @@ import {
 } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Switch } from './ui/switch';
 import {
   getAllCoursesAction,
-  createCourseAction,
   updateCourseAction,
   deleteCourseAction,
 } from '@/lib/actions/courseActions';
@@ -29,9 +28,9 @@ interface CoursesClientProps {
 }
 
 export default function CoursesClient({ locale, dict }: CoursesClientProps) {
+  const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [formData, setFormData] = useState({
@@ -40,7 +39,7 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
     description: '',
     descriptionAr: '',
     price: 0,
-    currency: 'USD',
+    currency: 'OMR',
     duration: 1,
     maxStudents: 0,
   });
@@ -56,25 +55,6 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
       setCourses(result.courses);
     }
     setLoading(false);
-  };
-
-  const handleCreate = async () => {
-    const result = await createCourseAction({
-      name: formData.name,
-      nameAr: formData.nameAr,
-      description: formData.description || undefined,
-      descriptionAr: formData.descriptionAr || undefined,
-      price: formData.price,
-      currency: formData.currency,
-      duration: formData.duration,
-      maxStudents: formData.maxStudents > 0 ? formData.maxStudents : undefined,
-    });
-
-    if (result.success) {
-      setIsCreateDialogOpen(false);
-      resetForm();
-      loadCourses();
-    }
   };
 
   const handleEdit = async () => {
@@ -140,11 +120,11 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
   };
 
   if (loading) {
-    return <div className="p-6">{locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}</div>;
+    return <div className="flex items-center justify-center py-12">{locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}</div>;
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">{locale === 'ar' ? 'إدارة الدورات' : 'Course Management'}</h1>
@@ -152,7 +132,7 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
             {locale === 'ar' ? 'إدارة الدورات والأسعار' : 'Manage courses and pricing'}
           </p>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
+        <Button onClick={() => router.push(`/${locale}/dashboard/courses/new`)}>
           <Plus className="h-4 w-4 mr-2" />
           {locale === 'ar' ? 'دورة جديدة' : 'New Course'}
         </Button>
@@ -178,8 +158,7 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center text-sm">
-                <DollarSign className="h-4 w-4 mr-2 text-green-600" />
-                <span className="font-semibold">
+                <span className="font-semibold text-green-600">
                   {course.price} {course.currency}
                 </span>
               </div>
@@ -231,117 +210,7 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
         ))}
       </div>
 
-      {/* Create Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{locale === 'ar' ? 'إنشاء دورة جديدة' : 'Create New Course'}</DialogTitle>
-            <DialogDescription>
-              {locale === 'ar' ? 'أدخل تفاصيل الدورة الجديدة' : 'Enter the details for the new course'}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">{locale === 'ar' ? 'الاسم (إنجليزي)' : 'Name (English)'}</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Football Training"
-                />
-              </div>
-              <div>
-                <Label htmlFor="nameAr">{locale === 'ar' ? 'الاسم (عربي)' : 'Name (Arabic)'}</Label>
-                <Input
-                  id="nameAr"
-                  value={formData.nameAr}
-                  onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
-                  placeholder="تدريب كرة القدم"
-                  dir="rtl"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="description">{locale === 'ar' ? 'الوصف (إنجليزي)' : 'Description (English)'}</Label>
-                <Input
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Professional football training..."
-                />
-              </div>
-              <div>
-                <Label htmlFor="descriptionAr">{locale === 'ar' ? 'الوصف (عربي)' : 'Description (Arabic)'}</Label>
-                <Input
-                  id="descriptionAr"
-                  value={formData.descriptionAr}
-                  onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
-                  placeholder="تدريب كرة قدم احترافي..."
-                  dir="rtl"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="price">{locale === 'ar' ? 'السعر' : 'Price'}</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  min="0"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="currency">{locale === 'ar' ? 'العملة' : 'Currency'}</Label>
-                <Input
-                  id="currency"
-                  value={formData.currency}
-                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                  placeholder="USD"
-                />
-              </div>
-              <div>
-                <Label htmlFor="duration">{locale === 'ar' ? 'المدة (أشهر)' : 'Duration (months)'}</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  min="1"
-                  value={formData.duration}
-                  onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 1 })}
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="maxStudents">{locale === 'ar' ? 'الحد الأقصى للطلاب (اختياري)' : 'Max Students (optional)'}</Label>
-              <Input
-                id="maxStudents"
-                type="number"
-                min="0"
-                value={formData.maxStudents}
-                onChange={(e) => setFormData({ ...formData, maxStudents: parseInt(e.target.value) || 0 })}
-                placeholder="0 = unlimited"
-              />
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => { setIsCreateDialogOpen(false); resetForm(); }}>
-                {locale === 'ar' ? 'إلغاء' : 'Cancel'}
-              </Button>
-              <Button onClick={handleCreate}>
-                {locale === 'ar' ? 'إنشاء' : 'Create'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Dialog - Same structure as create */}
+      {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>

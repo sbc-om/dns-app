@@ -49,8 +49,7 @@ export default async function DashboardLayout({
   if (permissions?.canManageCourses) {
     accessibleResources.push('dashboard.courses');
   }
-  if (permissions?.canAccessDashboard) {
-    // Parents can see payments
+  if (permissions?.canViewPayments) {
     accessibleResources.push('dashboard.payments');
   }
   if (permissions?.canAccessSettings) {
