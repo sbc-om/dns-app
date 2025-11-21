@@ -9,6 +9,9 @@ export interface Course {
   price: number;
   currency: string; // e.g., "USD", "SAR", "IQD"
   duration: number; // in months
+  startDate?: string; // ISO date string
+  endDate?: string; // ISO date string
+  courseImage?: string; // base64 image string
   isActive: boolean;
   maxStudents?: number;
   createdAt: string;
@@ -23,6 +26,9 @@ export interface CreateCourseInput {
   price: number;
   currency?: string;
   duration: number;
+  startDate?: string; // ISO date string
+  endDate?: string; // ISO date string
+  courseImage?: string; // base64 image string
   maxStudents?: number;
 }
 
@@ -70,6 +76,9 @@ export async function createCourse(input: CreateCourseInput): Promise<Course> {
     price: input.price,
     currency: input.currency || 'USD',
     duration: input.duration,
+    startDate: input.startDate,
+    endDate: input.endDate,
+    courseImage: input.courseImage,
     maxStudents: input.maxStudents,
     isActive: true,
     createdAt: new Date().toISOString(),

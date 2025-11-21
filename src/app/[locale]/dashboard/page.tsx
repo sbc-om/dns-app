@@ -158,7 +158,7 @@ export default async function DashboardPage({
               <p className="text-gray-500 text-lg">{dictionary.users.noChildren}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-4">
               {children.map((child) => (
                 <Link 
                   key={child.id} 
@@ -166,17 +166,78 @@ export default async function DashboardPage({
                   className="block group"
                 >
                   <div className="bg-white p-6 rounded-xl border-2 border-blue-100 shadow-md hover:shadow-xl hover:border-blue-300 transition-all duration-300">
-                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                      <div className="bg-blue-100 p-4 rounded-full group-hover:bg-blue-200 transition-colors">
-                        <Users className="w-8 h-8 text-blue-600" />
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                      {/* Left: Profile Image & Info */}
+                      <div className="flex items-center gap-4 flex-1">
+                        {/* Profile Image */}
+                        <div className="relative flex-shrink-0">
+                          {child.profilePicture ? (
+                            <img
+                              src={child.profilePicture}
+                              alt={child.fullName || child.username}
+                              className="w-16 h-16 rounded-full object-cover border-4 border-blue-200 group-hover:border-blue-400 transition-colors"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-2xl font-bold border-4 border-blue-200 group-hover:border-blue-400 transition-colors">
+                              {(child.fullName || child.username).charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Name & Info */}
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
+                            {child.fullName || child.username}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {child.nationalId ? `${dictionary.users.nationalId}: ${child.nationalId}` : child.username}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
-                          {child.fullName || child.username}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {child.nationalId ? `${dictionary.users.nationalId}: ${child.nationalId}` : child.username}
-                        </p>
+
+                      {/* Right: Achievements (Medals) */}
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <div className="flex items-center gap-1">
+                          {/* Gold Medal */}
+                          <div className="relative group/medal">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                              <span className="text-white text-xl">🥇</span>
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-yellow-600 border border-yellow-400">
+                              3
+                            </div>
+                          </div>
+
+                          {/* Silver Medal */}
+                          <div className="relative group/medal">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                              <span className="text-white text-xl">🥈</span>
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-gray-600 border border-gray-400">
+                              5
+                            </div>
+                          </div>
+
+                          {/* Bronze Medal */}
+                          <div className="relative group/medal">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                              <span className="text-white text-xl">🥉</span>
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-orange-600 border border-orange-400">
+                              8
+                            </div>
+                          </div>
+
+                          {/* Star/Trophy */}
+                          <div className="relative group/medal">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                              <span className="text-white text-xl">⭐</span>
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-purple-600 border border-purple-400">
+                              12
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

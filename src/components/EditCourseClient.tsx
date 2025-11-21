@@ -9,35 +9,38 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUpload } from '@/components/ImageUpload';
-import { createCourseAction } from '@/lib/actions/courseActions';
+import { updateCourseAction } from '@/lib/actions/courseActions';
+import { Course } from '@/lib/db/repositories/courseRepository';
 
-interface CreateCourseClientProps {
+interface EditCourseClientProps {
   locale: string;
   dict: any;
+  course: Course;
 }
 
-export default function CreateCourseClient({ locale, dict }: CreateCourseClientProps) {
+export default function EditCourseClient({ locale, dict, course }: EditCourseClientProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    nameAr: '',
-    description: '',
-    descriptionAr: '',
-    price: 0,
-    currency: 'OMR',
-    duration: 1,
-    maxStudents: 0,
-    startDate: '',
-    endDate: '',
-    courseImage: '',
+    name: course.name || '',
+    nameAr: course.nameAr || '',
+    description: course.description || '',
+    descriptionAr: course.descriptionAr || '',
+    price: course.price || 0,
+    currency: course.currency || 'OMR',
+    duration: course.duration || 1,
+    maxStudents: course.maxStudents || 0,
+    startDate: course.startDate ? course.startDate.split('T')[0] : '',
+    endDate: course.endDate ? course.endDate.split('T')[0] : '',
+    courseImage: course.courseImage || '',
+    isActive: course.isActive,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const result = await createCourseAction({
+    const result = await updateCourseAction(course.id, {
       name: formData.name,
       nameAr: formData.nameAr,
       description: formData.description || undefined,
@@ -49,12 +52,13 @@ export default function CreateCourseClient({ locale, dict }: CreateCourseClientP
       startDate: formData.startDate || undefined,
       endDate: formData.endDate || undefined,
       courseImage: formData.courseImage || undefined,
+      isActive: formData.isActive,
     });
 
     if (result.success) {
       router.push(`/${locale}/dashboard/courses`);
     } else {
-      alert(result.error || 'Failed to create course');
+      alert(result.error || 'Failed to update course');
     }
     setLoading(false);
   };
@@ -76,10 +80,10 @@ export default function CreateCourseClient({ locale, dict }: CreateCourseClientP
         </Button>
         <div>
           <h1 className="text-3xl font-bold">
-            {locale === 'ar' ? 'إنشاء دورة جديدة' : 'Create New Course'}
+            {locale === 'ar' ? 'تعديل الدورة' : 'Edit Course'}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {locale === 'ar' ? 'أدخل تفاصيل الدورة الجديدة' : 'Enter the details for the new course'}
+            {locale === 'ar' ? 'تحديث تفاصيل الدورة' : 'Update course details'}
           </p>
         </div>
       </div>
@@ -90,7 +94,7 @@ export default function CreateCourseClient({ locale, dict }: CreateCourseClientP
           <CardHeader>
             <CardTitle>{locale === 'ar' ? 'معلومات الدورة' : 'Course Information'}</CardTitle>
             <CardDescription>
-              {locale === 'ar' ? 'املأ جميع الحقول المطلوبة' : 'Fill in all required fields'}
+              {locale === 'ar' ? 'قم بتعديل الحقول المطلوبة' : 'Update the required fields'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -268,6 +272,21 @@ export default function CreateCourseClient({ locale, dict }: CreateCourseClientP
               </p>
             </div>
 
+            {/* Active Status Toggle */}
+            <div className="flex items-center gap-3 p-4 border rounded-lg">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={formData.isActive}
+                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                className="h-4 w-4 rounded border-gray-300"
+                aria-label={locale === 'ar' ? 'الدورة نشطة' : 'Course is Active'}
+              />
+              <Label htmlFor="isActive" className="cursor-pointer">
+                {locale === 'ar' ? 'الدورة نشطة' : 'Course is Active'}
+              </Label>
+            </div>
+
             {/* Action Buttons */}
             <div className="flex justify-end gap-3 pt-4 border-t">
               <Button
@@ -282,7 +301,7 @@ export default function CreateCourseClient({ locale, dict }: CreateCourseClientP
                 <Save className="h-4 w-4 mr-2" />
                 {loading 
                   ? (locale === 'ar' ? 'جاري الحفظ...' : 'Saving...')
-                  : (locale === 'ar' ? 'حفظ الدورة' : 'Save Course')}
+                  : (locale === 'ar' ? 'حفظ التغييرات' : 'Save Changes')}
               </Button>
             </div>
           </CardContent>

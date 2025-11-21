@@ -7,7 +7,6 @@ import { Locale } from '@/config/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { UserCircle, Trophy, Activity, Star, Calendar, CreditCard, Edit, BookOpen, Save, Trash2, Pencil } from 'lucide-react';
@@ -227,23 +226,8 @@ export function KidProfileClient({
         </CardContent>
       </Card>
 
-      {/* Tabs for Activities, Scores, etc. */}
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className={`grid w-full ${currentUser.role === 'admin' ? 'grid-cols-4 lg:w-[500px]' : 'grid-cols-3 lg:w-[400px]'}`}>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          {currentUser.role === 'admin' && (
-            <TabsTrigger value="playercard">
-              <CreditCard className="h-4 w-4 me-2" />
-              Player Card
-            </TabsTrigger>
-          )}
-          <TabsTrigger value="activities">Activities</TabsTrigger>
-          <TabsTrigger value="scores">Scores</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview" className="space-y-4 mt-4">
-          {/* Courses Information Card */}
-          <Card className="border-2 border-blue-200 bg-blue-50/50">
+      {/* Courses Information Card */}
+      <Card className="border-2 border-blue-200 bg-blue-50/50">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -305,59 +289,103 @@ export function KidProfileClient({
                     const isDeleting = deletingEnrollmentId === enrollment.id;
                     
                     return (
-                      <div key={enrollment.id} className="bg-white p-4 rounded-lg border border-blue-200">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-blue-900 mb-2">
-                              {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
-                            </h3>
-                            <div className="flex items-center justify-between text-sm mb-2">
-                              <span className="text-gray-600">
-                                {locale === 'ar' ? 'الرسوم:' : 'Fee:'}
-                              </span>
-                              <span className="font-bold text-lg text-blue-600">
-                                {enrollment.course?.price} {enrollment.course?.currency}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-600">
-                                {locale === 'ar' ? 'حالة الدفع:' : 'Payment Status:'}
-                              </span>
-                              <Badge className={
-                                enrollment.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' :
-                                enrollment.paymentStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-red-100 text-red-800'
-                              }>
-                                {enrollment.paymentStatus === 'paid' ? (locale === 'ar' ? 'مدفوع' : 'Paid') :
-                                 enrollment.paymentStatus === 'pending' ? (locale === 'ar' ? 'قيد المراجعة' : 'Pending') :
-                                 (locale === 'ar' ? 'غير مدفوع' : 'Unpaid')}
-                              </Badge>
-                            </div>
-                          </div>
-                          {currentUser.role === 'admin' && (
-                            <div className="flex gap-2 ms-3">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleEditEnrollment(enrollment)}
-                                disabled={isDeleting}
-                                className="h-8 w-8 p-0 hover:bg-blue-100 dark:hover:bg-blue-900"
-                                title={locale === 'ar' ? 'تعديل الدورة' : 'Edit Course'}
-                              >
-                                <Pencil className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleDeleteEnrollment(enrollment.id)}
-                                disabled={isDeleting}
-                                className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-900"
-                                title={locale === 'ar' ? 'حذف الدورة' : 'Delete Course'}
-                              >
-                                <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
-                              </Button>
+                      <div key={enrollment.id} className="bg-white rounded-lg border border-blue-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex flex-col md:flex-row">
+                          {/* Course Image */}
+                          {enrollment.course?.courseImage && (
+                            <div className="w-full md:w-48 h-32 md:h-auto flex-shrink-0 bg-gray-100">
+                              <img
+                                src={enrollment.course.courseImage}
+                                alt={locale === 'ar' ? enrollment.course.nameAr : enrollment.course.name}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
                           )}
+                          
+                          {/* Course Content */}
+                          <div className="flex-1 p-4">
+                            <div className="flex items-start justify-between">
+                              <div 
+                                className={`flex-1 ${enrollment.paymentStatus === 'paid' ? 'cursor-pointer' : ''}`}
+                                onClick={() => {
+                                  if (enrollment.paymentStatus === 'paid') {
+                                    window.location.href = `/${locale}/dashboard/kids/${currentKid.id}/courses/${enrollment.course?.id}`;
+                                  }
+                                }}
+                              >
+                                {/* Course Name and Dates/Status on Same Line */}
+                                <div className="flex items-center justify-between mb-3">
+                                  <h3 className="font-semibold text-blue-900 text-lg">
+                                    {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
+                                  </h3>
+                                  
+                                  {enrollment.paymentStatus === 'paid' ? (
+                                    enrollment.course?.startDate && enrollment.course?.endDate && (
+                                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                                        <span className="font-medium">
+                                          {new Date(enrollment.course.startDate).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
+                                        </span>
+                                        <span>-</span>
+                                        <span className="font-medium">
+                                          {new Date(enrollment.course.endDate).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                        </span>
+                                      </div>
+                                    )
+                                  ) : (
+                                    <span className="font-bold text-lg text-blue-600 whitespace-nowrap">
+                                      {enrollment.course?.price} {enrollment.course?.currency}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Status Badge */}
+                                <div className="flex items-center gap-2">
+                                  <Badge className={
+                                    enrollment.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' :
+                                    enrollment.paymentStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                    'bg-red-100 text-red-800'
+                                  }>
+                                    {enrollment.paymentStatus === 'paid' ? (locale === 'ar' ? 'نشطة' : 'Active') :
+                                     enrollment.paymentStatus === 'pending' ? (locale === 'ar' ? 'قيد المراجعة' : 'Pending') :
+                                     (locale === 'ar' ? 'غير مدفوع' : 'Unpaid')}
+                                  </Badge>
+                                </div>
+
+                                {/* Description if exists */}
+                                {enrollment.course?.description && enrollment.paymentStatus === 'paid' && (
+                                  <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                                    {locale === 'ar' ? enrollment.course.descriptionAr : enrollment.course.description}
+                                  </p>
+                                )}
+                              </div>
+                              
+                              {/* Admin Actions */}
+                              {currentUser.role === 'admin' && (
+                                <div className="flex gap-2 ms-3">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => handleEditEnrollment(enrollment)}
+                                    disabled={isDeleting}
+                                    className="h-8 w-8 p-0 hover:bg-blue-100 dark:hover:bg-blue-900"
+                                    title={locale === 'ar' ? 'تعديل الدورة' : 'Edit Course'}
+                                  >
+                                    <Pencil className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => handleDeleteEnrollment(enrollment.id)}
+                                    disabled={isDeleting}
+                                    className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-900"
+                                    title={locale === 'ar' ? 'حذف الدورة' : 'Delete Course'}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     );
@@ -387,16 +415,19 @@ export function KidProfileClient({
               )}
             </CardContent>
           </Card>
-        </TabsContent>
 
-        {currentUser.role === 'admin' && (
-          <TabsContent value="playercard" className="space-y-4 mt-4">
+      {/* Player Card Section - Admin Only */}
+      {currentUser.role === 'admin' && (
+        <Card className="shadow-lg">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-purple-600" />
+              <CardTitle className="text-lg">Player Card</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
             {loadingCard ? (
-              <Card>
-                <CardContent className="py-8">
-                  <div className="text-center text-gray-500">Loading player card...</div>
-                </CardContent>
-              </Card>
+              <div className="text-center py-8 text-gray-500">Loading player card...</div>
             ) : playerCard ? (
               <PlayerCardDisplay card={playerCard} />
             ) : (
@@ -407,35 +438,10 @@ export function KidProfileClient({
                 userName={currentKid.fullName || currentKid.username} 
               />
             )}
-          </TabsContent>
-        )}
+          </CardContent>
+        </Card>
+      )}
 
-        <TabsContent value="activities" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activities</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                No recent activities found.
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="scores" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Score History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                No score history available.
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }
