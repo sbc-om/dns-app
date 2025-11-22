@@ -85,27 +85,27 @@ export default function HomePage({ params }: PageProps) {
   const programs = [
     {
       title: 'FOOTBALL',
-      description: 'Professional football training program',
-      image: '/icons/icon-192x192.png',
-      color: 'from-blue-500 to-cyan-500'
+      description: 'Professional football training program for all skill levels',
+      image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=400&fit=crop',
+      color: 'from-blue-600 to-cyan-500'
     },
     {
       title: 'BASKETBALL',
-      description: 'Elite basketball development',
-      image: '/icons/icon-192x192.png',
-      color: 'from-orange-500 to-red-500'
+      description: 'Elite basketball development and skills training',
+      image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&h=400&fit=crop',
+      color: 'from-orange-600 to-red-500'
     },
     {
       title: 'VOLLEYBALL',
-      description: 'Comprehensive volleyball training',
-      image: '/icons/icon-192x192.png',
-      color: 'from-purple-500 to-pink-500'
+      description: 'Comprehensive volleyball training and team development',
+      image: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=400&h=400&fit=crop',
+      color: 'from-purple-600 to-pink-500'
     },
     {
       title: 'YOUTH PROGRAM',
-      description: 'Building tomorrow\'s champions',
-      image: '/icons/icon-192x192.png',
-      color: 'from-green-500 to-emerald-500'
+      description: 'Building tomorrow\'s champions through structured training',
+      image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400&h=400&fit=crop',
+      color: 'from-green-600 to-emerald-500'
     }
   ];
 
@@ -113,20 +113,20 @@ export default function HomePage({ params }: PageProps) {
     {
       name: 'John Doe',
       role: 'Parent',
-      content: 'Amazing program! My son has improved significantly.',
-      image: '/icons/icon-192x192.png'
+      content: 'Amazing program! My son has improved significantly in both skills and confidence.',
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'
     },
     {
       name: 'Sarah Smith',
       role: 'Athlete',
-      content: 'The coaching staff is exceptional. Highly recommend!',
-      image: '/icons/icon-192x192.png'
+      content: 'The coaching staff is exceptional and truly cares about each athlete. Highly recommend!',
+      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop'
     },
     {
       name: 'Mike Johnson',
       role: 'Coach',
-      content: 'Best sports academy in the region. Great facilities!',
-      image: '/icons/icon-192x192.png'
+      content: 'Best sports academy in the region. Great facilities and amazing community!',
+      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop'
     }
   ];
 
@@ -219,9 +219,14 @@ export default function HomePage({ params }: PageProps) {
                 {dictionary.pages.home.partners.title}
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-60">
-                {[1, 2, 3, 4].map((i) => (
+                {[
+                  'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop',
+                  'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=200&h=200&fit=crop',
+                  'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&h=200&fit=crop',
+                  'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=200&h=200&fit=crop'
+                ].map((img, i) => (
                   <div key={i} className="flex items-center justify-center p-8 bg-background rounded-lg shadow-sm">
-                    <img src="/icons/icon-192x192.png" alt={`Partner ${i}`} className="w-24 h-24 object-contain grayscale hover:grayscale-0 transition-all" />
+                    <img src={img} alt={`Partner ${i + 1}`} className="w-24 h-24 object-cover rounded-full grayscale hover:grayscale-0 transition-all" />
                   </div>
                 ))}
               </div>
@@ -266,10 +271,11 @@ export default function HomePage({ params }: PageProps) {
                 className="relative"
               >
                 <img 
-                  src="/icons/icon-512x512.png" 
+                  src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&h=600&fit=crop" 
                   alt="Philosophy" 
-                  className="w-full rounded-2xl shadow-2xl"
+                  className="w-full rounded-2xl shadow-2xl object-cover h-[500px]"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-2xl"></div>
               </motion.div>
             </div>
           </div>
@@ -308,13 +314,13 @@ export default function HomePage({ params }: PageProps) {
                 >
                   <Card className="group h-full flex flex-col hover:shadow-2xl transition-all duration-500 overflow-hidden border-2 hover:border-[#30B2D2] cursor-pointer hover:-translate-y-2">
                     <CardContent className="p-0 flex flex-col h-full">
-                      <div className={`h-64 bg-gradient-to-br ${program.color} flex items-center justify-center relative overflow-hidden`}>
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-all duration-500"></div>
+                      <div className={`h-64 relative overflow-hidden`}>
                         <img 
                           src={program.image} 
                           alt={program.title} 
-                          className="w-32 h-32 object-contain relative z-10 drop-shadow-2xl group-hover:scale-125 group-hover:rotate-6 transition-all duration-500" 
+                          className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" 
                         />
+                        <div className="absolute inset-0 bg-gradient-to-br ${program.color} opacity-40 group-hover:opacity-20 transition-all duration-500"></div>
                       </div>
                       <div className="p-8 flex-1 flex flex-col">
                         <h3 className="text-2xl font-black mb-3 group-hover:text-[#30B2D2] transition-colors min-h-[3.5rem]">

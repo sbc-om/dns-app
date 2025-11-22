@@ -134,7 +134,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
               className="h-8 w-8 object-contain"
             />
             <h1 className="hidden sm:block text-xl font-bold bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#F2574C] bg-clip-text text-transparent">
-              DNA Program
+              Discover Natural Ability
             </h1>
           </div>
         </div>

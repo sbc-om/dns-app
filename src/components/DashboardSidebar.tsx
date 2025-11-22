@@ -131,9 +131,9 @@ export function DashboardSidebar({
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
               <h2 className="text-xl font-bold bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#F2574C] bg-clip-text text-transparent truncate">
-                DNA Program
+                DNA
               </h2>
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">Management System</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">Discover Natural Ability</p>
             </div>
           )}
         </Link>
@@ -182,7 +182,7 @@ export function DashboardSidebar({
           "text-xs text-center text-gray-500 dark:text-gray-400",
           isCollapsed && "lg:hidden"
         )}>
-          <p>© 2025 DNA Program</p>
+          <p>© 2025 Discover Natural Ability</p>
           <p className="mt-1">v1.0.0</p>
         </div>
         {isCollapsed && (

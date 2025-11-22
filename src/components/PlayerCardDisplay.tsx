@@ -79,7 +79,7 @@ export function PlayerCardDisplay({ card, size = 'large' }: PlayerCardDisplayPro
         <div className="flex items-center justify-between pt-4 border-t border-white/20">
           <div className="flex items-center gap-2">
             <Trophy className="w-4 h-4" />
-            <span className="text-xs font-medium">DNA PROGRAM</span>
+            <span className="text-xs font-medium">DISCOVER NATURAL ABILITY</span>
           </div>
           <Badge variant="secondary" className="bg-white/20 text-white border-none">
             {card.preferredFoot.toUpperCase()}

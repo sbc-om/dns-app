@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DNA Web App",
-  description: "Digital Network Application - A comprehensive web application",
+  title: "Discover Natural Ability",
+  description: "Discover Natural Ability - Transform your potential into excellence through professional sports training",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "DNA Web App",
+    title: "Discover Natural Ability",
   },
   formatDetection: {
     telephone: false,

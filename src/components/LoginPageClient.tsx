@@ -63,7 +63,7 @@ export default function LoginPageClient({ dictionary, locale }: LoginPageClientP
               <p className="text-sm font-medium text-purple-800 dark:text-purple-200">
                 {dictionary.auth.dontHaveAccount}{' '}
                 <Link 
-                  href={`/${locale}/auth/register`}
+                  href={`/${locale}/book-appointment`}
                   className="text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 font-bold underline underline-offset-2 transition-colors"
                 >
                   {dictionary.auth.signupButton}

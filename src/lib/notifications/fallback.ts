@@ -38,12 +38,12 @@ export function useNotificationFallback(enabled: boolean = true) {
         
         // Update page title with unread count
         if (typeof document !== 'undefined') {
-          document.title = `(${data.count}) DNA Program`;
+          document.title = `(${data.count}) Discover Natural Ability`;
         }
       } else {
         // Reset title when no unread messages
         if (typeof document !== 'undefined' && document.title.startsWith('(')) {
-          document.title = 'DNA Program';
+          document.title = 'Discover Natural Ability';
         }
       }
     } catch (error) {
