@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ 
         success: true, 
         date,
-        timeSlots: timeSlots.filter(slot => !slot.isBooked) // Only show available slots
+        timeSlots // Return all slots including booked ones so they can be shown as unavailable
       });
     }
 

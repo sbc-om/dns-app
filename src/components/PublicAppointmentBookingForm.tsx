@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calendar, Clock, User, Mail, Phone, CheckCircle2 } from 'lucide-react';
+import { Calendar, Clock, User, Mail, Phone, CheckCircle2, ArrowRight, ArrowLeft, MessageSquare } from 'lucide-react';
 
 interface PublicAppointmentBookingFormProps {
   dictionary: Dictionary;
@@ -18,7 +18,10 @@ interface TimeSlot {
   isBooked: boolean;
 }
 
+type WizardStep = 'personal' | 'date' | 'time' | 'confirm';
+
 export function PublicAppointmentBookingForm({ dictionary, locale }: PublicAppointmentBookingFormProps) {
+  const [currentStep, setCurrentStep] = useState<WizardStep>('personal');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
@@ -32,6 +35,13 @@ export function PublicAppointmentBookingForm({ dictionary, locale }: PublicAppoi
     time: '',
     notes: '',
   });
+
+  const steps: { id: WizardStep; title: string; icon: any }[] = [
+    { id: 'personal', title: locale === 'ar' ? 'المعلومات الشخصية' : 'Personal Info', icon: User },
+    { id: 'date', title: locale === 'ar' ? 'اختر التاريخ' : 'Select Date', icon: Calendar },
+    { id: 'time', title: locale === 'ar' ? 'اختر الوقت' : 'Select Time', icon: Clock },
+    { id: 'confirm', title: locale === 'ar' ? 'تأكيد' : 'Confirm', icon: CheckCircle2 },
+  ];
 
   // Load available dates on mount
   useEffect(() => {
@@ -73,8 +83,36 @@ export function PublicAppointmentBookingForm({ dictionary, locale }: PublicAppoi
     setLoadingSlots(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const canProceedToNext = () => {
+    switch (currentStep) {
+      case 'personal':
+        return formData.fullName && formData.email && formData.phoneNumber;
+      case 'date':
+        return formData.date;
+      case 'time':
+        return formData.time;
+      case 'confirm':
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  const handleNext = () => {
+    const stepIndex = steps.findIndex(s => s.id === currentStep);
+    if (stepIndex < steps.length - 1) {
+      setCurrentStep(steps[stepIndex + 1].id);
+    }
+  };
+
+  const handleBack = () => {
+    const stepIndex = steps.findIndex(s => s.id === currentStep);
+    if (stepIndex > 0) {
+      setCurrentStep(steps[stepIndex - 1].id);
+    }
+  };
+
+  const handleSubmit = async () => {
     setIsSubmitting(true);
 
     try {
@@ -96,7 +134,7 @@ export function PublicAppointmentBookingForm({ dictionary, locale }: PublicAppoi
           time: '',
           notes: '',
         });
-        setTimeout(() => setIsSuccess(false), 5000);
+        setCurrentStep('personal');
       } else {
         alert(data.error || 'Failed to book appointment');
       }
@@ -110,19 +148,25 @@ export function PublicAppointmentBookingForm({ dictionary, locale }: PublicAppoi
 
   if (isSuccess) {
     return (
-      <Card className="border-2 border-green-200 bg-green-50 dark:bg-green-900/20">
+      <Card className="border-2 border-green-200 bg-linear-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
         <CardContent className="pt-6">
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-6 py-8">
             <div className="flex justify-center">
-              <CheckCircle2 className="h-16 w-16 text-green-600" />
+              <div className="rounded-full bg-green-100 dark:bg-green-900/40 p-6">
+                <CheckCircle2 className="h-20 w-20 text-green-600 dark:text-green-400" />
+              </div>
             </div>
-            <h3 className="text-2xl font-bold text-green-800 dark:text-green-300">
+            <h3 className="text-3xl font-bold text-green-800 dark:text-green-300">
               {dictionary.appointments?.bookingSuccess || 'Booking Successful!'}
             </h3>
-            <p className="text-green-700 dark:text-green-400">
+            <p className="text-lg text-green-700 dark:text-green-400 max-w-md mx-auto">
               {dictionary.appointments?.bookingSuccessMessage || 'Your appointment has been scheduled. We will contact you soon to confirm.'}
             </p>
-            <Button onClick={() => setIsSuccess(false)} className="bg-green-600 hover:bg-green-700 text-white">
+            <Button 
+              onClick={() => setIsSuccess(false)} 
+              size="lg"
+              className="bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg"
+            >
               {dictionary.appointments?.bookAnother || 'Book Another Appointment'}
             </Button>
           </div>
@@ -132,160 +176,360 @@ export function PublicAppointmentBookingForm({ dictionary, locale }: PublicAppoi
   }
 
   return (
-    <Card className="border-2 hover:border-purple-200 dark:hover:border-purple-800 transition-colors">
-      <CardHeader>
-        <CardTitle className="text-2xl">
-          {dictionary.appointments?.appointmentDetails || 'Appointment Details'}
-        </CardTitle>
-        <CardDescription>
-          {dictionary.appointments?.fillDetails || 'Please fill in your information below'}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="fullName" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              {dictionary.common?.fullName || 'Full Name'} *
-            </Label>
-            <Input
-              id="fullName"
-              type="text"
-              value={formData.fullName}
-              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-              placeholder={dictionary.appointments?.enterFullName || 'Enter your full name'}
-              required
-              className="text-lg"
-            />
-          </div>
+    <Card className="border-2 border-purple-100 dark:border-purple-900 shadow-xl">
+      <CardHeader className="space-y-6">
+        <div>
+          <CardTitle className="text-2xl md:text-3xl">
+            {dictionary.appointments?.appointmentDetails || 'Appointment Details'}
+          </CardTitle>
+          <CardDescription className="text-base mt-2">
+            {dictionary.appointments?.fillDetails || 'Please fill in your information below'}
+          </CardDescription>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
-              <Mail className="h-4 w-4" />
-              {dictionary.common?.email || 'Email'} *
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder={dictionary.appointments?.enterEmail || 'Enter your email'}
-              required
-              className="text-lg"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phoneNumber" className="flex items-center gap-2">
-              <Phone className="h-4 w-4" />
-              {dictionary.common?.phoneNumber || 'Phone Number'} *
-            </Label>
-            <Input
-              id="phoneNumber"
-              type="tel"
-              value={formData.phoneNumber}
-              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-              placeholder={dictionary.appointments?.enterPhone || 'Enter your phone number'}
-              required
-              className="text-lg"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="date" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              {dictionary.appointments?.preferredDate || 'Preferred Date'} *
-            </Label>
-            {availableDates.length === 0 ? (
-              <p className="text-sm text-muted-foreground p-3 border rounded-md">
-                {dictionary.appointment?.noAvailableDates || 'No dates available. Please check back later.'}
-              </p>
-            ) : (
-              <select
-                id="date"
-                aria-label={dictionary.appointment?.selectDate || 'Select a date'}
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value, time: '' })}
-                required
-                className="w-full px-3 py-2 text-lg border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              >
-                <option value="">{dictionary.appointment?.selectDate || 'Select a date'}</option>
-                {availableDates.map((date) => (
-                  <option key={date} value={date}>
-                    {new Date(date + 'T00:00:00').toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-
-          {formData.date && (
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                {dictionary.appointments?.preferredTime || 'Preferred Time'} *
-              </Label>
-              {loadingSlots ? (
-                <p className="text-sm text-muted-foreground p-3 border rounded-md">
-                  {dictionary.common?.loading || 'Loading...'}
-                </p>
-              ) : timeSlots.length === 0 ? (
-                <p className="text-sm text-muted-foreground p-3 border rounded-md">
-                  {dictionary.appointment?.noSlotsAvailable || 'No time slots available for this date'}
-                </p>
-              ) : (
-                <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
-                  {timeSlots.map((slot) => (
-                    <button
-                      key={slot.time}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, time: slot.time })}
-                      disabled={slot.isBooked}
-                      className={`px-3 py-2 text-sm border rounded-md transition-colors ${
-                        formData.time === slot.time
-                          ? 'bg-purple-600 text-white border-purple-600'
-                          : slot.isBooked
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'hover:bg-purple-50 hover:border-purple-300'
+        {/* Progress Steps */}
+        <div className="w-full overflow-x-auto">
+          <div className="flex items-center justify-center min-w-max px-4 py-2">
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+              const isActive = step.id === currentStep;
+              const isCompleted = steps.findIndex(s => s.id === currentStep) > index;
+              
+              return (
+                <div key={step.id} className="flex items-center">
+                  {/* Step Circle */}
+                  <div className="flex flex-col items-center">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 ${
+                        isActive
+                          ? 'bg-linear-to-r from-purple-600 to-pink-600 border-purple-600 text-white shadow-md'
+                          : isCompleted
+                          ? 'bg-green-500 border-green-500 text-white'
+                          : 'bg-white border-gray-300 text-gray-400'
                       }`}
                     >
-                      {slot.time}
-                    </button>
-                  ))}
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <span
+                      className={`text-[10px] mt-1.5 font-medium text-center whitespace-nowrap transition-colors duration-300 ${
+                        isActive ? 'text-purple-600' : isCompleted ? 'text-green-600' : 'text-gray-400'
+                      }`}
+                    >
+                      {step.title}
+                    </span>
+                  </div>
+                  
+                  {/* Connector Line */}
+                  {index < steps.length - 1 && (
+                    <div className="relative mx-2 w-12">
+                      <div className="h-px bg-gray-200 rounded-full"></div>
+                      <div 
+                        className={`absolute top-0 left-0 h-px rounded-full transition-all duration-500 ${
+                          isCompleted ? 'bg-green-500 w-full' : 'bg-gray-200 w-0'
+                        }`}
+                      ></div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
+          {/* Step Content */}
+          {currentStep === 'personal' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  {locale === 'ar' ? 'أخبرنا عن نفسك' : 'Tell Us About Yourself'}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {locale === 'ar' ? 'نحتاج بعض المعلومات للاتصال بك' : 'We need some information to contact you'}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="flex items-center gap-2 text-base">
+                  <User className="h-5 w-5 text-purple-600" />
+                  {dictionary.common?.fullName || 'Full Name'} *
+                </Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  placeholder={dictionary.appointments?.enterFullName || 'Enter your full name'}
+                  className="text-lg h-12"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="flex items-center gap-2 text-base">
+                  <Mail className="h-5 w-5 text-purple-600" />
+                  {dictionary.common?.email || 'Email'} *
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder={dictionary.appointments?.enterEmail || 'Enter your email'}
+                  className="text-lg h-12"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phoneNumber" className="flex items-center gap-2 text-base">
+                  <Phone className="h-5 w-5 text-purple-600" />
+                  {dictionary.common?.phoneNumber || 'Phone Number'} *
+                </Label>
+                <Input
+                  id="phoneNumber"
+                  type="tel"
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  placeholder={dictionary.appointments?.enterPhone || 'Enter your phone number'}
+                  className="text-lg h-12"
+                />
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'date' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  {locale === 'ar' ? 'اختر التاريخ المناسب' : 'Choose Your Preferred Date'}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {locale === 'ar' ? 'اختر اليوم الذي يناسبك' : 'Select the day that works best for you'}
+                </p>
+              </div>
+
+              {availableDates.length === 0 ? (
+                <div className="text-center py-12 px-4 border-2 border-dashed rounded-lg">
+                  <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {dictionary.appointment?.noAvailableDates || 'No dates available. Please check back later.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {availableDates.map((date) => {
+                    const dateObj = new Date(date + 'T00:00:00');
+                    const isSelected = formData.date === date;
+                    return (
+                      <button
+                        key={date}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, date, time: '' })}
+                        className={`p-4 rounded-xl border-2 text-left transition-all ${
+                          isSelected
+                            ? 'border-purple-600 bg-purple-50 dark:bg-purple-900/20 shadow-md'
+                            : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`flex-shrink-0 w-14 h-14 rounded-lg flex flex-col items-center justify-center ${
+                            isSelected ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-900'
+                          }`}>
+                            <span className="text-xs font-medium uppercase">
+                              {dateObj.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { month: 'short' })}
+                            </span>
+                            <span className="text-xl font-bold">
+                              {dateObj.getDate()}
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-lg">
+                              {dateObj.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { weekday: 'long' })}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {dateObj.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { 
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}
+                            </p>
+                          </div>
+                          {isSelected && (
+                            <CheckCircle2 className="h-6 w-6 text-purple-600" />
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="notes">
-              {dictionary.appointments?.additionalNotes || 'Additional Notes'} ({dictionary.common?.optional || 'Optional'})
-            </Label>
-            <textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder={dictionary.appointments?.notesPlaceholder || 'Any additional information...'}
-              className="w-full min-h-[100px] px-3 py-2 text-lg border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              rows={4}
-            />
-          </div>
+          {currentStep === 'time' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  {locale === 'ar' ? 'اختر الوقت المناسب' : 'Pick Your Time Slot'}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {locale === 'ar' ? 'المواعيد المحجوزة باللون الأحمر' : 'Booked slots are shown in red'}
+                </p>
+              </div>
 
-          <Button
-            type="submit"
-            disabled={isSubmitting || !formData.date || !formData.time}
-            className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg py-6 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting 
-              ? (dictionary.common?.loading || 'Submitting...') 
-              : (dictionary.appointments?.submitBooking || 'Submit Booking')}
-          </Button>
-        </form>
+              {loadingSlots ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent mx-auto"></div>
+                  <p className="mt-4 text-gray-600">{dictionary.common?.loading || 'Loading...'}</p>
+                </div>
+              ) : timeSlots.length === 0 ? (
+                <div className="text-center py-12 px-4 border-2 border-dashed rounded-lg">
+                  <Clock className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {dictionary.appointment?.noSlotsAvailable || 'No time slots available for this date'}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {timeSlots.map((slot) => {
+                    const isSelected = formData.time === slot.time;
+                    return (
+                      <button
+                        key={slot.time}
+                        type="button"
+                        onClick={() => !slot.isBooked && setFormData({ ...formData, time: slot.time })}
+                        disabled={slot.isBooked}
+                        className={`relative p-4 rounded-xl border-2 text-center font-semibold transition-all duration-200 ${
+                          isSelected
+                            ? 'border-purple-600 bg-purple-600 text-white shadow-lg scale-105'
+                            : slot.isBooked
+                            ? 'border-red-500 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 cursor-not-allowed opacity-70'
+                            : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50 hover:scale-105 active:scale-95'
+                        }`}
+                      >
+                        <Clock className={`h-5 w-5 mx-auto mb-2 transition-colors ${
+                          isSelected ? 'text-white' : slot.isBooked ? 'text-red-500 dark:text-red-400' : 'text-gray-600'
+                        }`} />
+                        <span className="text-sm block">{slot.time}</span>
+                        {slot.isBooked && (
+                          <>
+                            <div className="absolute -top-1 -right-1 z-10">
+                              <div className="relative flex h-4 w-4">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 shadow-lg"></span>
+                              </div>
+                            </div>
+                            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">
+                              {locale === 'ar' ? 'محجوز' : 'Booked'}
+                            </span>
+                          </>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {currentStep === 'confirm' && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  {locale === 'ar' ? 'تأكيد الحجز' : 'Confirm Your Booking'}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {locale === 'ar' ? 'تحقق من التفاصيل قبل التأكيد' : 'Review your details before confirming'}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <User className="h-5 w-5 text-purple-600" />
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">{locale === 'ar' ? 'المعلومات الشخصية' : 'Personal Information'}</span>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <p><strong>{locale === 'ar' ? 'الاسم:' : 'Name:'}</strong> {formData.fullName}</p>
+                    <p><strong>{locale === 'ar' ? 'البريد الإلكتروني:' : 'Email:'}</strong> {formData.email}</p>
+                    <p><strong>{locale === 'ar' ? 'الهاتف:' : 'Phone:'}</strong> {formData.phoneNumber}</p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">{locale === 'ar' ? 'التاريخ والوقت' : 'Date & Time'}</span>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <p><strong>{locale === 'ar' ? 'التاريخ:' : 'Date:'}</strong> {new Date(formData.date + 'T00:00:00').toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}</p>
+                    <p><strong>{locale === 'ar' ? 'الوقت:' : 'Time:'}</strong> {formData.time}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="notes" className="flex items-center gap-2 text-base">
+                    <MessageSquare className="h-5 w-5 text-gray-600" />
+                    {dictionary.appointments?.additionalNotes || 'Additional Notes'} ({dictionary.common?.optional || 'Optional'})
+                  </Label>
+                  <textarea
+                    id="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    placeholder={dictionary.appointments?.notesPlaceholder || 'Any additional information...'}
+                    className="w-full min-h-[100px] px-4 py-3 text-base border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    rows={4}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Buttons */}
+          <div className="flex gap-3 pt-6 border-t">
+            {currentStep !== 'personal' && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleBack}
+                className="flex-1 h-12 text-base"
+                disabled={isSubmitting}
+              >
+                <ArrowLeft className="h-5 w-5 me-2" />
+                {locale === 'ar' ? 'السابق' : 'Back'}
+              </Button>
+            )}
+            
+            {currentStep !== 'confirm' ? (
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={!canProceedToNext()}
+                className="flex-1 h-12 text-base bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg disabled:opacity-50"
+              >
+                {locale === 'ar' ? 'التالي' : 'Next'}
+                <ArrowRight className="h-5 w-5 ms-2" />
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="flex-1 h-12 text-base bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg"
+              >
+                <CheckCircle2 className="h-5 w-5 me-2" />
+                {isSubmitting 
+                  ? (dictionary.common?.loading || 'Submitting...') 
+                  : (locale === 'ar' ? 'تأكيد الحجز' : 'Confirm Booking')}
+              </Button>
+            )}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
