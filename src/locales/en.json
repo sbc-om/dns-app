@@ -316,10 +316,60 @@
   "pages": {
     "home": {
       "hero": {
-        "title": "DNA",
-        "subtitle": "Be a Champion!",
-        "cta": "Start Now",
-        "loginCta": "Login"
+        "title": "LET'S CREATE A HERO",
+        "subtitle": "Transform your potential into excellence",
+        "cta": "Book Appointment",
+        "loginCta": "Sign In"
+      },
+      "partners": {
+        "title": "OUR PARTNERS"
+      },
+      "programs": {
+        "title": "OUR PROGRAMS",
+        "subtitle": "Choose your path to greatness",
+        "viewAll": "View All Programs",
+        "learnMore": "Learn More"
+      },
+      "philosophy": {
+        "badge": "1% PHILOSOPHY",
+        "title": "THE MOMENT",
+        "subtitle": "What is the program?",
+        "description": "NOT JUST REWARDS",
+        "goal": "To the highest athletic performance"
+      },
+      "recognition": {
+        "title": "NOT JUST REWARDS",
+        "subtitle": "REAL RECOGNITION",
+        "point1": "Appendicit",
+        "point2": "Appendicit",
+        "point3": "Dramatically",
+        "point4": "Indoloi"
+      },
+      "testimonials": {
+        "title": "WORDS FROM",
+        "subtitle": "OUR COMMUNITY"
+      },
+      "faq": {
+        "title": "Have Questions? Check Out Our FAQ for All the Answers You Need.",
+        "q1": "What sports programs does the academy offer?",
+        "a1": "We offer comprehensive training programs in football, basketball, and various other sports disciplines.",
+        "q2": "What age groups can join?",
+        "a2": "We welcome athletes of all ages, from young beginners to advanced players.",
+        "q3": "Do I need prior experience to join?",
+        "a3": "No prior experience needed! We have programs for all skill levels.",
+        "q4": "Where are practices and games held?",
+        "a4": "Our training facilities are located across multiple venues. Details will be provided upon registration."
+      },
+      "newsletter": {
+        "badge": "NEWSLETTER",
+        "title": "STAY UP TO DATE",
+        "placeholder": "Enter your email address",
+        "button": "Subscribe",
+        "privacy": "By submitting this form, you agree to our Privacy Policy"
+      },
+      "discover": {
+        "title": "DISCOVER NOW",
+        "sports": ["FOOTBALL", "BASKETBALL", "CLUB"]
       },
       "features": {
         "title": "Discover The Moment",
@@ -340,11 +390,6 @@
           "title": "Earn & Collect Rewards",
           "description": "Collect coins and points after each training session—pre-programmed rewards that motivate consistent effort and celebrate dedication"
         }
-      },
-      "philosophy": {
-        "title": "Making Fitness Fun & Empowering",
-        "subtitle": "High appeal: Tap into the growing love for physical challenges and movement, inspired by Discover's philosophy of making fitness fun and empowering",
-        "forEveryone": "Fun for everyone: Courses and activities are designed to engage and challenge all ages and abilities – from young kids to adults seeking excitement"
       }
     },
     "about": {
