@@ -2,8 +2,10 @@ import { requireAuth } from '@/lib/auth/auth';
 import { getDictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import { ROLE_LABELS } from '@/config/roles';
-import { listUsers, getChildrenByParentId } from '@/lib/db/repositories/userRepository';
+import { listUsers, getChildrenByParentId, getUsersByIds } from '@/lib/db/repositories/userRepository';
 import { getAllAppointments } from '@/lib/db/repositories/appointmentRepository';
+import { getCoursesByCoachId, type Course } from '@/lib/db/repositories/courseRepository';
+import { getPaidEnrollmentsByCourseId } from '@/lib/db/repositories/enrollmentRepository';
 import { Users, Calendar, Clock, CheckCircle, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -40,6 +42,31 @@ export default async function DashboardPage({
     };
   }
 
+  // Fetch courses for coach
+  let coachCourses: Array<{ course: Course; activePlayers: number }> = [];
+  if (user.role === 'coach') {
+    const courses = await getCoursesByCoachId(user.id);
+
+    if (courses.length > 0) {
+      coachCourses = await Promise.all(
+        courses.map(async (course) => {
+          const paidEnrollments = await getPaidEnrollmentsByCourseId(course.id);
+
+          if (paidEnrollments.length === 0) {
+            return { course, activePlayers: 0 };
+          }
+
+          const studentIds = Array.from(new Set(paidEnrollments.map((enrollment) => enrollment.studentId)));
+          const students = await getUsersByIds(studentIds);
+          const activeStudentIds = new Set(students.filter((student) => student.isActive).map((student) => student.id));
+          const activePlayers = paidEnrollments.filter((enrollment) => activeStudentIds.has(enrollment.studentId)).length;
+
+          return { course, activePlayers };
+        })
+      );
+    }
+  }
+
   return (
     <div className="h-full overflow-y-auto">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl space-y-6">
@@ -59,7 +86,7 @@ export default async function DashboardPage({
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Total Users Card */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border-2 border-blue-200 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-linear-to-br from-blue-50 to-blue-100 p-6 rounded-xl border-2 border-blue-200 shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-blue-600 mb-1">
@@ -76,7 +103,7 @@ export default async function DashboardPage({
             </div>
 
             {/* Active Users Card */}
-            <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border-2 border-green-200 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-linear-to-br from-green-50 to-green-100 p-6 rounded-xl border-2 border-green-200 shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-green-600 mb-1">
@@ -93,7 +120,7 @@ export default async function DashboardPage({
             </div>
 
             {/* Total Appointments Card */}
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border-2 border-purple-200 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-linear-to-br from-purple-50 to-purple-100 p-6 rounded-xl border-2 border-purple-200 shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-purple-600 mb-1">
@@ -110,7 +137,7 @@ export default async function DashboardPage({
             </div>
 
             {/* Pending Appointments Card */}
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border-2 border-orange-200 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-linear-to-br from-orange-50 to-orange-100 p-6 rounded-xl border-2 border-orange-200 shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-orange-600 mb-1">
@@ -127,7 +154,7 @@ export default async function DashboardPage({
             </div>
 
             {/* Today's Appointments Card */}
-            <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-xl border-2 border-teal-200 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-linear-to-br from-teal-50 to-teal-100 p-6 rounded-xl border-2 border-teal-200 shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-teal-600 mb-1">
@@ -170,7 +197,7 @@ export default async function DashboardPage({
                       {/* Left: Profile Image & Info */}
                       <div className="flex items-center gap-4 flex-1">
                         {/* Profile Image */}
-                        <div className="relative flex-shrink-0">
+                        <div className="relative shrink-0">
                           {child.profilePicture ? (
                             <img
                               src={child.profilePicture}
@@ -178,7 +205,7 @@ export default async function DashboardPage({
                               className="w-16 h-16 rounded-full object-cover border-4 border-blue-200 group-hover:border-blue-400 transition-colors"
                             />
                           ) : (
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-2xl font-bold border-4 border-blue-200 group-hover:border-blue-400 transition-colors">
+                            <div className="w-16 h-16 rounded-full bg-linear-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-2xl font-bold border-4 border-blue-200 group-hover:border-blue-400 transition-colors">
                               {(child.fullName || child.username).charAt(0).toUpperCase()}
                             </div>
                           )}
@@ -196,11 +223,11 @@ export default async function DashboardPage({
                       </div>
 
                       {/* Right: Achievements (Medals) */}
-                      <div className="flex items-center gap-3 flex-shrink-0">
+                      <div className="flex items-center gap-3 shrink-0">
                         <div className="flex items-center gap-1">
                           {/* Gold Medal */}
                           <div className="relative group/medal">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                               <span className="text-white text-xl">🥇</span>
                             </div>
                             <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-yellow-600 border border-yellow-400">
@@ -210,7 +237,7 @@ export default async function DashboardPage({
 
                           {/* Silver Medal */}
                           <div className="relative group/medal">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-gray-300 to-gray-500 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                               <span className="text-white text-xl">🥈</span>
                             </div>
                             <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-gray-600 border border-gray-400">
@@ -220,7 +247,7 @@ export default async function DashboardPage({
 
                           {/* Bronze Medal */}
                           <div className="relative group/medal">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                               <span className="text-white text-xl">🥉</span>
                             </div>
                             <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-orange-600 border border-orange-400">
@@ -230,7 +257,7 @@ export default async function DashboardPage({
 
                           {/* Star/Trophy */}
                           <div className="relative group/medal">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-400 to-purple-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                               <span className="text-white text-xl">⭐</span>
                             </div>
                             <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-purple-600 border border-purple-400">
@@ -238,6 +265,86 @@ export default async function DashboardPage({
                             </div>
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Coach View: Assigned Courses */}
+      {user.role === 'coach' && (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-[#1E3A8A]">
+              {dictionary.dashboard.coachCourses}
+            </h2>
+            <p className="text-muted-foreground">
+              {dictionary.dashboard.coachCoursesDescription}
+            </p>
+          </div>
+
+          {coachCourses.length === 0 ? (
+            <div className="bg-white p-8 rounded-xl border-2 border-dashed border-gray-300 text-center">
+              <p className="text-gray-500 text-lg">
+                {dictionary.dashboard.noCoachCourses}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {coachCourses.map(({ course, activePlayers }) => (
+                <Link
+                  key={course.id}
+                  href={`/${locale}/dashboard/coach/courses/${course.id}`}
+                  className="group block"
+                >
+                  <div className="bg-white p-6 rounded-xl border-2 border-blue-100 shadow-md hover:shadow-xl hover:border-blue-300 transition-all duration-300 h-full flex flex-col gap-4">
+                    {course.courseImage && (
+                      <div className="h-40 w-full rounded-lg overflow-hidden bg-gray-100">
+                        <img
+                          src={course.courseImage}
+                          alt={locale === 'ar' ? course.nameAr : course.name}
+                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                          {locale === 'ar' ? course.nameAr : course.name}
+                        </h3>
+                        <span className={`text-sm font-semibold px-3 py-1 rounded-full ${course.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}>
+                          {course.isActive ? dictionary.users.active : dictionary.users.inactive}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                        {course.startDate && (
+                          <span>
+                            <strong>{dictionary.dashboard.startsOn}:</strong>{' '}
+                            {new Date(course.startDate).toLocaleDateString(locale)}
+                          </span>
+                        )}
+                        {course.endDate && (
+                          <span>
+                            <strong>{dictionary.dashboard.endsOn}:</strong>{' '}
+                            {new Date(course.endDate).toLocaleDateString(locale)}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-500">{dictionary.dashboard.activePlayers}</p>
+                          <p className="text-2xl font-bold text-blue-600">{activePlayers}</p>
+                        </div>
+                        <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
+                          {dictionary.dashboard.viewRoster}
+                        </Button>
                       </div>
                     </div>
                   </div>

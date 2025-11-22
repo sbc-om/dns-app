@@ -63,6 +63,12 @@ export async function getEnrollmentsByCourseId(courseId: string): Promise<Enroll
   return allEnrollments.filter(e => e.courseId === courseId);
 }
 
+// Get paid enrollments by course ID
+export async function getPaidEnrollmentsByCourseId(courseId: string): Promise<Enrollment[]> {
+  const enrollments = await getEnrollmentsByCourseId(courseId);
+  return enrollments.filter(e => e.paymentStatus === 'paid');
+}
+
 // Get pending payments for parent
 export async function getPendingPaymentsByParentId(parentId: string): Promise<Enrollment[]> {
   const enrollments = await getEnrollmentsByParentId(parentId);

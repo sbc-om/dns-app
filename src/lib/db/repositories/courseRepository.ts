@@ -13,6 +13,10 @@ export interface Course {
   endDate?: string; // ISO date string
   courseImage?: string; // base64 image string
   coachId?: string; // ID of the assigned coach
+  totalSessions?: number;
+  sessionDays?: string[]; // e.g., ["Sunday", "Tuesday"]
+  sessionStartTime?: string; // HH:mm
+  sessionEndTime?: string; // HH:mm
   isActive: boolean;
   maxStudents?: number;
   createdAt: string;
@@ -31,6 +35,10 @@ export interface CreateCourseInput {
   endDate?: string; // ISO date string
   courseImage?: string; // base64 image string
   coachId?: string; // ID of the assigned coach
+  totalSessions?: number;
+  sessionDays?: string[];
+  sessionStartTime?: string;
+  sessionEndTime?: string;
   maxStudents?: number;
 }
 
@@ -55,6 +63,16 @@ export async function getAllCourses(): Promise<Course[]> {
 export async function getActiveCourses(): Promise<Course[]> {
   const allCourses = await getAllCourses();
   return allCourses.filter(course => course.isActive);
+}
+
+// Get courses assigned to a specific coach
+export async function getCoursesByCoachId(coachId: string): Promise<Course[]> {
+  if (!coachId) {
+    return [];
+  }
+
+  const allCourses = await getAllCourses();
+  return allCourses.filter(course => course.coachId === coachId);
 }
 
 // Get course by ID
@@ -82,6 +100,10 @@ export async function createCourse(input: CreateCourseInput): Promise<Course> {
     endDate: input.endDate,
     courseImage: input.courseImage,
     coachId: input.coachId,
+    totalSessions: input.totalSessions,
+    sessionDays: input.sessionDays,
+    sessionStartTime: input.sessionStartTime,
+    sessionEndTime: input.sessionEndTime,
     maxStudents: input.maxStudents,
     isActive: true,
     createdAt: new Date().toISOString(),

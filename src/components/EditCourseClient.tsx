@@ -37,8 +37,22 @@ export default function EditCourseClient({ locale, dict, course }: EditCourseCli
     endDate: course.endDate ? course.endDate.split('T')[0] : '',
     courseImage: course.courseImage || '',
     coachId: course.coachId || '',
+    totalSessions: course.totalSessions || 0,
+    sessionDays: course.sessionDays || [],
+    sessionStartTime: course.sessionStartTime || '',
+    sessionEndTime: course.sessionEndTime || '',
     isActive: course.isActive,
   });
+
+  const weekDays = [
+    { key: 'sunday', label: locale === 'ar' ? 'الأحد' : 'Sunday' },
+    { key: 'monday', label: locale === 'ar' ? 'الاثنين' : 'Monday' },
+    { key: 'tuesday', label: locale === 'ar' ? 'الثلاثاء' : 'Tuesday' },
+    { key: 'wednesday', label: locale === 'ar' ? 'الأربعاء' : 'Wednesday' },
+    { key: 'thursday', label: locale === 'ar' ? 'الخميس' : 'Thursday' },
+    { key: 'friday', label: locale === 'ar' ? 'الجمعة' : 'Friday' },
+    { key: 'saturday', label: locale === 'ar' ? 'السبت' : 'Saturday' },
+  ];
 
   // Load coaches on mount
   useEffect(() => {
@@ -50,6 +64,18 @@ export default function EditCourseClient({ locale, dict, course }: EditCourseCli
     }
     loadCoaches();
   }, []);
+
+  const toggleSessionDay = (dayKey: string) => {
+    setFormData((prev) => {
+      const exists = prev.sessionDays.includes(dayKey);
+      return {
+        ...prev,
+        sessionDays: exists
+          ? prev.sessionDays.filter((day) => day !== dayKey)
+          : [...prev.sessionDays, dayKey],
+      };
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,6 +94,10 @@ export default function EditCourseClient({ locale, dict, course }: EditCourseCli
       endDate: formData.endDate || undefined,
       courseImage: formData.courseImage || undefined,
       coachId: formData.coachId && formData.coachId !== 'none' ? formData.coachId : undefined,
+      totalSessions: formData.totalSessions > 0 ? formData.totalSessions : undefined,
+      sessionDays: formData.sessionDays.length > 0 ? formData.sessionDays : undefined,
+      sessionStartTime: formData.sessionStartTime || undefined,
+      sessionEndTime: formData.sessionEndTime || undefined,
       isActive: formData.isActive,
     });
 
@@ -264,6 +294,67 @@ export default function EditCourseClient({ locale, dict, course }: EditCourseCli
                   value={formData.endDate}
                   onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                   min={formData.startDate}
+                />
+              </div>
+            </div>
+
+            {/* Total Sessions */}
+            <div className="space-y-2">
+              <Label htmlFor="totalSessions">
+                {locale === 'ar' ? 'عدد الجلسات' : 'Total Sessions'}
+              </Label>
+              <Input
+                id="totalSessions"
+                type="number"
+                min="0"
+                value={formData.totalSessions}
+                onChange={(e) => setFormData({ ...formData, totalSessions: parseInt(e.target.value) || 0 })}
+                placeholder={locale === 'ar' ? 'مثال: 24 جلسة' : 'e.g., 24 sessions'}
+              />
+            </div>
+
+            {/* Session Days */}
+            <div className="space-y-2">
+              <Label>{locale === 'ar' ? 'أيام الجلسات' : 'Session Days'}</Label>
+              <div className="flex flex-wrap gap-2">
+                {weekDays.map((day) => {
+                  const selected = formData.sessionDays.includes(day.key);
+                  return (
+                    <button
+                      key={day.key}
+                      type="button"
+                      onClick={() => toggleSessionDay(day.key)}
+                      className={`px-3 py-1 rounded-full border text-sm transition-colors ${selected ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 text-gray-600 hover:border-blue-400 hover:text-blue-600'}`}
+                    >
+                      {day.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Session Time */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="sessionStartTime">
+                  {locale === 'ar' ? 'وقت البدء' : 'Start Time'}
+                </Label>
+                <Input
+                  id="sessionStartTime"
+                  type="time"
+                  value={formData.sessionStartTime}
+                  onChange={(e) => setFormData({ ...formData, sessionStartTime: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="sessionEndTime">
+                  {locale === 'ar' ? 'وقت الانتهاء' : 'End Time'}
+                </Label>
+                <Input
+                  id="sessionEndTime"
+                  type="time"
+                  value={formData.sessionEndTime}
+                  onChange={(e) => setFormData({ ...formData, sessionEndTime: e.target.value })}
                 />
               </div>
             </div>

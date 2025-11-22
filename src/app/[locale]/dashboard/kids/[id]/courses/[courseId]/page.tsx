@@ -22,19 +22,20 @@ export default async function CourseDetailPage({
     notFound();
   }
 
-  // Security check: Only Admin or the Parent of the kid can view this
-  const isParent = user.role === 'parent' && kid.parentId === user.id;
-  const isAdmin = user.role === 'admin';
-
-  if (!isParent && !isAdmin) {
-    redirect(`/${locale}/dashboard`);
-  }
-
   // Fetch the course
   const course = await findCourseById(courseId);
 
   if (!course) {
     notFound();
+  }
+
+  // Security check: Only Admin, Parent of the kid, or Coach can view this
+  const isParent = user.role === 'parent' && kid.parentId === user.id;
+  const isAdmin = user.role === 'admin';
+  const isCoach = user.role === 'coach' && course.coachId === user.id;
+
+  if (!isParent && !isAdmin && !isCoach) {
+    redirect(`/${locale}/dashboard`);
   }
 
   return (

@@ -21,11 +21,12 @@ export default async function KidProfilePage({
     notFound();
   }
 
-  // Security check: Only Admin or the Parent of the kid can view this
+  // Security check: Only Admin, Parent of the kid, or Coach can view this
   const isParent = user.role === 'parent' && kid.parentId === user.id;
   const isAdmin = user.role === 'admin';
+  const isCoach = user.role === 'coach';
 
-  if (!isParent && !isAdmin) {
+  if (!isParent && !isAdmin && !isCoach) {
     // If not authorized, redirect to dashboard
     redirect(`/${locale}/dashboard`);
   }

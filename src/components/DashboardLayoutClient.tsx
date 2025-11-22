@@ -60,14 +60,14 @@ export function DashboardLayoutClient({
         onMobileClose={() => setIsMobileSidebarOpen(false)}
       />
 
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden min-h-0">
         <DashboardHeader
           dictionary={dictionary}
           user={user}
           onMobileMenuToggle={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
         />
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto min-h-0">
           {children}
         </main>
       </div>

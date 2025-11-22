@@ -334,6 +334,19 @@ export async function getCoaches(): Promise<User[]> {
 }
 
 /**
+ * Fetch multiple users by their IDs
+ */
+export async function getUsersByIds(ids: string[]): Promise<User[]> {
+  if (!ids || ids.length === 0) {
+    return [];
+  }
+
+  const idSet = new Set(ids);
+  const allUsers = await listUsers();
+  return allUsers.filter(user => idSet.has(user.id));
+}
+
+/**
  * Get all users (alias for listUsers for consistency)
  */
 export async function getAllUsers(): Promise<User[]> {
