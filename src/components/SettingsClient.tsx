@@ -154,26 +154,30 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
         </div>
 
         <Tabs defaultValue="notifications" className="space-y-4">
-          <TabsList className={`grid w-full lg:w-[800px] ${permissions.canManageBackups ? 'grid-cols-4' : 'grid-cols-3'}`}>
-            <TabsTrigger value="notifications" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              {dictionary.settings?.notifications || 'Notifications'}
+          <TabsList className="w-full">
+            <TabsTrigger value="notifications" className="flex-1 min-w-fit">
+              <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">{dictionary.settings?.notifications || 'Notifications'}</span>
+              <span className="sm:hidden">Notif</span>
             </TabsTrigger>
             {permissions.canManageBackups && (
-              <TabsTrigger value="backup" className="flex items-center gap-2">
-                <Database className="h-4 w-4" />
-                {dictionary.settings?.backupRestore || 'Backup & Restore'}
+              <TabsTrigger value="backup" className="flex-1 min-w-fit">
+                <Database className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">{dictionary.settings?.backupRestore || 'Backup & Restore'}</span>
+                <span className="sm:hidden">Backup</span>
               </TabsTrigger>
             )}
             {permissions.canManageBackups && (
-              <TabsTrigger value="admin" className="flex items-center gap-2">
-                <UserCog className="h-4 w-4" />
-                {dictionary.settings?.adminSettings || 'Admin Settings'}
+              <TabsTrigger value="admin" className="flex-1 min-w-fit">
+                <UserCog className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">{dictionary.settings?.adminSettings || 'Admin Settings'}</span>
+                <span className="sm:hidden">Admin</span>
               </TabsTrigger>
             )}
-            <TabsTrigger value="general" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              {dictionary.settings?.general || 'General'}
+            <TabsTrigger value="general" className="flex-1 min-w-fit">
+              <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">{dictionary.settings?.general || 'General'}</span>
+              <span className="sm:hidden">General</span>
             </TabsTrigger>
           </TabsList>
 

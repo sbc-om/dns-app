@@ -99,18 +99,18 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
         </div>
 
         <Tabs defaultValue="pending" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="pending">
-              <Clock className="w-4 h-4 mr-2" />
-              {locale === 'ar' ? 'قيد المراجعة' : 'Pending Review'} ({pendingEnrollments.length})
+          <TabsList className="w-full">
+            <TabsTrigger value="pending" className="flex-1 min-w-fit">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="truncate">{locale === 'ar' ? 'قيد المراجعة' : 'Pending'} ({pendingEnrollments.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="paid">
-              <CheckCircle className="w-4 h-4 mr-2" />
-              {locale === 'ar' ? 'مدفوع' : 'Paid'} ({paidEnrollments.length})
+            <TabsTrigger value="paid" className="flex-1 min-w-fit">
+              <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="truncate">{locale === 'ar' ? 'مدفوع' : 'Paid'} ({paidEnrollments.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="unpaid">
-              <XCircle className="w-4 h-4 mr-2" />
-              {locale === 'ar' ? 'غير مدفوع' : 'Unpaid'} ({unpaidEnrollments.length})
+            <TabsTrigger value="unpaid" className="flex-1 min-w-fit">
+              <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="truncate">{locale === 'ar' ? 'غير مدفوع' : 'Unpaid'} ({unpaidEnrollments.length})</span>
             </TabsTrigger>
           </TabsList>
 
