@@ -40,7 +40,7 @@ export function DashboardLayoutClient({
   useNotificationFallback(!isPushSupported);
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-950 dark:via-purple-950/30 dark:to-pink-950/30" dir={direction}>
+    <div className="flex h-screen bg-[#DDDDDD] dark:bg-[#000000]" dir={direction}>
       {/* Initialize Push Notifications (only on supported devices) */}
       {isPushSupported && <PushNotificationInit />}
       

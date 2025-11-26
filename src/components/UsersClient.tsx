@@ -28,7 +28,7 @@ export function UsersClient({ dictionary, initialUsers, locale }: UsersClientPro
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-[#262626] dark:text-white">
             {dictionary.users.title}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">{dictionary.users.userList}</p>
@@ -45,7 +45,7 @@ export function UsersClient({ dictionary, initialUsers, locale }: UsersClientPro
           </Link>
           <Button 
             onClick={() => setIsCreateDialogOpen(true)}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg"
+            className="bg-[#FF5F02] hover:bg-[#262626] text-white shadow-lg"
           >
             <Plus className="mr-2 h-4 w-4" />
             {dictionary.users.createUser}

@@ -148,7 +148,7 @@ export function RegisterForm({ dictionary, locale }: RegisterFormProps) {
 
       <Button 
         type="submit" 
-        className="w-full h-14 text-lg font-black rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95" 
+        className="w-full h-14 text-lg font-black rounded-2xl bg-[#FF5F02] hover:bg-[#262626] shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 text-white" 
         disabled={isSubmitting}
       >
         {isSubmitting ? (

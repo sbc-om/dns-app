@@ -14,12 +14,12 @@ export function Footer({ dictionary, locale }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t bg-gradient-to-r from-[#F2574C]/5 via-[#30B2D2]/5 to-[#E8A12D]/5 pb-20 md:pb-0">
+    <footer className="border-t bg-[#DDDDDD] dark:bg-[#262626] pb-20 md:pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
         <div className="flex flex-col items-center space-y-5">
           {/* Logo */}
           <Link href={`/${locale}`} className="flex items-center space-x-3">
-            <div className="text-lg md:text-xl font-black bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#E8A12D] bg-clip-text text-transparent text-center">
+            <div className="text-lg md:text-xl font-black text-[#FF5F02] text-center">
               LET'S BUILD CHAMPIONS TOGETHER
             </div>
           </Link>

@@ -79,7 +79,7 @@ export function Header({ dictionary, locale, user }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-white/90 backdrop-blur-xl dark:bg-gray-900/90 shadow-sm">
+    <header className="sticky top-0 z-40 border-b bg-white dark:bg-[#262626] shadow-sm">
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 max-w-7xl mx-auto">
         {/* Logo & Title */}
         <Link href={`/${locale}`} className="flex items-center gap-3">
@@ -88,7 +88,7 @@ export function Header({ dictionary, locale, user }: HeaderProps) {
             alt="DNA Logo" 
             className="h-8 w-8 object-contain"
           />
-          <h1 className="hidden sm:block text-xl font-bold bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#F2574C] bg-clip-text text-transparent">
+          <h1 className="hidden sm:block text-xl font-bold text-[#FF5F02]">
             Discover Natural Ability
           </h1>
         </Link>
@@ -102,10 +102,10 @@ export function Header({ dictionary, locale, user }: HeaderProps) {
               variant="ghost"
               size="icon"
               onClick={handleInstall}
-              className="h-10 w-10 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20"
+              className="h-10 w-10 rounded-lg hover:bg-[#DDDDDD] text-[#FF5F02]"
               title="Install App"
             >
-              <Download className="h-5 w-5 text-green-600" />
+              <Download className="h-5 w-5" />
               <span className="sr-only">Install App</span>
             </Button>
           )}
@@ -115,10 +115,10 @@ export function Header({ dictionary, locale, user }: HeaderProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 relative"
+              className="h-10 w-10 rounded-lg hover:bg-[#DDDDDD] text-[#FF5F02] relative"
               title={dictionary.nav.notifications}
             >
-              <Bell className="h-5 w-5 text-blue-600" />
+              <Bell className="h-5 w-5" />
               <span className="sr-only">{dictionary.nav.notifications}</span>
             </Button>
           </Link>
@@ -127,8 +127,8 @@ export function Header({ dictionary, locale, user }: HeaderProps) {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-purple-50 dark:hover:bg-purple-900/20">
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white text-sm font-semibold shadow-lg">
+                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-[#DDDDDD]">
+                  <div className="h-8 w-8 rounded-full bg-[#FF5F02] flex items-center justify-center text-white text-sm font-semibold shadow-lg">
                     {user.fullName?.[0]?.toUpperCase() || 'U'}
                   </div>
                   <span className="sr-only">User menu</span>
@@ -152,7 +152,7 @@ export function Header({ dictionary, locale, user }: HeaderProps) {
             </DropdownMenu>
           ) : (
             <Link href={`/${locale}/auth/login`}>
-              <Button className="bg-[#F2574C] hover:bg-[#d94841] text-white">
+              <Button className="bg-[#FF5F02] hover:bg-[#262626] text-white">
                 {dictionary.common.login}
               </Button>
             </Link>

@@ -152,41 +152,41 @@ export function CourseDetailClient({
         <TabsContent value="overview" className="space-y-4 mt-4">
           {/* Stats Summary */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100">
+            <Card className="bg-[#DDDDDD]">
               <CardContent className="p-4 text-center">
-                <Activity className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-                <p className="text-2xl font-bold text-blue-900">{totalSessions}</p>
-                <p className="text-sm text-blue-700">
+                <Activity className="h-8 w-8 mx-auto mb-2 text-[#FF5F02]" />
+                <p className="text-2xl font-bold text-[#262626]">{totalSessions}</p>
+                <p className="text-sm text-[#262626]">
                   {locale === 'ar' ? 'جلسات' : 'Sessions'}
                 </p>
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-green-50 to-green-100">
+            <Card className="bg-[#DDDDDD]">
               <CardContent className="p-4 text-center">
-                <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-600" />
-                <p className="text-2xl font-bold text-green-900">{presentCount}</p>
-                <p className="text-sm text-green-700">
+                <CheckCircle className="h-8 w-8 mx-auto mb-2 text-[#FF5F02]" />
+                <p className="text-2xl font-bold text-[#262626]">{presentCount}</p>
+                <p className="text-sm text-[#262626]">
                   {locale === 'ar' ? 'حضور' : 'Present'}
                 </p>
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
+            <Card className="bg-[#DDDDDD]">
               <CardContent className="p-4 text-center">
-                <Target className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-                <p className="text-2xl font-bold text-purple-900">{attendanceRate}%</p>
-                <p className="text-sm text-purple-700">
+                <Target className="h-8 w-8 mx-auto mb-2 text-[#FF5F02]" />
+                <p className="text-2xl font-bold text-[#262626]">{attendanceRate}%</p>
+                <p className="text-sm text-[#262626]">
                   {locale === 'ar' ? 'نسبة الحضور' : 'Attendance'}
                 </p>
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100">
+            <Card className="bg-[#DDDDDD]">
               <CardContent className="p-4 text-center">
-                <Star className="h-8 w-8 mx-auto mb-2 text-yellow-600" />
-                <p className="text-2xl font-bold text-yellow-900">{averageScore}/10</p>
-                <p className="text-sm text-yellow-700">
+                <Star className="h-8 w-8 mx-auto mb-2 text-[#FF5F02]" />
+                <p className="text-2xl font-bold text-[#262626]">{averageScore}/10</p>
+                <p className="text-sm text-[#262626]">
                   {locale === 'ar' ? 'متوسط النقاط' : 'Avg Score'}
                 </p>
               </CardContent>

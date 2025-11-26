@@ -55,14 +55,14 @@ export default function ContactPage({ dictionary, locale, user }: { dictionary: 
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-pink-900/20">
+    <div className="min-h-screen flex flex-col bg-[#DDDDDD] dark:bg-gray-900">
       <Header dictionary={dictionary} locale={locale} user={user} />
       
       <main className="flex-1">
         {/* Hero Section */}
         <section className="py-20 px-4 text-center">
           <div className="container max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-[#262626] dark:text-white">
               {dictionary.pages.contact.title}
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300">
@@ -78,7 +78,7 @@ export default function ContactPage({ dictionary, locale, user }: { dictionary: 
               {/* Contact Form */}
               <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-lg dark:bg-gray-900/80">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  <CardTitle className="text-2xl font-bold text-[#262626] dark:text-white">
                     {dictionary.pages.contact.form.submit}
                   </CardTitle>
                   <CardDescription className="text-gray-600 dark:text-gray-400">
@@ -141,7 +141,7 @@ export default function ContactPage({ dictionary, locale, user }: { dictionary: 
 
                     <Button 
                       type="submit" 
-                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg" 
+                      className="w-full bg-[#FF5F02] hover:bg-[#262626] text-white shadow-lg" 
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? dictionary.common.loading : dictionary.pages.contact.form.submit}
@@ -154,7 +154,7 @@ export default function ContactPage({ dictionary, locale, user }: { dictionary: 
               <div className="space-y-8">
                 <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-lg dark:bg-gray-900/80">
                   <CardHeader>
-                    <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <CardTitle className="text-2xl font-bold text-[#262626] dark:text-white">
                       {dictionary.pages.contact.info.title}
                     </CardTitle>
                   </CardHeader>

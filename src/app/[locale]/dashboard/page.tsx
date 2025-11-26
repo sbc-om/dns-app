@@ -72,10 +72,10 @@ export default async function DashboardPage({
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl space-y-6">
         {/* Header */}
         <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-[#1E3A8A]">
+        <h1 className="text-3xl font-bold text-[#262626] dark:text-white">
           {dictionary.common.welcome} {user.fullName || user.username}
         </h1>
-        <p className="text-lg font-semibold text-[#F2574C]">
+        <p className="text-lg font-semibold text-[#FF5F02]">
           {dictionary.users.role}: {roleLabel}
         </p>
       </div>
@@ -86,85 +86,85 @@ export default async function DashboardPage({
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Total Users Card */}
-            <div className="bg-linear-to-br from-blue-50 to-blue-100 p-6 rounded-xl border-2 border-blue-200 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-white dark:bg-[#262626] p-6 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-600 mb-1">
+                  <p className="text-sm font-medium text-[#FF5F02] mb-1">
                     {dictionary.dashboard.totalUsers}
                   </p>
-                  <p className="text-4xl font-bold text-blue-900">
+                  <p className="text-4xl font-bold text-[#262626] dark:text-white">
                     {stats.totalUsers}
                   </p>
                 </div>
-                <div className="bg-blue-500 p-4 rounded-full">
+                <div className="bg-[#FF5F02] p-4 rounded-full">
                   <Users className="w-8 h-8 text-white" />
                 </div>
               </div>
             </div>
 
             {/* Active Users Card */}
-            <div className="bg-linear-to-br from-green-50 to-green-100 p-6 rounded-xl border-2 border-green-200 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-white dark:bg-[#262626] p-6 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-600 mb-1">
+                  <p className="text-sm font-medium text-[#FF5F02] mb-1">
                     {dictionary.dashboard.activeUsers}
                   </p>
-                  <p className="text-4xl font-bold text-green-900">
+                  <p className="text-4xl font-bold text-[#262626] dark:text-white">
                     {stats.activeUsers}
                   </p>
                 </div>
-                <div className="bg-green-500 p-4 rounded-full">
+                <div className="bg-[#FF5F02] p-4 rounded-full">
                   <UserCheck className="w-8 h-8 text-white" />
                 </div>
               </div>
             </div>
 
             {/* Total Appointments Card */}
-            <div className="bg-linear-to-br from-purple-50 to-purple-100 p-6 rounded-xl border-2 border-purple-200 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-white dark:bg-[#262626] p-6 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-purple-600 mb-1">
+                  <p className="text-sm font-medium text-[#FF5F02] mb-1">
                     {dictionary.dashboard.totalAppointments}
                   </p>
-                  <p className="text-4xl font-bold text-purple-900">
+                  <p className="text-4xl font-bold text-[#262626] dark:text-white">
                     {stats.totalAppointments}
                   </p>
                 </div>
-                <div className="bg-purple-500 p-4 rounded-full">
+                <div className="bg-[#FF5F02] p-4 rounded-full">
                   <Calendar className="w-8 h-8 text-white" />
                 </div>
               </div>
             </div>
 
-            {/* Pending Appointments Card */}
-            <div className="bg-linear-to-br from-orange-50 to-orange-100 p-6 rounded-xl border-2 border-orange-200 shadow-lg hover:shadow-xl transition-shadow">
+            {/* Pending Appointments card */}
+            <div className="bg-white dark:bg-[#262626] p-6 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-orange-600 mb-1">
+                  <p className="text-sm font-medium text-[#FF5F02] mb-1">
                     {dictionary.dashboard.pendingAppointments}
                   </p>
-                  <p className="text-4xl font-bold text-orange-900">
+                  <p className="text-4xl font-bold text-[#262626] dark:text-white">
                     {stats.pendingAppointments}
                   </p>
                 </div>
-                <div className="bg-orange-500 p-4 rounded-full">
+                <div className="bg-[#FF5F02] p-4 rounded-full">
                   <Clock className="w-8 h-8 text-white" />
                 </div>
               </div>
             </div>
 
             {/* Today's Appointments Card */}
-            <div className="bg-linear-to-br from-teal-50 to-teal-100 p-6 rounded-xl border-2 border-teal-200 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-white dark:bg-[#262626] p-6 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-teal-600 mb-1">
+                  <p className="text-sm font-medium text-[#FF5F02] mb-1">
                     {dictionary.dashboard.todayAppointments}
                   </p>
-                  <p className="text-4xl font-bold text-teal-900">
+                  <p className="text-4xl font-bold text-[#262626] dark:text-white">
                     {stats.todayAppointments}
                   </p>
                 </div>
-                <div className="bg-teal-500 p-4 rounded-full">
+                <div className="bg-[#FF5F02] p-4 rounded-full">
                   <CheckCircle className="w-8 h-8 text-white" />
                 </div>
               </div>
@@ -176,7 +176,7 @@ export default async function DashboardPage({
       {/* Parent View: List of Children */}
       {user.role === 'parent' && (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-[#1E3A8A]">
+          <h2 className="text-2xl font-bold text-[#262626] dark:text-white">
             {dictionary.users.children}
           </h2>
           
@@ -205,7 +205,7 @@ export default async function DashboardPage({
                               className="w-16 h-16 rounded-full object-cover border-4 border-blue-200 group-hover:border-blue-400 transition-colors"
                             />
                           ) : (
-                            <div className="w-16 h-16 rounded-full bg-linear-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-2xl font-bold border-4 border-blue-200 group-hover:border-blue-400 transition-colors">
+                            <div className="w-16 h-16 rounded-full bg-[#FF5F02] flex items-center justify-center text-white text-2xl font-bold border-4 border-[#FF5F02]/20 group-hover:border-[#FF5F02] transition-colors">
                               {(child.fullName || child.username).charAt(0).toUpperCase()}
                             </div>
                           )}
@@ -227,40 +227,40 @@ export default async function DashboardPage({
                         <div className="flex items-center gap-1">
                           {/* Gold Medal */}
                           <div className="relative group/medal">
-                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                            <div className="w-10 h-10 rounded-full bg-[#FFD700] flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                               <span className="text-white text-xl">🥇</span>
                             </div>
-                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-yellow-600 border border-yellow-400">
+                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-[#FFD700] border border-[#FFD700]">
                               3
                             </div>
                           </div>
 
                           {/* Silver Medal */}
                           <div className="relative group/medal">
-                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-gray-300 to-gray-500 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                            <div className="w-10 h-10 rounded-full bg-[#C0C0C0] flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                               <span className="text-white text-xl">🥈</span>
                             </div>
-                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-gray-600 border border-gray-400">
+                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-[#C0C0C0] border border-[#C0C0C0]">
                               5
                             </div>
                           </div>
 
                           {/* Bronze Medal */}
                           <div className="relative group/medal">
-                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                            <div className="w-10 h-10 rounded-full bg-[#CD7F32] flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                               <span className="text-white text-xl">🥉</span>
                             </div>
-                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-orange-600 border border-orange-400">
+                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-[#CD7F32] border border-[#CD7F32]">
                               8
                             </div>
                           </div>
 
                           {/* Star/Trophy */}
                           <div className="relative group/medal">
-                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-400 to-purple-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                            <div className="w-10 h-10 rounded-full bg-[#FF5F02] flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                               <span className="text-white text-xl">⭐</span>
                             </div>
-                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-purple-600 border border-purple-400">
+                            <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-1.5 py-0.5 text-xs font-bold text-[#FF5F02] border border-[#FF5F02]">
                               12
                             </div>
                           </div>
@@ -279,7 +279,7 @@ export default async function DashboardPage({
       {user.role === 'coach' && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-[#1E3A8A]">
+            <h2 className="text-2xl font-bold text-[#262626] dark:text-white">
               {dictionary.dashboard.coachCourses}
             </h2>
             <p className="text-muted-foreground">
@@ -340,9 +340,9 @@ export default async function DashboardPage({
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm text-gray-500">{dictionary.dashboard.activePlayers}</p>
-                          <p className="text-2xl font-bold text-blue-600">{activePlayers}</p>
+                          <p className="text-2xl font-bold text-[#FF5F02]">{activePlayers}</p>
                         </div>
-                        <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
+                        <Button variant="outline" className="border-[#FF5F02] text-[#FF5F02] hover:bg-[#FF5F02] hover:text-white">
                           {dictionary.dashboard.viewRoster}
                         </Button>
                       </div>
@@ -357,28 +357,28 @@ export default async function DashboardPage({
 
       {/* Quick Actions */}
       {user.role === 'admin' && (
-        <div className="bg-white p-6 rounded-lg border-2 border-[#1E3A8A]/20 shadow-md">
-          <h2 className="text-xl font-bold text-[#1E3A8A] mb-4">
+        <div className="bg-white dark:bg-[#262626] p-6 rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] shadow-md">
+          <h2 className="text-xl font-bold text-[#262626] dark:text-white mb-4">
             {dictionary.dashboard.quickActions}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Link href={`/${locale}/dashboard/users`}>
-              <Button className="w-full bg-[#1E3A8A] hover:bg-[#1E3A8A]/90">
+              <Button className="w-full bg-[#262626] hover:bg-[#000000] text-white">
                 {dictionary.dashboard.manageUsers}
               </Button>
             </Link>
             <Link href={`/${locale}/dashboard/appointments`}>
-              <Button className="w-full bg-[#F2574C] hover:bg-[#F2574C]/90">
+              <Button className="w-full bg-[#FF5F02] hover:bg-[#262626] text-white">
                 {dictionary.dashboard.viewAppointments}
               </Button>
             </Link>
             <Link href={`/${locale}/dashboard/schedules`}>
-              <Button className="w-full bg-[#30B2D2] hover:bg-[#30B2D2]/90">
+              <Button className="w-full bg-[#FF5F02] hover:bg-[#262626] text-white">
                 {dictionary.dashboard.manageSchedules}
               </Button>
             </Link>
             <Link href={`/${locale}/dashboard/roles`}>
-              <Button className="w-full bg-purple-600 hover:bg-purple-700">
+              <Button className="w-full bg-[#FF5F02] hover:bg-[#262626] text-white">
                 {dictionary.dashboard.viewRoles}
               </Button>
             </Link>

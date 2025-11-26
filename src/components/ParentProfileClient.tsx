@@ -98,9 +98,9 @@ export function ParentProfileClient({
 
       {/* Parent Information Card */}
       <Card className="border-2 border-[#1E3A8A]/20">
-        <CardHeader className="bg-gradient-to-r from-[#1E3A8A]/10 to-[#30B2D2]/10">
+        <CardHeader className="bg-[#DDDDDD]">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl font-bold text-[#1E3A8A] flex items-center gap-2">
+            <CardTitle className="text-2xl font-bold text-[#262626] flex items-center gap-2">
               <UserCircle className="h-7 w-7" />
               {parent.fullName || parent.username}
             </CardTitle>

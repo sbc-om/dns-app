@@ -114,7 +114,7 @@ export function DashboardSidebar({
     <div className="flex flex-col h-full">
       {/* Logo/Brand */}
       <div className={cn(
-        "p-6 border-b border-gray-200 dark:border-gray-700",
+        "p-6 border-b border-[#000000]",
         isCollapsed && "lg:px-3"
       )}>
         <Link href={`/${locale}/dashboard`} className={cn(
@@ -130,10 +130,10 @@ export function DashboardSidebar({
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-bold bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#F2574C] bg-clip-text text-transparent truncate">
+              <h2 className="text-xl font-bold text-[#FF5F02] truncate">
                 DNA
               </h2>
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">Discover Natural Ability</p>
+              <p className="text-xs font-medium text-white truncate">Discover Natural Ability</p>
             </div>
           )}
         </Link>
@@ -155,8 +155,8 @@ export function DashboardSidebar({
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
                   isActive 
-                    ? "bg-[#F2574C] text-white" 
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
+                    ? "bg-[#FF5F02] text-white" 
+                    : "text-white hover:bg-[#000000]",
                   isCollapsed && "lg:justify-center lg:px-3"
                 )}
               >
@@ -175,18 +175,18 @@ export function DashboardSidebar({
 
       {/* Footer */}
       <div className={cn(
-        "p-4 border-t border-gray-200 dark:border-gray-700",
+        "p-4 border-t border-[#000000]",
         isCollapsed && "lg:px-2"
       )}>
         <div className={cn(
-          "text-xs text-center text-gray-500 dark:text-gray-400",
+          "text-xs text-center text-white",
           isCollapsed && "lg:hidden"
         )}>
           <p>© 2025 Discover Natural Ability</p>
           <p className="mt-1">v1.0.0</p>
         </div>
         {isCollapsed && (
-          <div className="hidden lg:block text-xs text-center text-gray-500 dark:text-gray-400">
+          <div className="hidden lg:block text-xs text-center text-white">
             v1.0
           </div>
         )}
@@ -198,7 +198,7 @@ export function DashboardSidebar({
     <>
       {/* Desktop Sidebar */}
       <aside className={cn(
-        "hidden lg:flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 relative",
+        "hidden lg:flex flex-col bg-[#262626] border-r border-[#000000] transition-all duration-300 relative",
         isCollapsed ? "w-20" : "w-72"
       )}>
         <SidebarContent />
@@ -207,7 +207,7 @@ export function DashboardSidebar({
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={cn(
-            "absolute top-20 -right-3 h-6 w-6 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors z-50",
+            "absolute top-20 -right-3 h-6 w-6 rounded-full bg-[#FF5F02] border border-[#FF5F02] flex items-center justify-center hover:bg-[#262626] transition-colors z-50 text-white",
             isRTL && "-left-3 right-auto"
           )}
         >
@@ -221,7 +221,7 @@ export function DashboardSidebar({
 
       {/* Mobile Sidebar */}
       <aside className={cn(
-        "lg:hidden fixed top-0 bottom-0 z-50 w-72 bg-white dark:bg-gray-900 shadow-xl transition-transform duration-300 flex flex-col",
+        "lg:hidden fixed top-0 bottom-0 z-50 w-72 bg-[#262626] shadow-xl transition-transform duration-300 flex flex-col",
         isMobileOpen 
           ? "translate-x-0" 
           : isRTL 

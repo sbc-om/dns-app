@@ -133,7 +133,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
               alt="DNA Logo" 
               className="h-8 w-8 object-contain"
             />
-            <h1 className="hidden sm:block text-xl font-bold bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#F2574C] bg-clip-text text-transparent">
+            <h1 className="hidden sm:block text-xl font-bold text-[#FF5F02]">
               Discover Natural Ability
             </h1>
           </div>
@@ -196,7 +196,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                     className="h-8 w-8 rounded-full object-cover shadow-lg border-2 border-purple-600"
                   />
                 ) : (
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white text-sm font-semibold shadow-lg">
+                  <div className="h-8 w-8 rounded-full bg-[#FF5F02] flex items-center justify-center text-white text-sm font-semibold shadow-lg">
                     {user.fullName?.[0]?.toUpperCase() || 'U'}
                   </div>
                 )}

@@ -274,7 +274,7 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-semibold">
+                        <div className="h-10 w-10 rounded-full bg-[#FF5F02] flex items-center justify-center text-white font-semibold">
                           {conv.user?.fullName?.[0]?.toUpperCase() || 'U'}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -304,7 +304,7 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-600 flex items-center justify-center text-white">
+                        <div className="h-10 w-10 rounded-full bg-[#FF5F02] flex items-center justify-center text-white">
                           <UsersIcon className="h-5 w-5" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -325,7 +325,7 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
               <>
                 {/* Chat Header */}
                 <div className="p-4 border-b flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-semibold">
+                  <div className="h-10 w-10 rounded-full bg-[#FF5F02] flex items-center justify-center text-white font-semibold">
                     {selectedConversation.name[0]?.toUpperCase()}
                   </div>
                   <div>

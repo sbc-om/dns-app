@@ -249,7 +249,7 @@ export function PushNotificationSetup({
             <Button
               onClick={handleSubscribe}
               disabled={isLoading}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              className="bg-[#FF5F02] hover:bg-[#262626] text-white"
             >
               <Bell className="mr-2 h-4 w-4" />
               {isLoading ? 'Enabling...' : 'Enable Notifications'}

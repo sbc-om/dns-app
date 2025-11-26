@@ -163,8 +163,8 @@ export function ProfileClient({ dictionary, locale, user }: ProfileClientProps) 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Profile Picture Section */}
           <Card className="border-2 border-[#30B2D2]/30">
-            <CardHeader className="bg-gradient-to-r from-[#30B2D2]/10 to-[#1E3A8A]/10">
-              <CardTitle className="text-xl font-bold text-[#1E3A8A] flex items-center gap-2">
+            <CardHeader className="bg-[#DDDDDD]">
+              <CardTitle className="text-xl font-bold text-[#262626] flex items-center gap-2">
                 <Camera className="h-6 w-6" />
                 {dictionary.users?.profilePicture || 'Profile Picture'}
               </CardTitle>
@@ -182,8 +182,8 @@ export function ProfileClient({ dictionary, locale, user }: ProfileClientProps) 
 
           {/* Personal Information */}
           <Card className="border-2 border-[#30B2D2]/30">
-            <CardHeader className="bg-gradient-to-r from-[#30B2D2]/10 to-[#1E3A8A]/10">
-              <CardTitle className="text-xl font-bold text-[#1E3A8A] flex items-center gap-2">
+            <CardHeader className="bg-[#DDDDDD]">
+              <CardTitle className="text-xl font-bold text-[#262626] flex items-center gap-2">
                 <UserCircle className="h-6 w-6" />
                 {dictionary.users?.personalInfo || 'Personal Information'}
               </CardTitle>
@@ -259,7 +259,7 @@ export function ProfileClient({ dictionary, locale, user }: ProfileClientProps) 
             <Button
               type="submit"
               disabled={loading}
-              className="bg-gradient-to-r from-[#30B2D2] to-[#1E3A8A] hover:from-[#1E3A8A] hover:to-[#30B2D2] text-white px-8 py-6 text-lg"
+              className="bg-[#FF5F02] hover:bg-[#262626] text-white px-8 py-6 text-lg"
             >
               <Save className="mr-2 h-5 w-5" />
               {loading ? dictionary.common.loading : dictionary.common.save}
