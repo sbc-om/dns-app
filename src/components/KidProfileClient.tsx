@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { UserCircle, Trophy, Activity, Star, Calendar, CreditCard, Edit, BookOpen, Save, Trash2, Pencil } from 'lucide-react';
+import { UserCircle, Trophy, Activity, Star, Calendar, CreditCard, Edit, BookOpen, Save, Trash2, Pencil, DollarSign, CheckCircle2, Award, Plus, X, Check } from 'lucide-react';
 import { PlayerCardGenerator } from '@/components/PlayerCardGenerator';
 import { PlayerCardDisplay } from '@/components/PlayerCardDisplay';
 import { ImageUpload } from '@/components/ImageUpload';
@@ -228,25 +228,36 @@ export function KidProfileClient({
       </Card>
 
       {/* Courses Information Card */}
-      <Card className="border-2 border-blue-200 bg-blue-50/50">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-blue-600" />
-                  <CardTitle className="text-lg">
-                    {locale === 'ar' ? 'الدورات التدريبية' : 'Training Courses'}
-                  </CardTitle>
+      <Card className="border-2 border-[#FF5F02]/20 bg-linear-to-br from-white to-orange-50/30 dark:from-[#262626] dark:to-[#1a1a1a] shadow-xl overflow-hidden">
+            <CardHeader className="bg-linear-to-r from-[#FF5F02] to-[#ff7b33] text-white pb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
+                    <BookOpen className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl sm:text-2xl font-bold">
+                      {locale === 'ar' ? 'الدورات التدريبية' : 'Training Courses'}
+                    </CardTitle>
+                    <p className="text-sm text-white/90 mt-1">
+                      {locale === 'ar' ? 'مسار التعلم والتطور' : 'Learning & Development Path'}
+                    </p>
+                  </div>
                 </div>
                 {currentUser.role === 'admin' && availableCourses.length > 0 && (
                   <Button
                     size="sm"
-                    variant="outline"
                     onClick={() => editingCourse ? handleCancelEdit() : setEditingCourse(true)}
-                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                    className="bg-white text-[#FF5F02] hover:bg-white/90 shadow-md active:scale-95 transition-all self-start sm:self-auto"
                   >
-                    {editingCourse ? (locale === 'ar' ? 'إلغاء' : 'Cancel') : (
+                    {editingCourse ? (
                       <>
-                        <BookOpen className="h-4 w-4 me-1" />
+                        <X className="h-4 w-4 me-1" />
+                        {locale === 'ar' ? 'إلغاء' : 'Cancel'}
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4 me-1" />
                         {locale === 'ar' ? 'إضافة دورة' : 'Add Course'}
                       </>
                     )}
@@ -254,16 +265,16 @@ export function KidProfileClient({
                 )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6 pb-6 px-4 sm:px-6">
               {editingCourse && currentUser.role === 'admin' ? (
-                <div className="space-y-4">
+                <div className="space-y-4 bg-white dark:bg-[#262626] rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700">
                   <div>
-                    <Label>{locale === 'ar' ? 'اختر الدورة' : 'Select Course'}</Label>
+                    <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300">{locale === 'ar' ? 'اختر الدورة' : 'Select Course'}</Label>
                     <Select
                       value={selectedCourseId}
                       onValueChange={setSelectedCourseId}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="mt-2 border-2 border-gray-300 dark:border-gray-600 focus:border-[#FF5F02] h-12">
                         <SelectValue placeholder={locale === 'ar' ? 'اختر دورة جديدة' : 'Select new course'} />
                       </SelectTrigger>
                       <SelectContent>
@@ -278,51 +289,58 @@ export function KidProfileClient({
                   <Button
                     onClick={handleSaveCourse}
                     disabled={savingCourse || !selectedCourseId}
-                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    className="w-full bg-[#FF5F02] hover:bg-[#e55502] text-white shadow-md active:scale-95 transition-all h-12"
                   >
                     <Save className="h-4 w-4 me-2" />
                     {savingCourse ? (locale === 'ar' ? 'جاري الإضافة...' : 'Adding...') : (locale === 'ar' ? 'إضافة الدورة' : 'Add Course')}
                   </Button>
                 </div>
               ) : enrollments.length > 0 ? (
-                <div className="space-y-3">
+                <div className="grid gap-4 sm:gap-6">
                   {enrollments.map((enrollment: any) => {
                     const isDeleting = deletingEnrollmentId === enrollment.id;
                     
                     return (
-                      <div key={enrollment.id} className="bg-white rounded-lg border border-blue-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex flex-col md:flex-row">
+                      <div 
+                        key={enrollment.id} 
+                        className="group relative bg-white dark:bg-[#262626] rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-[#FF5F02] hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                      >
+                        {/* Background gradient overlay */}
+                        <div className="absolute inset-0 bg-linear-to-br from-[#FF5F02]/5 to-orange-50/30 dark:from-[#FF5F02]/10 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        
+                        <div className="relative flex flex-col sm:flex-row gap-4 p-4 sm:p-6">
                           {/* Course Image */}
                           {enrollment.course?.courseImage && (
-                            <div className="w-full md:w-48 h-32 md:h-auto flex-shrink-0 bg-gray-100">
+                            <div className="relative h-48 sm:h-32 sm:w-32 lg:h-40 lg:w-40 shrink-0 rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow">
                               <img
                                 src={enrollment.course.courseImage}
                                 alt={locale === 'ar' ? enrollment.course.nameAr : enrollment.course.name}
-                                className="w-full h-full object-cover"
+                                className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
                               />
+                              <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             </div>
                           )}
                           
                           {/* Course Content */}
-                          <div className="flex-1 p-4">
-                            <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-3 mb-3">
                               <div 
-                                className={`flex-1 ${enrollment.paymentStatus === 'paid' ? 'cursor-pointer' : ''}`}
+                                className={`flex-1 min-w-0 ${enrollment.paymentStatus === 'paid' ? 'cursor-pointer' : ''}`}
                                 onClick={() => {
                                   if (enrollment.paymentStatus === 'paid') {
                                     window.location.href = `/${locale}/dashboard/kids/${currentKid.id}/courses/${enrollment.course?.id}`;
                                   }
                                 }}
                               >
-                                {/* Course Name and Dates/Status on Same Line */}
-                                <div className="flex items-center justify-between mb-3">
-                                  <h3 className="font-semibold text-blue-900 text-lg">
-                                    {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
-                                  </h3>
-                                  
+                                <h3 className="font-bold text-lg lg:text-xl text-gray-900 dark:text-white mb-2 group-hover:text-[#FF5F02] transition-colors">
+                                  {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
+                                </h3>
+                                
+                                <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 dark:text-gray-400 mb-3">
                                   {enrollment.paymentStatus === 'paid' ? (
                                     enrollment.course?.startDate && enrollment.course?.endDate && (
-                                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                                      <span className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full">
+                                        <Calendar className="h-4 w-4 text-[#FF5F02]" />
                                         <span className="font-medium">
                                           {new Date(enrollment.course.startDate).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
                                         </span>
@@ -330,22 +348,26 @@ export function KidProfileClient({
                                         <span className="font-medium">
                                           {new Date(enrollment.course.endDate).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })}
                                         </span>
-                                      </div>
+                                      </span>
                                     )
                                   ) : (
-                                    <span className="font-bold text-lg text-blue-600 whitespace-nowrap">
+                                    <span className="flex items-center gap-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1.5 rounded-full font-bold text-base">
+                                      <DollarSign className="h-4 w-4" />
                                       {enrollment.course?.price} {enrollment.course?.currency}
                                     </span>
                                   )}
                                 </div>
 
                                 {/* Status Badge */}
-                                <div className="flex items-center gap-2">
-                                  <Badge className={
-                                    enrollment.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' :
-                                    enrollment.paymentStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                    'bg-red-100 text-red-800'
-                                  }>
+                                <div className="flex flex-wrap items-center gap-2 mb-3">
+                                  <Badge 
+                                    className={`px-3 py-1.5 text-xs font-semibold shadow-md ${
+                                      enrollment.paymentStatus === 'paid' ? 'bg-linear-to-r from-green-500 to-green-600 text-white border-0' :
+                                      enrollment.paymentStatus === 'pending' ? 'bg-linear-to-r from-yellow-500 to-yellow-600 text-white border-0' :
+                                      'bg-linear-to-r from-red-500 to-red-600 text-white border-0'
+                                    }`}
+                                  >
+                                    {enrollment.paymentStatus === 'paid' && <CheckCircle2 className="h-3.5 w-3.5 me-1 inline" />}
                                     {enrollment.paymentStatus === 'paid' ? (locale === 'ar' ? 'نشطة' : 'Active') :
                                      enrollment.paymentStatus === 'pending' ? (locale === 'ar' ? 'قيد المراجعة' : 'Pending') :
                                      (locale === 'ar' ? 'غير مدفوع' : 'Unpaid')}
@@ -354,7 +376,7 @@ export function KidProfileClient({
 
                                 {/* Description if exists */}
                                 {enrollment.course?.description && enrollment.paymentStatus === 'paid' && (
-                                  <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                                     {locale === 'ar' ? enrollment.course.descriptionAr : enrollment.course.description}
                                   </p>
                                 )}
@@ -362,13 +384,13 @@ export function KidProfileClient({
                               
                               {/* Admin Actions */}
                               {currentUser.role === 'admin' && (
-                                <div className="flex gap-2 ms-3">
+                                <div className="flex gap-2 shrink-0">
                                   <Button
                                     size="sm"
                                     variant="ghost"
                                     onClick={() => handleEditEnrollment(enrollment)}
                                     disabled={isDeleting}
-                                    className="h-8 w-8 p-0 hover:bg-blue-100 dark:hover:bg-blue-900"
+                                    className="h-9 w-9 p-0 hover:bg-blue-100 dark:hover:bg-blue-900 active:scale-95 transition-all"
                                     title={locale === 'ar' ? 'تعديل الدورة' : 'Edit Course'}
                                   >
                                     <Pencil className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -378,7 +400,7 @@ export function KidProfileClient({
                                     variant="ghost"
                                     onClick={() => handleDeleteEnrollment(enrollment.id)}
                                     disabled={isDeleting}
-                                    className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-900"
+                                    className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900 active:scale-95 transition-all"
                                     title={locale === 'ar' ? 'حذف الدورة' : 'Delete Course'}
                                   >
                                     <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
@@ -393,22 +415,29 @@ export function KidProfileClient({
                   })}
                   {currentUser.role === 'parent' && enrollments.some((e: any) => e.paymentStatus !== 'paid') && (
                     <Button
-                      className="w-full bg-[#30B2D2] hover:bg-[#1E3A8A]"
+                      className="w-full bg-linear-to-r from-[#30B2D2] to-[#1E3A8A] hover:from-[#1E3A8A] hover:to-[#30B2D2] text-white shadow-lg active:scale-95 transition-all h-12 text-base font-semibold"
                       onClick={() => window.location.href = `/${locale}/dashboard/payments`}
                     >
+                      <DollarSign className="h-5 w-5 me-2" />
                       {locale === 'ar' ? 'الذهاب إلى صفحة الدفع' : 'Go to Payment Page'}
                     </Button>
                   )}
                 </div>
               ) : (
-                <div className="text-center py-4 text-gray-500">
-                  {locale === 'ar' ? 'لم يتم تسجيل الطفل في أي دورة' : 'Not enrolled in any course'}
+                <div className="text-center py-12 px-4">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
+                    <BookOpen className="h-10 w-10 text-gray-400" />
+                  </div>
+                  <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">
+                    {locale === 'ar' ? 'لم يتم تسجيل الطفل في أي دورة' : 'Not enrolled in any course'}
+                  </p>
                   {currentUser.role === 'admin' && availableCourses.length > 0 && (
                     <Button
                       size="sm"
                       onClick={() => setEditingCourse(true)}
-                      className="mt-3 bg-blue-600 hover:bg-blue-700"
+                      className="bg-[#FF5F02] hover:bg-[#e55502] text-white shadow-md active:scale-95 transition-all"
                     >
+                      <Plus className="h-4 w-4 me-1" />
                       {locale === 'ar' ? 'تسجيل في دورة' : 'Enroll in Course'}
                     </Button>
                   )}

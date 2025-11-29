@@ -1,12 +1,24 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, CheckCircle, XCircle, Clock, DollarSign, Calendar, User as UserIcon, Eye } from 'lucide-react';
+import { Upload, CheckCircle, XCircle, Clock, DollarSign, Calendar, User as UserIcon, Eye, Edit2, CreditCard, MoreVertical, Check, X, AlertCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { getMyEnrollmentsAction, getAllEnrollmentsAction } from '@/lib/actions/enrollmentActions';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
+import { Label } from './ui/label';
+import { Textarea } from './ui/textarea';
+import { useToast } from '@/lib/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import { getMyEnrollmentsAction, getAllEnrollmentsAction, updatePaymentStatusAction } from '@/lib/actions/enrollmentActions';
 import type { Enrollment } from '@/lib/db/repositories/enrollmentRepository';
 import type { Course } from '@/lib/db/repositories/courseRepository';
 import type { User } from '@/lib/db/repositories/userRepository';
@@ -28,8 +40,14 @@ interface PaymentsClientProps {
 }
 
 export default function PaymentsClient({ locale, dict, currentUser }: PaymentsClientProps) {
+  const { toast } = useToast();
   const [enrollments, setEnrollments] = useState<EnrollmentWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [selectedEnrollment, setSelectedEnrollment] = useState<EnrollmentWithDetails | null>(null);
+  const [newStatus, setNewStatus] = useState<'pending' | 'paid' | 'rejected'>('paid');
+  const [notes, setNotes] = useState('');
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -47,6 +65,72 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
     }
     
     setLoading(false);
+  };
+
+  const openStatusDialog = (enrollment: EnrollmentWithDetails, targetStatus: 'pending' | 'paid' | 'rejected') => {
+    setSelectedEnrollment(enrollment);
+    setNewStatus(targetStatus);
+    setNotes('');
+    setStatusDialogOpen(true);
+  };
+
+  const handleStatusUpdate = async () => {
+    if (!selectedEnrollment) return;
+
+    setUpdating(true);
+    try {
+      const result = await updatePaymentStatusAction(
+        selectedEnrollment.id,
+        newStatus,
+        notes || undefined
+      );
+
+      if (result.success) {
+        // Update state immediately (optimistic update)
+        setEnrollments(prevEnrollments => 
+          prevEnrollments.map(enr => 
+            enr.id === selectedEnrollment.id 
+              ? { ...enr, paymentStatus: newStatus, paymentDate: newStatus === 'paid' ? new Date().toISOString() : enr.paymentDate }
+              : enr
+          )
+        );
+
+        // Show success toast
+        toast({
+          title: locale === 'ar' ? '✅ تم التحديث بنجاح' : '✅ Updated Successfully',
+          description: locale === 'ar' 
+            ? `تم تغيير حالة الدفع إلى "${newStatus === 'paid' ? 'مدفوع' : newStatus === 'pending' ? 'قيد الانتظار' : 'مرفوض'}"`
+            : `Payment status changed to "${newStatus === 'paid' ? 'Paid' : newStatus === 'pending' ? 'Pending' : 'Rejected'}"`,
+          duration: 3000,
+        });
+
+        // Close dialog
+        setStatusDialogOpen(false);
+        setSelectedEnrollment(null);
+        setNotes('');
+
+        // Refresh data in background to ensure sync
+        loadData();
+      } else {
+        // Show error toast
+        toast({
+          title: locale === 'ar' ? '❌ فشل التحديث' : '❌ Update Failed',
+          description: result.error || (locale === 'ar' ? 'حدث خطأ أثناء التحديث' : 'An error occurred during update'),
+          variant: 'destructive',
+          duration: 4000,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update payment status:', error);
+      toast({
+        title: locale === 'ar' ? '❌ خطأ' : '❌ Error',
+        description: locale === 'ar' ? 'حدث خطأ غير متوقع' : 'An unexpected error occurred',
+        variant: 'destructive',
+        duration: 4000,
+      });
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -168,12 +252,43 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                         </div>
                       )}
 
+                      {currentUser.role === 'admin' && (
+                        <div className="flex gap-2">
+                          <Button 
+                            onClick={() => {
+                              setSelectedEnrollment(enrollment);
+                              setNewStatus('paid');
+                              setNotes('');
+                              setStatusDialogOpen(true);
+                            }}
+                            className="flex-1 bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg active:scale-95 transition-all"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            {locale === 'ar' ? 'موافقة' : 'Approve'}
+                          </Button>
+                          <Button 
+                            onClick={() => {
+                              setSelectedEnrollment(enrollment);
+                              setNewStatus('rejected');
+                              setNotes('');
+                              setStatusDialogOpen(true);
+                            }}
+                            variant="destructive"
+                            className="flex-1 shadow-lg active:scale-95 transition-all"
+                          >
+                            <XCircle className="w-4 h-4 mr-2" />
+                            {locale === 'ar' ? 'رفض' : 'Reject'}
+                          </Button>
+                        </div>
+                      )}
+
                       <Button 
                         onClick={() => window.location.href = `/${locale}/dashboard/payments/review/${enrollment.id}`}
-                        className="w-full bg-[#30B2D2] hover:bg-[#1E3A8A]"
+                        variant="outline"
+                        className="w-full"
                       >
                         <Eye className="w-4 h-4 mr-2" />
-                        {locale === 'ar' ? 'مراجعة والموافقة' : 'Review & Approve'}
+                        {locale === 'ar' ? 'عرض التفاصيل' : 'View Details'}
                       </Button>
                     </CardContent>
                   </Card>
@@ -212,17 +327,64 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                         {getStatusBadge(enrollment.paymentStatus)}
                       </div>
                     </CardHeader>
-                    <CardContent className="p-6 space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">{locale === 'ar' ? 'المبلغ' : 'Amount'}</span>
-                        <span className="font-semibold">{enrollment.course?.price} {enrollment.course?.currency}</span>
+                    <CardContent className="p-6 space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{locale === 'ar' ? 'المبلغ' : 'Amount'}</span>
+                          <span className="font-semibold">{enrollment.course?.price} {enrollment.course?.currency}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{locale === 'ar' ? 'تاريخ الدفع' : 'Payment Date'}</span>
+                          <span className="font-semibold">
+                            {enrollment.paymentDate ? new Date(enrollment.paymentDate).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US') : '-'}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">{locale === 'ar' ? 'تاريخ الدفع' : 'Payment Date'}</span>
-                        <span className="font-semibold">
-                          {enrollment.paymentDate ? new Date(enrollment.paymentDate).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US') : '-'}
-                        </span>
-                      </div>
+
+                      {currentUser.role === 'admin' && (
+                        <div className="pt-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button 
+                                variant="outline"
+                                size="sm"
+                                className="w-full hover:bg-gray-100 active:scale-95 transition-all"
+                              >
+                                <MoreVertical className="w-4 h-4 mr-2" />
+                                {locale === 'ar' ? 'تغيير الحالة' : 'Change Status'}
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                              <DropdownMenuLabel>{locale === 'ar' ? 'تحديث حالة الدفع' : 'Update Payment Status'}</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => {
+                                  setSelectedEnrollment(enrollment);
+                                  setNewStatus('pending');
+                                  setNotes('');
+                                  setStatusDialogOpen(true);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <AlertCircle className="w-4 h-4 mr-2 text-orange-600" />
+                                <span>{locale === 'ar' ? 'قيد الانتظار' : 'Mark as Pending'}</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => {
+                                  setSelectedEnrollment(enrollment);
+                                  setNewStatus('rejected');
+                                  setNotes('');
+                                  setStatusDialogOpen(true);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <X className="w-4 h-4 mr-2 text-red-600" />
+                                <span>{locale === 'ar' ? 'رفض' : 'Mark as Rejected'}</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
@@ -259,20 +421,77 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="p-6 space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">{locale === 'ar' ? 'المبلغ المطلوب' : 'Amount Due'}</span>
-                        <span className="font-semibold">{enrollment.course?.price} {enrollment.course?.currency}</span>
+                    <CardContent className="p-6 space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{locale === 'ar' ? 'المبلغ المطلوب' : 'Amount Due'}</span>
+                          <span className="font-semibold">{enrollment.course?.price} {enrollment.course?.currency}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{locale === 'ar' ? 'تاريخ التسجيل' : 'Enrollment Date'}</span>
+                          <span className="font-semibold">
+                            {new Date(enrollment.enrollmentDate).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US')}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground pt-2">
+                          {locale === 'ar' ? 'في انتظار رفع إثبات الدفع من ولي الأمر' : 'Waiting for parent to upload payment proof'}
+                        </p>
                       </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">{locale === 'ar' ? 'تاريخ التسجيل' : 'Enrollment Date'}</span>
-                        <span className="font-semibold">
-                          {new Date(enrollment.enrollmentDate).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US')}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground pt-2">
-                        {locale === 'ar' ? 'في انتظار رفع إثبات الدفع من ولي الأمر' : 'Waiting for parent to upload payment proof'}
-                      </p>
+
+                      {currentUser.role === 'admin' && (
+                        <div className="pt-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button 
+                                className="w-full bg-linear-to-r from-[#30B2D2] to-[#1E3A8A] hover:from-[#1E3A8A] hover:to-[#30B2D2] text-white shadow-lg active:scale-95 transition-all"
+                              >
+                                <MoreVertical className="w-4 h-4 mr-2" />
+                                {locale === 'ar' ? 'تغيير الحالة' : 'Change Status'}
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                              <DropdownMenuLabel>{locale === 'ar' ? 'تحديث حالة الدفع' : 'Update Payment Status'}</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => {
+                                  setSelectedEnrollment(enrollment);
+                                  setNewStatus('paid');
+                                  setNotes('');
+                                  setStatusDialogOpen(true);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <Check className="w-4 h-4 mr-2 text-green-600" />
+                                <span>{locale === 'ar' ? 'تم الدفع نقداً' : 'Mark as Paid (Cash)'}</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => {
+                                  setSelectedEnrollment(enrollment);
+                                  setNewStatus('rejected');
+                                  setNotes('');
+                                  setStatusDialogOpen(true);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <X className="w-4 h-4 mr-2 text-red-600" />
+                                <span>{locale === 'ar' ? 'رفض' : 'Mark as Rejected'}</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => {
+                                  setSelectedEnrollment(enrollment);
+                                  setNewStatus('pending');
+                                  setNotes('');
+                                  setStatusDialogOpen(true);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <AlertCircle className="w-4 h-4 mr-2 text-orange-600" />
+                                <span>{locale === 'ar' ? 'قيد الانتظار' : 'Mark as Pending'}</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
@@ -393,6 +612,110 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
           ))}
         </div>
       )}
+
+      {/* Status Change Dialog */}
+      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className={`p-2.5 rounded-xl ${
+                newStatus === 'paid' 
+                  ? 'bg-linear-to-br from-green-100 to-emerald-100 text-green-700' 
+                  : newStatus === 'rejected'
+                  ? 'bg-linear-to-br from-red-100 to-rose-100 text-red-700'
+                  : 'bg-linear-to-br from-orange-100 to-yellow-100 text-orange-700'
+              }`}>
+                {newStatus === 'paid' && <Check className="w-6 h-6" />}
+                {newStatus === 'rejected' && <X className="w-6 h-6" />}
+                {newStatus === 'pending' && <AlertCircle className="w-6 h-6" />}
+              </div>
+              <div>
+                <DialogTitle className="text-xl">
+                  {locale === 'ar' ? 'تغيير حالة الدفع' : 'Change Payment Status'}
+                </DialogTitle>
+                <DialogDescription className="mt-1">
+                  {locale === 'ar' 
+                    ? `تحويل الحالة إلى "${newStatus === 'paid' ? 'مدفوع' : newStatus === 'pending' ? 'قيد الانتظار' : 'مرفوض'}"`
+                    : `Update status to "${newStatus === 'paid' ? 'Paid' : newStatus === 'pending' ? 'Pending' : 'Rejected'}"`
+                  }
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {selectedEnrollment && (
+              <div className="space-y-3 p-4 bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground font-medium">{locale === 'ar' ? 'الدورة' : 'Course'}:</span>
+                  <span className="font-semibold">
+                    {locale === 'ar' ? selectedEnrollment.course?.nameAr : selectedEnrollment.course?.name}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground font-medium">{locale === 'ar' ? 'الطالب' : 'Student'}:</span>
+                  <span className="font-semibold">{selectedEnrollment.student?.fullName}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground font-medium">{locale === 'ar' ? 'المبلغ' : 'Amount'}:</span>
+                  <span className="font-bold text-lg bg-linear-to-r from-[#30B2D2] to-[#1E3A8A] bg-clip-text text-transparent">
+                    {selectedEnrollment.course?.price} {selectedEnrollment.course?.currency}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="notes" className="text-sm font-semibold">
+                {locale === 'ar' ? 'ملاحظات (اختياري)' : 'Notes (Optional)'}
+              </Label>
+              <Textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={locale === 'ar' ? 'أضف ملاحظات أو سبب التغيير...' : 'Add notes or reason for change...'}
+                className="h-24 resize-none border-2 focus:border-[#30B2D2] transition-colors"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setStatusDialogOpen(false)}
+              disabled={updating}
+              className="hover:bg-gray-100 active:scale-95 transition-all"
+            >
+              {locale === 'ar' ? 'إلغاء' : 'Cancel'}
+            </Button>
+            <Button
+              onClick={handleStatusUpdate}
+              disabled={updating}
+              className={`shadow-lg active:scale-95 transition-all ${
+                newStatus === 'paid'
+                  ? 'bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white'
+                  : newStatus === 'rejected'
+                  ? 'bg-linear-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white'
+                  : 'bg-linear-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white'
+              }`}
+            >
+              {updating ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  {locale === 'ar' ? 'جارٍ التحديث...' : 'Updating...'}
+                </span>
+              ) : (
+                <>
+                  {newStatus === 'paid' && <Check className="w-4 h-4 mr-2" />}
+                  {newStatus === 'rejected' && <X className="w-4 h-4 mr-2" />}
+                  {newStatus === 'pending' && <AlertCircle className="w-4 h-4 mr-2" />}
+                  {locale === 'ar' ? 'تأكيد التغيير' : 'Confirm Change'}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { MessageSquare, Users as UsersIcon, Send, Plus, Search, X, Check } from 'lucide-react';
+import { MessageSquare, Users as UsersIcon, Send, Plus, Search, X, Check, Smile, Paperclip, MoreVertical, ArrowLeft, Phone, Video, CheckCheck, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import { AuthUser } from '@/lib/auth/auth';
 import { User } from '@/lib/db/repositories/userRepository';
+import EmojiPicker from 'emoji-picker-react';
 import {
   sendMessageAction,
   getConversationAction,
@@ -49,7 +50,12 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
   const [showUserSelectDialog, setShowUserSelectDialog] = useState(false);
   const [groupName, setGroupName] = useState('');
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(true);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const emojiButtonRef = useRef<HTMLButtonElement>(null);
   const { confirm, ConfirmDialog } = useConfirm();
 
   const isAdmin = currentUser.role === 'admin';
@@ -73,6 +79,23 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
       return () => clearInterval(interval);
     }
   }, [selectedConversation]);
+
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Show notification helper
+  const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   const loadData = async () => {
     try {
@@ -135,21 +158,23 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
 
       if (result.success) {
         setMessageText('');
+        setShowEmojiPicker(false);
         loadMessages(selectedConversation);
         loadData(); // Refresh conversation list
+        showNotification(locale === 'ar' ? 'تم إرسال الرسالة' : 'Message sent', 'success');
       } else {
-        await confirm({
-          title: dictionary.common.error,
-          description: result.error || 'Failed to send message',
-          confirmText: 'OK',
-          variant: 'destructive',
-        });
+        showNotification(result.error || 'Failed to send message', 'error');
       }
     } catch (error) {
       console.error('Send message error:', error);
+      showNotification('Failed to send message', 'error');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEmojiClick = (emojiData: any) => {
+    setMessageText(prev => prev + emojiData.emoji);
   };
 
   const handleCreateGroup = async () => {
@@ -200,8 +225,14 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
     const user = allUsers.find(u => u.id === userId);
     if (user) {
       setShowUserSelectDialog(false);
+      setShowMobileSidebar(false);
       handleSelectConversation({ type: 'user', id: user.id, name: user.fullName || user.email });
     }
+  };
+
+  const handleSelectConversationMobile = (conversation: { type: 'user' | 'group'; id: string; name: string }) => {
+    setShowMobileSidebar(false);
+    handleSelectConversation(conversation);
   };
 
   const toggleMemberSelection = (userId: string) => {
@@ -218,27 +249,55 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
 
   return (
     <>
-      <div className="h-full flex flex-col">
-        {/* Header */}
-        <div className="p-6 border-b bg-white dark:bg-[#262626]">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-[#262626] dark:text-white">
+      {/* Toast Notification */}
+      {notification && (
+        <div className={`fixed top-4 right-4 left-4 sm:left-auto sm:w-96 z-50 animate-in slide-in-from-top-5 ${
+          notification.type === 'success' 
+            ? 'bg-green-500' 
+            : 'bg-red-500'
+        } text-white rounded-xl shadow-2xl p-4 flex items-center gap-3`}>
+          {notification.type === 'success' ? (
+            <CheckCheck className="h-5 w-5 shrink-0" />
+          ) : (
+            <X className="h-5 w-5 shrink-0" />
+          )}
+          <p className="flex-1 font-medium">{notification.message}</p>
+          <button onClick={() => setNotification(null)} className="shrink-0 hover:bg-white/20 rounded-lg p-1 transition-colors" aria-label="Close notification">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      <div className="h-[calc(100vh-4rem)] lg:h-full flex flex-col bg-gray-50 dark:bg-[#1a1a1a] pb-0 lg:pb-0">
+        {/* Header - Hidden on mobile when chat is open */}
+        <div className={`${!showMobileSidebar && selectedConversation ? 'hidden lg:block' : 'block'} p-4 sm:p-6 border-b bg-white dark:bg-[#262626] shadow-sm`}>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#262626] dark:text-white truncate">
                 {dictionary.messages?.title || 'Messages'}
               </h1>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1 hidden sm:block">
                 {isAdmin ? 'Send messages to users and manage groups' : 'Your conversations'}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 shrink-0">
               {isAdmin && (
-                <Button onClick={() => setShowUserSelectDialog(true)} className="bg-[#FF5F02] hover:bg-[#262626]">
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  {dictionary.messages?.newMessage || 'New Message'}
+                <Button 
+                  onClick={() => setShowUserSelectDialog(true)} 
+                  size="sm"
+                  className="bg-[#FF5F02] hover:bg-[#e55502] shadow-md active:scale-95 transition-all"
+                >
+                  <MessageSquare className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">{dictionary.messages?.newMessage || 'New Message'}</span>
                 </Button>
               )}
               {permissions.canCreateGroup && (
-                <Button onClick={() => setShowNewGroupDialog(true)} variant="outline">
+                <Button 
+                  onClick={() => setShowNewGroupDialog(true)} 
+                  size="sm"
+                  variant="outline"
+                  className="border-2 active:scale-95 transition-all hidden sm:flex"
+                >
                   <UsersIcon className="mr-2 h-4 w-4" />
                   {dictionary.messages?.newGroup || 'New Group'}
                 </Button>
@@ -250,36 +309,60 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
           {/* Sidebar - Conversations List */}
-          <div className="w-80 border-r bg-[#DDDDDD] dark:bg-[#000000] overflow-y-auto">
-            <Tabs defaultValue="conversations" className="w-full">
-              <TabsList className="w-full grid grid-cols-2">
-                <TabsTrigger value="conversations">{dictionary.messages?.conversations || 'Conversations'}</TabsTrigger>
-                <TabsTrigger value="groups">{dictionary.messages?.groups || 'Groups'}</TabsTrigger>
-              </TabsList>
+          <div className={`${
+            showMobileSidebar ? 'flex' : 'hidden lg:flex'
+          } w-full lg:w-80 lg:max-w-[320px] border-r bg-white dark:bg-[#000000] overflow-y-auto overflow-x-hidden flex-col`}>
+            <Tabs defaultValue="conversations" className="w-full flex flex-col flex-1 overflow-hidden">
+              <div className="px-3 pt-3 pb-2">
+                <TabsList className="w-full grid grid-cols-2 bg-gray-100 dark:bg-[#262626] rounded-xl h-11 p-1">
+                  <TabsTrigger value="conversations" className="data-[state=active]:bg-[#FF5F02] data-[state=active]:text-white rounded-lg text-sm font-medium">
+                    {dictionary.messages?.conversations || 'Conversations'}
+                  </TabsTrigger>
+                  <TabsTrigger value="groups" className="data-[state=active]:bg-[#FF5F02] data-[state=active]:text-white rounded-lg text-sm font-medium">
+                    {dictionary.messages?.groups || 'Groups'}
+                  </TabsTrigger>
+                </TabsList>
+              </div>
               
-              <TabsContent value="conversations" className="space-y-1 p-2">
+              <TabsContent value="conversations" className="space-y-2 px-3 pb-3 flex-1 overflow-y-auto overflow-x-hidden">
                 {conversations.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    {dictionary.messages?.noConversations || 'No conversations yet'}
+                  <div className="text-center py-12 text-muted-foreground">
+                    <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>{dictionary.messages?.noConversations || 'No conversations yet'}</p>
                   </div>
                 ) : (
                   conversations.map((conv) => (
                     <button
                       key={conv.userId}
-                      onClick={() => handleSelectConversation({ type: 'user', id: conv.userId, name: conv.user?.fullName || conv.user?.email || '' })}
-                      className={`w-full p-3 rounded-lg text-left transition-colors ${
+                      onClick={() => handleSelectConversationMobile({ type: 'user', id: conv.userId, name: conv.user?.fullName || conv.user?.email || '' })}
+                      className={`w-full p-3 sm:p-4 rounded-xl text-left transition-all active:scale-95 overflow-hidden ${
                         selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
-                          ? 'bg-[#FF5F02] text-white'
-                          : 'hover:bg-white dark:hover:bg-[#262626]'
+                          ? 'bg-linear-to-r from-[#FF5F02] to-[#ff7b33] text-white shadow-lg'
+                          : 'hover:bg-gray-50 dark:hover:bg-[#262626] hover:shadow-md'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-[#FF5F02] flex items-center justify-center text-white font-semibold">
-                          {conv.user?.fullName?.[0]?.toUpperCase() || 'U'}
+                        <div className="relative">
+                          <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md ${
+                            selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
+                              ? 'bg-white/20'
+                              : 'bg-linear-to-br from-[#FF5F02] to-[#ff7b33]'
+                          }`}>
+                            {conv.user?.fullName?.[0]?.toUpperCase() || 'U'}
+                          </div>
+                          {/* Online indicator */}
+                          <div className="absolute bottom-0 right-0 h-3.5 w-3.5 bg-green-500 border-2 border-white dark:border-[#000000] rounded-full"></div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{conv.user?.fullName || conv.user?.email}</p>
-                          <p className="text-sm opacity-75 truncate">{conv.lastMessage?.content}</p>
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="font-semibold truncate">{conv.user?.fullName || conv.user?.email}</p>
+                            {conv.lastMessage && (
+                              <span className="text-xs opacity-75 shrink-0 ms-2">
+                                {new Date(conv.lastMessage.createdAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm opacity-75 truncate">{conv.lastMessage?.content || locale === 'ar' ? 'ابدأ محادثة' : 'Start conversation'}</p>
                         </div>
                       </div>
                     </button>
@@ -287,29 +370,44 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                 )}
               </TabsContent>
 
-              <TabsContent value="groups" className="space-y-1 p-2">
+              <TabsContent value="groups" className="space-y-2 px-3 pb-3 flex-1 overflow-y-auto overflow-x-hidden">
                 {groups.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No groups yet
+                  <div className="text-center py-12 text-muted-foreground">
+                    <UsersIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>{locale === 'ar' ? 'لا توجد مجموعات' : 'No groups yet'}</p>
+                    {permissions.canCreateGroup && (
+                      <Button
+                        onClick={() => setShowNewGroupDialog(true)}
+                        size="sm"
+                        className="mt-4 bg-[#FF5F02] hover:bg-[#e55502]"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        {dictionary.messages?.newGroup || 'New Group'}
+                      </Button>
+                    )}
                   </div>
                 ) : (
                   groups.map((group) => (
                     <button
                       key={group.id}
-                      onClick={() => handleSelectConversation({ type: 'group', id: group.id, name: group.name })}
-                      className={`w-full p-3 rounded-lg text-left transition-colors ${
+                      onClick={() => handleSelectConversationMobile({ type: 'group', id: group.id, name: group.name })}
+                      className={`w-full p-3 sm:p-4 rounded-xl text-left transition-all active:scale-95 overflow-hidden ${
                         selectedConversation?.id === group.id && selectedConversation?.type === 'group'
-                          ? 'bg-[#FF5F02] text-white'
-                          : 'hover:bg-white dark:hover:bg-[#262626]'
+                          ? 'bg-linear-to-r from-[#FF5F02] to-[#ff7b33] text-white shadow-lg'
+                          : 'hover:bg-gray-50 dark:hover:bg-[#262626] hover:shadow-md'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-[#FF5F02] flex items-center justify-center text-white">
-                          <UsersIcon className="h-5 w-5" />
+                        <div className={`h-12 w-12 rounded-full flex items-center justify-center shadow-md ${
+                          selectedConversation?.id === group.id && selectedConversation?.type === 'group'
+                            ? 'bg-white/20 text-white'
+                            : 'bg-linear-to-br from-blue-500 to-blue-600 text-white'
+                        }`}>
+                          <UsersIcon className="h-6 w-6" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{group.name}</p>
-                          <p className="text-sm opacity-75">{group.members.length} members</p>
+                          <p className="font-semibold truncate">{group.name}</p>
+                          <p className="text-sm opacity-75">{group.members.length} {locale === 'ar' ? 'أعضاء' : 'members'}</p>
                         </div>
                       </div>
                     </button>
@@ -320,61 +418,220 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
           </div>
 
           {/* Chat Area */}
-          <div className="flex-1 flex flex-col bg-white dark:bg-[#262626]">
+          <div className={`${
+            !showMobileSidebar && selectedConversation ? 'flex' : 'hidden lg:flex'
+          } flex-1 flex-col bg-gray-50 dark:bg-[#1a1a1a]`}>
             {selectedConversation ? (
               <>
                 {/* Chat Header */}
-                <div className="p-4 border-b flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-[#FF5F02] flex items-center justify-center text-white font-semibold">
-                    {selectedConversation.name[0]?.toUpperCase()}
+                <div className="p-3 sm:p-4 border-b bg-white dark:bg-[#262626] flex items-center gap-3 shadow-sm">
+                  {/* Back button for mobile */}
+                  <button
+                    onClick={() => setShowMobileSidebar(true)}
+                    className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-lg active:scale-95 transition-all"
+                    aria-label="Back to conversations"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </button>
+                  
+                  <div className="relative">
+                    <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center text-white font-bold shadow-md ${
+                      selectedConversation.type === 'group' 
+                        ? 'bg-linear-to-br from-blue-500 to-blue-600' 
+                        : 'bg-linear-to-br from-[#FF5F02] to-[#ff7b33]'
+                    }`}>
+                      {selectedConversation.type === 'group' ? (
+                        <UsersIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                      ) : (
+                        selectedConversation.name[0]?.toUpperCase()
+                      )}
+                    </div>
+                    {selectedConversation.type === 'user' && (
+                      <div className="absolute bottom-0 right-0 h-3 w-3 sm:h-3.5 sm:w-3.5 bg-green-500 border-2 border-white dark:border-[#262626] rounded-full"></div>
+                    )}
                   </div>
-                  <div>
-                    <h3 className="font-semibold">{selectedConversation.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedConversation.type === 'group' ? 'Group Chat' : 'Direct Message'}
+                  
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-base sm:text-lg truncate">{selectedConversation.name}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
+                      {selectedConversation.type === 'group' ? (
+                        <><UsersIcon className="h-3 w-3" /> {locale === 'ar' ? 'مجموعة' : 'Group Chat'}</>
+                      ) : (
+                        <><span className="h-2 w-2 bg-green-500 rounded-full"></span> {locale === 'ar' ? 'متصل' : 'Online'}</>
+                      )}
                     </p>
+                  </div>
+
+                  <div className="flex gap-1 sm:gap-2 shrink-0">
+                    <Button size="sm" variant="ghost" className="h-9 w-9 p-0 hidden sm:flex">
+                      <Phone className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-9 w-9 p-0 hidden sm:flex">
+                      <Video className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-9 w-9 p-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {messages.map((message) => {
-                    const isOwn = message.senderId === currentUser.id;
-                    return (
-                      <div key={message.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[70%] ${isOwn ? 'bg-[#FF5F02] text-white' : 'bg-[#DDDDDD] dark:bg-[#000000] dark:text-white'} rounded-lg p-3`}>
-                          <p>{message.content}</p>
-                          <p className={`text-xs mt-1 ${isOwn ? 'text-white opacity-70' : 'text-gray-500'}`}>
-                            {new Date(message.createdAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                        </div>
+                <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
+                  {messages.length === 0 ? (
+                    <div className="flex items-center justify-center h-full text-muted-foreground">
+                      <div className="text-center">
+                        <MessageSquare className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                        <p className="text-sm">{locale === 'ar' ? 'لا توجد رسائل بعد' : 'No messages yet'}</p>
+                        <p className="text-xs mt-2">{locale === 'ar' ? 'ابدأ المحادثة الآن' : 'Start the conversation now'}</p>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ) : (
+                    messages.map((message, index) => {
+                      const isOwn = message.senderId === currentUser.id;
+                      const showDate = index === 0 || 
+                        new Date(messages[index - 1].createdAt).toDateString() !== new Date(message.createdAt).toDateString();
+                      
+                      return (
+                        <div key={message.id}>
+                          {/* Date separator */}
+                          {showDate && (
+                            <div className="flex items-center justify-center my-4">
+                              <div className="bg-gray-200 dark:bg-[#262626] px-3 py-1 rounded-full text-xs text-gray-600 dark:text-gray-400">
+                                {new Date(message.createdAt).toLocaleDateString(locale, { 
+                                  weekday: 'short', 
+                                  month: 'short', 
+                                  day: 'numeric' 
+                                })}
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className={`flex items-end gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                            {!isOwn && (
+                              <div className="h-8 w-8 rounded-full bg-linear-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                {selectedConversation.name[0]?.toUpperCase()}
+                              </div>
+                            )}
+                            
+                            <div className={`group max-w-[85%] sm:max-w-[70%] ${isOwn ? 'bg-linear-to-br from-[#FF5F02] to-[#ff7b33] text-white' : 'bg-white dark:bg-[#262626] dark:text-white'} rounded-2xl ${isOwn ? 'rounded-br-md' : 'rounded-bl-md'} p-3 sm:p-4 shadow-md hover:shadow-lg transition-shadow`}>
+                              <p className="wrap-break-word text-sm sm:text-base whitespace-pre-wrap">{message.content}</p>
+                              <div className={`flex items-center gap-1.5 mt-1.5 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                                <p className={`text-xs ${isOwn ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>
+                                  {new Date(message.createdAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                                {isOwn && (
+                                  <CheckCheck className={`h-3.5 w-3.5 ${message.readBy.length > 1 ? 'text-blue-200' : 'text-white/60'}`} />
+                                )}
+                              </div>
+                            </div>
+                            
+                            {isOwn && (
+                              <div className="h-8 w-8 rounded-full bg-linear-to-br from-[#FF5F02] to-[#ff7b33] flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                {currentUser.fullName?.[0]?.toUpperCase() || 'U'}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                   <div ref={messagesEndRef} />
                 </div>
 
                 {/* Message Input */}
-                <div className="p-4 border-t">
-                  <div className="flex gap-2">
-                    <Input
-                      value={messageText}
-                      onChange={(e) => setMessageText(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                      placeholder={dictionary.messages?.typeMessage || 'Type your message...'}
-                      className="flex-1"
-                    />
-                    <Button onClick={handleSendMessage} disabled={loading || !messageText.trim()} className="bg-[#FF5F02] hover:bg-[#262626]">
-                      <Send className="h-4 w-4" />
+                <div className="p-3 sm:p-4 border-t bg-white dark:bg-[#262626] pb-[88px] lg:pb-3 sm:lg:pb-4 relative">
+                  {/* Emoji Picker - Positioned above emoji button */}
+                  {showEmojiPicker && (
+                    <div 
+                      ref={emojiPickerRef} 
+                      className="fixed bottom-[140px] left-2 right-2 sm:absolute sm:bottom-full sm:left-3 sm:right-auto sm:mb-2 z-50 shadow-2xl rounded-xl overflow-hidden max-w-[320px] mx-auto sm:mx-0"
+                    >
+                      <EmojiPicker 
+                        onEmojiClick={handleEmojiClick}
+                        theme={'light' as any}
+                        searchPlaceholder={locale === 'ar' ? 'بحث عن إيموجي...' : 'Search emoji...'}
+                        height={350}
+                        width="100%"
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="flex items-end gap-2">
+                    {/* Emoji Button */}
+                    <Button
+                      ref={emojiButtonRef}
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      className="h-10 w-10 p-0 shrink-0 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] active:scale-95 transition-all"
+                    >
+                      <Smile className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    </Button>
+
+                    {/* Attachment Button */}
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="h-10 w-10 p-0 shrink-0 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] active:scale-95 transition-all hidden sm:flex"
+                    >
+                      <Paperclip className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    </Button>
+                    
+                    {/* Message Input */}
+                    <div className="flex-1 relative">
+                      <Input
+                        value={messageText}
+                        onChange={(e) => setMessageText(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendMessage();
+                          }
+                        }}
+                        placeholder={dictionary.messages?.typeMessage || 'Type your message...'}
+                        className="pr-4 h-10 sm:h-11 rounded-full border-2 focus:border-[#FF5F02] transition-colors bg-gray-50 dark:bg-[#1a1a1a]"
+                      />
+                    </div>
+                    
+                    {/* Send Button */}
+                    <Button 
+                      onClick={handleSendMessage} 
+                      disabled={loading || !messageText.trim()} 
+                      size="sm"
+                      className="h-10 w-10 sm:h-11 sm:w-11 p-0 rounded-full bg-linear-to-br from-[#FF5F02] to-[#ff7b33] hover:from-[#e55502] hover:to-[#ff5f02] shadow-lg active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {loading ? (
+                        <Clock className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <Send className="h-5 w-5" />
+                      )}
                     </Button>
                   </div>
                 </div>
               </>
             ) : (
-              <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                <div className="text-center">
-                  <MessageSquare className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p>{dictionary.messages?.selectUser || 'Select a conversation to start chatting'}</p>
+              <div className="flex-1 flex items-center justify-center text-muted-foreground p-8">
+                <div className="text-center max-w-md">
+                  <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-100 dark:bg-[#262626] mb-6">
+                    <MessageSquare className="h-10 w-10 sm:h-12 sm:w-12 opacity-50" />
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-bold mb-2 text-gray-900 dark:text-white">
+                    {locale === 'ar' ? 'ابدأ محادثة' : 'Start a Conversation'}
+                  </h3>
+                  <p className="text-sm sm:text-base mb-6">
+                    {dictionary.messages?.selectUser || 'Select a conversation to start chatting'}
+                  </p>
+                  {isAdmin && (
+                    <Button
+                      onClick={() => setShowUserSelectDialog(true)}
+                      className="bg-[#FF5F02] hover:bg-[#e55502] shadow-md"
+                    >
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      {dictionary.messages?.newMessage || 'New Message'}
+                    </Button>
+                  )}
                 </div>
               </div>
             )}
@@ -384,47 +641,71 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
 
       {/* New Group Dialog */}
       <Dialog open={showNewGroupDialog} onOpenChange={setShowNewGroupDialog}>
-        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>{dictionary.messages?.createGroup || 'Create Group'}</DialogTitle>
-            <DialogDescription>
-              Create a group to send messages to multiple users at once
+        <DialogContent className="max-w-2xl max-h-[90vh] sm:max-h-[80vh] flex flex-col gap-0 p-0">
+          <DialogHeader className="p-4 sm:p-6 border-b">
+            <DialogTitle className="text-xl sm:text-2xl">{dictionary.messages?.createGroup || 'Create Group'}</DialogTitle>
+            <DialogDescription className="text-sm">
+              {locale === 'ar' ? 'إنشاء مجموعة لإرسال الرسائل إلى عدة مستخدمين' : 'Create a group to send messages to multiple users at once'}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 flex-1 overflow-y-auto">
+          <div className="space-y-4 flex-1 overflow-y-auto p-4 sm:p-6">
             <div>
-              <Label>{dictionary.messages?.groupName || 'Group Name'}</Label>
+              <Label className="text-sm font-semibold">{dictionary.messages?.groupName || 'Group Name'}</Label>
               <Input
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
-                placeholder="Enter group name"
+                placeholder={locale === 'ar' ? 'أدخل اسم المجموعة' : 'Enter group name'}
+                className="mt-2 h-11 border-2 focus:border-[#FF5F02]"
               />
             </div>
 
             <div>
-              <Label>{dictionary.messages?.selectMembers || 'Select Members'}</Label>
-              <div className="mt-2 space-y-2 max-h-60 overflow-y-auto">
+              <Label className="text-sm font-semibold">{dictionary.messages?.selectMembers || 'Select Members'}</Label>
+              <div className="mt-2 space-y-2 max-h-60 overflow-y-auto rounded-lg border p-2">
                 {allUsers.filter(u => u.id !== currentUser.id).map((user) => (
-                  <div key={user.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+                  <div key={user.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-[#262626] rounded-lg transition-colors active:scale-95">
                     <Checkbox
                       checked={selectedMembers.includes(user.id)}
                       onCheckedChange={() => toggleMemberSelection(user.id)}
+                      className="data-[state=checked]:bg-[#FF5F02] data-[state=checked]:border-[#FF5F02]"
                     />
-                    <span className="flex-1">{user.fullName || user.email}</span>
-                    <Badge variant="outline">{user.role}</Badge>
+                    <div className="h-10 w-10 rounded-full bg-linear-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                      {user.fullName?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{user.fullName || user.email}</p>
+                      <p className="text-xs text-muted-foreground">{user.role}</p>
+                    </div>
                   </div>
                 ))}
               </div>
+              {selectedMembers.length > 0 && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  {selectedMembers.length} {locale === 'ar' ? 'عضو محدد' : 'members selected'}
+                </p>
+              )}
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowNewGroupDialog(false)}>
+          <DialogFooter className="p-4 sm:p-6 border-t gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowNewGroupDialog(false)}
+              className="flex-1 sm:flex-none border-2 active:scale-95 transition-all"
+            >
               {dictionary.common.cancel}
             </Button>
-            <Button onClick={handleCreateGroup} disabled={loading} className="bg-[#FF5F02] hover:bg-[#262626]">
-              {loading ? dictionary.common.loading : dictionary.messages?.createGroup}
+            <Button 
+              onClick={handleCreateGroup} 
+              disabled={loading || !groupName.trim() || selectedMembers.length === 0} 
+              className="flex-1 sm:flex-none bg-[#FF5F02] hover:bg-[#e55502] active:scale-95 transition-all"
+            >
+              {loading ? (
+                <><Clock className="mr-2 h-4 w-4 animate-spin" /> {dictionary.common.loading}</>
+              ) : (
+                <><UsersIcon className="mr-2 h-4 w-4" /> {dictionary.messages?.createGroup}</>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -432,40 +713,51 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
 
       {/* User Select Dialog */}
       <Dialog open={showUserSelectDialog} onOpenChange={setShowUserSelectDialog}>
-        <DialogContent className="max-w-md max-h-[80vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>{dictionary.messages?.selectRecipient || 'Select Recipient'}</DialogTitle>
-            <DialogDescription>
-              Choose a user to start a conversation
+        <DialogContent className="max-w-md max-h-[90vh] sm:max-h-[80vh] flex flex-col gap-0 p-0">
+          <DialogHeader className="p-4 sm:p-6 border-b">
+            <DialogTitle className="text-xl sm:text-2xl">{dictionary.messages?.selectRecipient || 'Select Recipient'}</DialogTitle>
+            <DialogDescription className="text-sm">
+              {locale === 'ar' ? 'اختر مستخدم لبدء المحادثة' : 'Choose a user to start a conversation'}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 flex-1 overflow-y-auto">
-            <div>
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={dictionary.messages?.searchUsers || 'Search users...'}
-                className="w-full"
-              />
+          <div className="space-y-4 flex-1 overflow-y-auto p-4 sm:p-6">
+            <div className="sticky top-0 bg-white dark:bg-[#262626] pb-3 z-10">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={dictionary.messages?.searchUsers || 'Search users...'}
+                  className="pl-10 h-11 border-2 focus:border-[#FF5F02]"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
-              {filteredUsers.map((user) => (
-                <button
-                  key={user.id}
-                  onClick={() => handleSelectUser(user.id)}
-                  className="w-full p-3 hover:bg-gray-50 rounded-lg text-left transition-colors flex items-center gap-3"
-                >
-                  <div className="h-10 w-10 rounded-full bg-[#FF5F02] flex items-center justify-center text-white font-semibold">
-                    {user.fullName?.[0]?.toUpperCase() || 'U'}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{user.fullName || user.email}</p>
-                    <p className="text-sm text-muted-foreground">{user.role}</p>
-                  </div>
-                </button>
-              ))}
+              {filteredUsers.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Search className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>{locale === 'ar' ? 'لم يتم العثور على مستخدمين' : 'No users found'}</p>
+                </div>
+              ) : (
+                filteredUsers.map((user) => (
+                  <button
+                    key={user.id}
+                    onClick={() => handleSelectUser(user.id)}
+                    className="w-full p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] rounded-xl text-left transition-all flex items-center gap-3 active:scale-95 border border-transparent hover:border-[#FF5F02]/20"
+                  >
+                    <div className="h-12 w-12 rounded-full bg-linear-to-br from-[#FF5F02] to-[#ff7b33] flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
+                      {user.fullName?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold truncate">{user.fullName || user.email}</p>
+                      <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
+                    </div>
+                    <MessageSquare className="h-5 w-5 text-[#FF5F02] shrink-0" />
+                  </button>
+                ))
+              )}
             </div>
           </div>
         </DialogContent>

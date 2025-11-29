@@ -112,16 +112,16 @@ export function DashboardSidebar({
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      {/* Logo/Brand */}
+      {/* Logo/Brand - Hidden on mobile (mobile has its own header) */}
       <div className={cn(
-        "p-6 border-b border-[#000000]",
+        "hidden lg:block p-6 border-b border-[#000000]",
         isCollapsed && "lg:px-3"
       )}>
         <Link href={`/${locale}/dashboard`} className={cn(
           "flex items-center gap-3 group",
           isCollapsed && "lg:justify-center"
         )}>
-          <div className="h-10 w-10 flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-105">
+          <div className="h-10 w-10 flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
             <img 
               src="/logo.png" 
               alt="DNA Logo" 
@@ -152,20 +152,27 @@ export function DashboardSidebar({
             <div key={item.key} className="relative group/item">
               <Link
                 href={href}
+                onClick={() => onMobileClose && onMobileClose()}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
+                  "flex items-center gap-3 px-4 py-3.5 rounded-lg transition-all duration-200 touch-manipulation",
+                  "active:scale-[0.98] active:brightness-95",
                   isActive 
-                    ? "bg-[#FF5F02] text-white" 
-                    : "text-white hover:bg-[#000000]",
-                  isCollapsed && "lg:justify-center lg:px-3"
+                    ? "bg-[#FF5F02] text-white shadow-lg shadow-[#FF5F02]/30" 
+                    : "text-white hover:bg-[#000000] hover:shadow-md",
+                  isCollapsed && "lg:justify-center lg:px-3",
+                  "min-h-12" // Touch-friendly minimum height
                 )}
               >
-                <Icon className="h-5 w-5 flex-shrink-0" />
+                <Icon className="h-5 w-5 shrink-0" />
                 
                 {!isCollapsed && (
-                  <span className="font-medium truncate flex-1">
+                  <span className="font-medium truncate flex-1 text-[15px]">
                     {dictionary.nav[item.labelKey]}
                   </span>
+                )}
+                
+                {!isCollapsed && isActive && (
+                  <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
                 )}
               </Link>
             </div>
@@ -207,9 +214,10 @@ export function DashboardSidebar({
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={cn(
-            "absolute top-20 -right-3 h-6 w-6 rounded-full bg-[#FF5F02] border border-[#FF5F02] flex items-center justify-center hover:bg-[#262626] transition-colors z-50 text-white",
+            "absolute top-20 -right-3 h-6 w-6 rounded-full bg-[#FF5F02] border border-[#FF5F02] flex items-center justify-center hover:bg-[#262626] transition-all duration-200 z-50 text-white hover:scale-110 active:scale-95",
             isRTL && "-left-3 right-auto"
           )}
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {isCollapsed ? (
             isRTL ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />
@@ -220,15 +228,42 @@ export function DashboardSidebar({
       </aside>
 
       {/* Mobile Sidebar */}
-      <aside className={cn(
-        "lg:hidden fixed top-0 bottom-0 z-50 w-72 bg-[#262626] shadow-xl transition-transform duration-300 flex flex-col",
-        isMobileOpen 
-          ? "translate-x-0" 
-          : isRTL 
-            ? "translate-x-full" 
-            : "-translate-x-full",
-        isRTL ? "right-0" : "left-0"
-      )}>
+      <aside 
+        className={cn(
+          "lg:hidden fixed top-0 bottom-0 z-50 bg-[#262626] shadow-2xl transition-all duration-300 ease-out flex flex-col",
+          "w-[85vw] max-w-[320px] sm:w-80",
+          isMobileOpen 
+            ? "translate-x-0" 
+            : isRTL 
+              ? "translate-x-full" 
+              : "-translate-x-full",
+          isRTL ? "right-0" : "left-0"
+        )}
+        role="dialog"
+        aria-label="Navigation menu"
+      >
+        {/* Mobile Header with Close Button */}
+        <div className="flex items-center justify-between p-4 border-b border-[#000000] lg:hidden">
+          <div className="flex items-center gap-3">
+            <img 
+              src="/logo.png" 
+              alt="DNA Logo" 
+              className="h-8 w-8 object-contain"
+            />
+            <div>
+              <h2 className="text-lg font-bold text-[#FF5F02]">DNA</h2>
+              <p className="text-xs text-white">Menu</p>
+            </div>
+          </div>
+          <button
+            onClick={onMobileClose}
+            className="h-10 w-10 rounded-lg flex items-center justify-center text-white hover:bg-[#000000] transition-colors active:scale-95"
+            aria-label="Close menu"
+          >
+            ✕
+          </button>
+        </div>
+
         <SidebarContent />
       </aside>
     </>

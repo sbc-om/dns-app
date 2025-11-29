@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from './ui/button';
 import { SessionPlanEditor } from './SessionPlanEditor';
+import { PageContainer, PageHeader } from './ui/page-layout';
 import type { Course } from '@/lib/db/repositories/courseRepository';
 
 interface NewSessionClientProps {
@@ -33,27 +34,26 @@ export default function NewSessionClient({
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleCancel}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">
-            {dictionary.courses?.addSession || 'Add New Session'}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {locale === 'ar' 
-              ? `${course.nameAr} - الجلسة رقم ${nextSessionNumber}`
-              : `${course.name} - Session #${nextSessionNumber}`}
-          </p>
-        </div>
-      </div>
+    <PageContainer maxWidth="4xl">
+      <PageHeader
+        title={dictionary.courses?.addSession || 'Add New Session'}
+        description={
+          locale === 'ar' 
+            ? `${course.nameAr} - الجلسة رقم ${nextSessionNumber}`
+            : `${course.name} - Session #${nextSessionNumber}`
+        }
+        backButton={
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCancel}
+            className="gap-2 active-scale"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">{dictionary.common?.back || 'Back'}</span>
+          </Button>
+        }
+      />
 
       {/* Session Editor */}
       <SessionPlanEditor
@@ -65,6 +65,6 @@ export default function NewSessionClient({
         onSuccess={handleSuccess}
         onCancel={handleCancel}
       />
-    </div>
+    </PageContainer>
   );
 }

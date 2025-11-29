@@ -108,15 +108,15 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-white/90 backdrop-blur-xl dark:bg-gray-900/90 shadow-sm">
-      <div className="flex h-16 items-center justify-between px-4 sm:px-6">
-        <div className="flex items-center gap-4">
+    <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur-xl dark:bg-gray-900/95 shadow-sm">
+      <div className="flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4 lg:px-6 gap-2">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
           {/* Mobile Menu Button */}
           <Button
             variant="ghost"
             size="icon"
             onClick={handleMobileMenuToggle}
-            className="lg:hidden h-10 w-10 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20"
+            className="lg:hidden h-10 w-10 min-w-10 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 active:scale-95 transition-transform touch-manipulation"
           >
             {isMobileMenuOpen ? (
               <X className="h-5 w-5 text-purple-600" />
@@ -127,28 +127,28 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
           </Button>
 
           {/* Logo & Title */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <img 
               src="/logo.png" 
               alt="DNA Logo" 
-              className="h-8 w-8 object-contain"
+              className="h-7 w-7 sm:h-8 sm:w-8 object-contain shrink-0"
             />
-            <h1 className="hidden sm:block text-xl font-bold text-[#FF5F02]">
+            <h1 className="hidden sm:block text-base md:text-lg lg:text-xl font-bold text-[#FF5F02] truncate">
               Discover Natural Ability
             </h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* View Website Button */}
-          <Link href={`/${locale}`}>
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {/* View Website Button - Hidden on very small screens */}
+          <Link href={`/${locale}`} className="hidden xs:inline-flex">
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20"
+              className="h-9 w-9 sm:h-10 sm:w-10 min-w-9 sm:min-w-10 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 active:scale-95 transition-transform touch-manipulation"
               title="View Website"
             >
-              <Globe className="h-5 w-5 text-purple-600" />
+              <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
               <span className="sr-only">View Website</span>
             </Button>
           </Link>
@@ -161,10 +161,10 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
               variant="ghost"
               size="icon"
               onClick={handleInstall}
-              className="h-10 w-10 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20"
+              className="h-9 w-9 sm:h-10 sm:w-10 min-w-9 sm:min-w-10 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 active:scale-95 transition-transform touch-manipulation"
               title="Install App"
             >
-              <Download className="h-5 w-5 text-green-600" />
+              <Download className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               <span className="sr-only">Install App</span>
             </Button>
           )}
@@ -174,12 +174,12 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 relative"
+              className="h-9 w-9 sm:h-10 sm:w-10 min-w-9 sm:min-w-10 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 active:scale-95 transition-transform touch-manipulation relative"
               title={dictionary.nav.notifications}
             >
-              <Bell className="h-5 w-5 text-blue-600" />
+              <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 h-3 w-3 rounded-full bg-red-500 border-2 border-white dark:border-gray-900" />
+                <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500 border-2 border-white dark:border-gray-900 animate-pulse" />
               )}
               <span className="sr-only">{dictionary.nav.notifications}</span>
             </Button>
@@ -187,16 +187,16 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-purple-50 dark:hover:bg-purple-900/20">
+              <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 min-w-9 sm:min-w-10 rounded-full hover:bg-purple-50 dark:hover:bg-purple-900/20 active:scale-95 transition-transform touch-manipulation">
                 {user.profilePicture ? (
                   <img
                     key={user.profilePicture}
                     src={user.profilePicture}
                     alt={user.fullName || 'User'}
-                    className="h-8 w-8 rounded-full object-cover shadow-lg border-2 border-purple-600"
+                    className="h-7 w-7 sm:h-8 sm:w-8 rounded-full object-cover shadow-lg border-2 border-purple-600"
                   />
                 ) : (
-                  <div className="h-8 w-8 rounded-full bg-[#FF5F02] flex items-center justify-center text-white text-sm font-semibold shadow-lg">
+                  <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-[#FF5F02] flex items-center justify-center text-white text-xs sm:text-sm font-semibold shadow-lg">
                     {user.fullName?.[0]?.toUpperCase() || 'U'}
                   </div>
                 )}

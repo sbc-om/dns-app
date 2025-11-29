@@ -171,8 +171,8 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
             {permissions.canManageBackups && (
               <TabsTrigger value="medals" className="flex-1 min-w-fit">
                 <Award className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">{dictionary.settings?.medals || 'Medals'}</span>
-                <span className="sm:hidden">Medals</span>
+                <span className="hidden sm:inline">{dictionary.settings?.medals || 'Achievements'}</span>
+                <span className="sm:hidden">Achievements</span>
               </TabsTrigger>
             )}
             {permissions.canManageBackups && (
@@ -308,7 +308,7 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
           </TabsContent>
           )}
 
-          {/* Medals Tab */}
+          {/* Achievements Tab */}
           {permissions.canManageBackups && (
           <TabsContent value="medals" className="space-y-4">
             <MedalsManagement dictionary={dictionary} />

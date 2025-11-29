@@ -6,7 +6,7 @@ import { listUsers, getChildrenByParentId, getUsersByIds } from '@/lib/db/reposi
 import { getAllAppointments } from '@/lib/db/repositories/appointmentRepository';
 import { getCoursesByCoachId, type Course } from '@/lib/db/repositories/courseRepository';
 import { getPaidEnrollmentsByCourseId } from '@/lib/db/repositories/enrollmentRepository';
-import { Users, Calendar, Clock, CheckCircle, UserCheck } from 'lucide-react';
+import { Users, Calendar, Clock, CheckCircle, UserCheck, User } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ChildMedalsPreview } from '@/components/ChildMedalsPreview';
@@ -185,7 +185,72 @@ export default async function DashboardPage({
             <div className="bg-white p-8 rounded-xl border-2 border-dashed border-gray-300 text-center">
               <p className="text-gray-500 text-lg">{dictionary.users.noChildren}</p>
             </div>
+          ) : children.length === 1 ? (
+            // Single Child - Large Featured Card
+            <Link 
+              href={`/${locale}/dashboard/kids/${children[0].id}`}
+              className="block group"
+            >
+              <div className="bg-linear-to-br from-white to-blue-50 dark:from-[#262626] dark:to-[#1a1a1a] p-8 rounded-2xl border-2 border-[#FF5F02] shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row items-center gap-6 mb-6">
+                  {/* Large Profile Image */}
+                  <div className="relative shrink-0">
+                    {children[0].profilePicture ? (
+                      <img
+                        src={children[0].profilePicture}
+                        alt={children[0].fullName || children[0].username}
+                        className="w-32 h-32 rounded-full object-cover border-4 border-[#FF5F02] shadow-lg group-hover:scale-110 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-32 h-32 rounded-full bg-linear-to-br from-[#FF5F02] to-[#ff7b33] flex items-center justify-center text-white text-5xl font-bold border-4 border-[#FF5F02]/20 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        {(children[0].fullName || children[0].username).charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Name & Info */}
+                  <div className="flex-1 text-center md:text-left">
+                    <h3 className="text-3xl md:text-4xl font-bold text-[#262626] dark:text-white mb-2 group-hover:text-[#FF5F02] transition-colors">
+                      {children[0].fullName || children[0].username}
+                    </h3>
+                    <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 mb-3">
+                      {children[0].nationalId ? `${dictionary.users.nationalId}: ${children[0].nationalId}` : children[0].username}
+                    </p>
+                    {children[0].dateOfBirth && (
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#262626] rounded-full shadow-md">
+                        <Calendar className="h-4 w-4 text-[#FF5F02]" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {new Date(children[0].dateOfBirth).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Medals Section */}
+                <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="h-10 w-10 rounded-full bg-[#FF5F02]/10 flex items-center justify-center">
+                        <User className="h-5 w-5 text-[#FF5F02]" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{dictionary.users.createdAt || 'Member Since'}</p>
+                        <p className="text-base font-semibold text-[#262626] dark:text-white">
+                          {new Date(children[0].createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'short' })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="shrink-0">
+                      <ChildMedalsPreview childId={children[0].id} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
           ) : (
+            // Multiple Children - List Layout
             <div className="space-y-4">
               {children.map((child) => (
                 <Link 
@@ -193,7 +258,7 @@ export default async function DashboardPage({
                   href={`/${locale}/dashboard/kids/${child.id}`}
                   className="block group"
                 >
-                  <div className="bg-white p-6 rounded-xl border-2 border-blue-100 shadow-md hover:shadow-xl hover:border-blue-300 transition-all duration-300">
+                  <div className="bg-white dark:bg-[#262626] p-6 rounded-xl border-2 border-blue-100 dark:border-[#1a1a1a] shadow-md hover:shadow-xl hover:border-blue-300 dark:hover:border-[#FF5F02] transition-all duration-300">
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                       {/* Left: Profile Image & Info */}
                       <div className="flex items-center gap-4 flex-1">
@@ -214,10 +279,10 @@ export default async function DashboardPage({
 
                         {/* Name & Info */}
                         <div className="flex-1">
-                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-[#FF5F02] transition-colors">
                             {child.fullName || child.username}
                           </h3>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {child.nationalId ? `${dictionary.users.nationalId}: ${child.nationalId}` : child.username}
                           </p>
                         </div>

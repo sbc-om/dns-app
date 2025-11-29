@@ -34,13 +34,11 @@ export default async function NewSessionPage({
     : 1;
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-5xl">
-      <NewSessionClient
-        locale={locale}
-        dictionary={dictionary}
-        course={course}
-        nextSessionNumber={nextSessionNumber}
-      />
-    </div>
+    <NewSessionClient
+      locale={locale}
+      dictionary={dictionary}
+      course={course}
+      nextSessionNumber={nextSessionNumber}
+    />
   );
 }

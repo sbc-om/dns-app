@@ -171,7 +171,74 @@ export function ParentProfileClient({
               {dictionary.users.noChildren || 'No children added yet'}
             </p>
           </Card>
+        ) : children.length === 1 ? (
+          // Single Child - Large Card
+          <Link href={`/${locale}/dashboard/kids/${children[0].id}`}>
+            <Card className="border-2 border-[#FF5F02] hover:shadow-2xl transition-all cursor-pointer overflow-hidden">
+              <CardHeader className="bg-linear-to-r from-[#FF5F02] to-[#FF5F02]/80 text-white pb-6">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-3xl font-bold flex items-center gap-3">
+                    <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      {children[0].profilePicture ? (
+                        <img
+                          src={children[0].profilePicture}
+                          alt={children[0].fullName || children[0].username}
+                          className="h-14 w-14 rounded-full object-cover"
+                        />
+                      ) : (
+                        <User className="h-8 w-8" />
+                      )}
+                    </div>
+                    <span>{children[0].fullName || children[0].username}</span>
+                  </CardTitle>
+                  <Badge variant={children[0].isActive ? 'default' : 'destructive'} className="text-base px-4 py-2">
+                    {children[0].isActive ? (dictionary.users.active || 'Active') : (dictionary.users.inactive || 'Inactive')}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-8 pb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="flex items-start gap-4 p-4 bg-[#DDDDDD]/30 dark:bg-[#262626]/30 rounded-lg">
+                    <div className="h-12 w-12 rounded-full bg-[#FF5F02]/10 flex items-center justify-center shrink-0">
+                      <User className="h-6 w-6 text-[#FF5F02]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-muted-foreground">{dictionary.users.nationalId || 'National ID'}</p>
+                      <p className="text-lg font-bold text-[#262626] dark:text-white truncate">{children[0].nationalId || 'N/A'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4 p-4 bg-[#DDDDDD]/30 dark:bg-[#262626]/30 rounded-lg">
+                    <div className="h-12 w-12 rounded-full bg-[#FF5F02]/10 flex items-center justify-center shrink-0">
+                      <Calendar className="h-6 w-6 text-[#FF5F02]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-muted-foreground">{dictionary.users.dateOfBirth || 'Date of Birth'}</p>
+                      <p className="text-lg font-bold text-[#262626] dark:text-white">
+                        {children[0].dateOfBirth ? new Date(children[0].dateOfBirth).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US') : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4 p-4 bg-[#DDDDDD]/30 dark:bg-[#262626]/30 rounded-lg">
+                    <div className="h-12 w-12 rounded-full bg-[#FF5F02]/10 flex items-center justify-center shrink-0">
+                      <Mail className="h-6 w-6 text-[#FF5F02]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-muted-foreground">{dictionary.users.email || 'Email'}</p>
+                      <p className="text-lg font-bold text-[#262626] dark:text-white truncate">{children[0].email || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6 p-4 bg-linear-to-r from-[#FF5F02]/5 to-[#FF5F02]/10 rounded-lg border-l-4 border-[#FF5F02]">
+                  <p className="text-sm text-muted-foreground mb-1">{dictionary.users.createdAt || 'Member Since'}</p>
+                  <p className="text-base font-semibold text-[#262626] dark:text-white">
+                    {new Date(children[0].createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         ) : (
+          // Multiple Children - Grid Layout
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {children.map((child) => (
               <Link key={child.id} href={`/${locale}/dashboard/kids/${child.id}`}>
