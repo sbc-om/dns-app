@@ -11,11 +11,11 @@ services:
     restart: unless-stopped
     environment:
       # Nginx Proxy Configuration
-      VIRTUAL_HOST: dna.sbc.om
+      VIRTUAL_HOST: discovernaturalability.com
       VIRTUAL_PORT: 4040
       VIRTUAL_PROTO: http
       VIRTUAL_NETWORK: proxy
-      LETSENCRYPT_HOST: dna.sbc.om
+      LETSENCRYPT_HOST: discovernaturalability.com
       LETSENCRYPT_EMAIL: admin@sbc.om
       
       # Application Configuration
@@ -24,8 +24,8 @@ services:
       DATABASE_URL: file:/app/data/dev.db
       
       # Application URLs
-      NEXT_PUBLIC_APP_URL: https://dna.sbc.om
-      NEXT_PUBLIC_API_URL: https://dna.sbc.om
+      NEXT_PUBLIC_APP_URL: https://discovernaturalability.com
+      NEXT_PUBLIC_API_URL: https://discovernaturalability.com
       
       # Security (CHANGE THESE!)
       JWT_SECRET: your-super-secret-jwt-key-change-this-in-production

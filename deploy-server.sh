@@ -66,7 +66,7 @@ start() {
     print_info "Starting DNA..."
     $DOCKER_COMPOSE up -d
     print_success "DNA started"
-    print_info "Application will be available at: https://dna.sbc.om"
+    print_info "Application will be available at: https://discovernaturalability.com"
     print_warning "Wait 1-2 minutes for SSL certificate to be generated"
 }
 
@@ -104,7 +104,7 @@ deploy() {
     print_info "Starting full deployment..."
     echo ""
     print_warning "⚠️  IMPORTANT: Make sure DNS is configured!"
-    print_info "Domain: dna.sbc.om → Your Server IP"
+    print_info "Domain: discovernaturalability.com → Your Server IP"
     echo ""
     read -p "Press Enter to continue or Ctrl+C to cancel..."
     echo ""
@@ -120,7 +120,7 @@ deploy() {
     echo ""
     print_info "🌐 Your application is now available at:"
     echo ""
-    echo "   https://dna.sbc.om"
+    echo "   https://discovernaturalability.com"
     echo ""
     print_warning "⏳ Wait 1-2 minutes for SSL certificate generation"
     echo ""
@@ -151,7 +151,7 @@ show_help() {
     echo "  ./deploy-server.sh logs      # View logs"
     echo ""
     echo "Domain Configuration:"
-    echo "  Domain: dna.sbc.om"
+    echo "  Domain: discovernaturalability.com"
     echo "  Email:  admin@sbc.om"
     echo ""
     echo "⚠️  Remember to:"
