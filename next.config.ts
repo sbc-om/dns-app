@@ -11,7 +11,14 @@ const nextConfig: NextConfig = {
   },
   output: 'standalone',
   serverExternalPackages: ['lmdb', 'argon2', 'cbor-x', 'msgpackr'],
-
+  
+  // Disable all caching
+  experimental: {
+    staleTimes: {
+      dynamic: 0,
+      static: 0,
+    },
+  },
 };
 
 export default withPWA({

@@ -37,6 +37,9 @@ const publicApiRoutes = [
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Create response with no-cache headers
+  let response: NextResponse;
+
   // Skip proxy for static files, API routes, and Next.js internals
   if (
     pathname.startsWith('/_next') ||
@@ -46,7 +49,12 @@ export default async function proxy(request: NextRequest) {
     pathname.startsWith('/manifest.json') ||
     pathname.includes('.')
   ) {
-    return NextResponse.next();
+    response = NextResponse.next();
+    // Disable caching for all responses
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    return response;
   }
 
   // Check if the pathname already has a locale
@@ -105,14 +113,18 @@ export default async function proxy(request: NextRequest) {
       
       // If authenticated and trying to access auth routes, redirect to dashboard
       if (isAuthRoute) {
-        return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
+        response = NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
+        response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+        response.headers.set('Pragma', 'no-cache');
+        response.headers.set('Expires', '0');
+        return response;
       }
     } catch (error) {
       // Invalid token - this is common when JWT secret changes or tokens expire
       console.warn('Invalid JWT token, clearing and redirecting to login');
       
       // Clear invalid token and redirect to login
-      const response = NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
+      response = NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
       response.cookies.set('auth-token', '', { 
         expires: new Date(0),
         path: '/',
@@ -120,6 +132,9 @@ export default async function proxy(request: NextRequest) {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax'
       });
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+      response.headers.set('Pragma', 'no-cache');
+      response.headers.set('Expires', '0');
       
       // Don't redirect if already on auth page to prevent infinite loops
       if (!isAuthRoute) {
@@ -128,7 +143,12 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  response = NextResponse.next();
+  // Disable caching for all responses
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  response.headers.set('Pragma', 'no-cache');
+  response.headers.set('Expires', '0');
+  return response;
 }
 
 export const config = {

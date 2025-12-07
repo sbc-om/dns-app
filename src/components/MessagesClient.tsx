@@ -342,14 +342,26 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md ${
-                            selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
-                              ? 'bg-white/20'
-                              : 'bg-linear-to-br from-[#FF5F02] to-[#ff7b33]'
-                          }`}>
-                            {conv.user?.fullName?.[0]?.toUpperCase() || 'U'}
-                          </div>
+                        <div className="relative shrink-0">
+                          {conv.user?.profilePicture ? (
+                            <img
+                              src={conv.user.profilePicture}
+                              alt={conv.user.fullName || conv.user.email}
+                              className={`h-12 w-12 rounded-full object-cover shadow-md ${
+                                selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
+                                  ? 'border-2 border-white'
+                                  : 'border-2 border-orange-500'
+                              }`}
+                            />
+                          ) : (
+                            <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md ${
+                              selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
+                                ? 'bg-white/20'
+                                : 'bg-orange-500'
+                            }`}>
+                              {conv.user?.fullName?.[0]?.toUpperCase() || 'U'}
+                            </div>
+                          )}
                           {/* Online indicator */}
                           <div className="absolute bottom-0 right-0 h-3.5 w-3.5 bg-green-500 border-2 border-white dark:border-[#000000] rounded-full"></div>
                         </div>
@@ -362,7 +374,7 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                               </span>
                             )}
                           </div>
-                          <p className="text-sm opacity-75 truncate">{conv.lastMessage?.content || locale === 'ar' ? 'ابدأ محادثة' : 'Start conversation'}</p>
+                          <p className="text-sm opacity-75 truncate">{conv.lastMessage?.content || (locale === 'ar' ? 'ابدأ محادثة' : 'Start conversation')}</p>
                         </div>
                       </div>
                     </button>
@@ -434,20 +446,29 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                     <ArrowLeft className="h-5 w-5" />
                   </button>
                   
-                  <div className="relative">
-                    <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center text-white font-bold shadow-md ${
-                      selectedConversation.type === 'group' 
-                        ? 'bg-linear-to-br from-blue-500 to-blue-600' 
-                        : 'bg-linear-to-br from-[#FF5F02] to-[#ff7b33]'
-                    }`}>
-                      {selectedConversation.type === 'group' ? (
+                  <div className="relative shrink-0">
+                    {selectedConversation.type === 'group' ? (
+                      <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-md">
                         <UsersIcon className="h-5 w-5 sm:h-6 sm:w-6" />
-                      ) : (
-                        selectedConversation.name[0]?.toUpperCase()
-                      )}
-                    </div>
-                    {selectedConversation.type === 'user' && (
-                      <div className="absolute bottom-0 right-0 h-3 w-3 sm:h-3.5 sm:w-3.5 bg-green-500 border-2 border-white dark:border-[#262626] rounded-full"></div>
+                      </div>
+                    ) : (
+                      <>
+                        {(() => {
+                          const chatUser = allUsers.find(u => u.id === selectedConversation.id);
+                          return chatUser?.profilePicture ? (
+                            <img
+                              src={chatUser.profilePicture}
+                              alt={selectedConversation.name}
+                              className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover border-2 border-orange-500 shadow-md"
+                            />
+                          ) : (
+                            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold shadow-md">
+                              {selectedConversation.name[0]?.toUpperCase()}
+                            </div>
+                          );
+                        })()}
+                        <div className="absolute bottom-0 right-0 h-3 w-3 sm:h-3.5 sm:w-3.5 bg-green-500 border-2 border-white dark:border-[#262626] rounded-full"></div>
+                      </>
                     )}
                   </div>
                   
@@ -507,8 +528,26 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                           )}
                           
                           <div className={`flex items-end gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                            {!isOwn && (
-                              <div className="h-8 w-8 rounded-full bg-linear-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                            {!isOwn && selectedConversation.type === 'user' && (
+                              <>
+                                {(() => {
+                                  const sender = allUsers.find(u => u.id === message.senderId);
+                                  return sender?.profilePicture ? (
+                                    <img
+                                      src={sender.profilePicture}
+                                      alt={sender.fullName || sender.username}
+                                      className="h-8 w-8 rounded-full object-cover border-2 border-gray-300 shrink-0"
+                                    />
+                                  ) : (
+                                    <div className="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                      {selectedConversation.name[0]?.toUpperCase()}
+                                    </div>
+                                  );
+                                })()}
+                              </>
+                            )}
+                            {!isOwn && selectedConversation.type === 'group' && (
+                              <div className="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
                                 {selectedConversation.name[0]?.toUpperCase()}
                               </div>
                             )}
@@ -526,9 +565,19 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                             </div>
                             
                             {isOwn && (
-                              <div className="h-8 w-8 rounded-full bg-linear-to-br from-[#FF5F02] to-[#ff7b33] flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                {currentUser.fullName?.[0]?.toUpperCase() || 'U'}
-                              </div>
+                              <>
+                                {currentUser.profilePicture ? (
+                                  <img
+                                    src={currentUser.profilePicture}
+                                    alt={currentUser.fullName || currentUser.username}
+                                    className="h-8 w-8 rounded-full object-cover border-2 border-orange-500 shrink-0"
+                                  />
+                                ) : (
+                                  <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                    {currentUser.fullName?.[0]?.toUpperCase() || 'U'}
+                                  </div>
+                                )}
+                              </>
                             )}
                           </div>
                         </div>
