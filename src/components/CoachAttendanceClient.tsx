@@ -12,6 +12,7 @@ import { AwardMedalDialog } from './AwardMedalDialog';
 interface RosterEntry {
   id: string;
   name: string;
+  profilePicture?: string;
 }
 
 interface AttendanceText {
@@ -219,8 +220,21 @@ export default function CoachAttendanceClient({ text, courseId, roster, dictiona
                 >
                   {/* Mobile: Stacked Layout */}
                   <div className="flex flex-col gap-4 md:hidden">
-                    <div className="text-base font-bold text-gray-900">
-                      {student.name}
+                    <div className="flex items-center gap-3">
+                      {student.profilePicture ? (
+                        <img
+                          src={student.profilePicture}
+                          alt={student.name}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-orange-500 shadow-md"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-base border-2 border-orange-400 shadow-md">
+                          {student.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="text-base font-bold text-gray-900">
+                        {student.name}
+                      </div>
                     </div>
                     
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-50/50 hover:bg-blue-100/60 transition-colors cursor-pointer">
@@ -269,8 +283,21 @@ export default function CoachAttendanceClient({ text, courseId, roster, dictiona
 
                   {/* Tablet & Desktop: Row Layout */}
                   <div className="hidden md:grid md:grid-cols-[2fr_1.5fr_1fr] md:gap-6 md:items-center">
-                    <div className="text-base font-bold text-gray-900">
-                      {student.name}
+                    <div className="flex items-center gap-3">
+                      {student.profilePicture ? (
+                        <img
+                          src={student.profilePicture}
+                          alt={student.name}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-orange-500 shadow-md shrink-0"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-base border-2 border-orange-400 shadow-md shrink-0">
+                          {student.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="text-base font-bold text-gray-900">
+                        {student.name}
+                      </div>
                     </div>
                     
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-50/50 hover:bg-blue-100/60 transition-colors cursor-pointer">

@@ -23,6 +23,7 @@ export default function EditSessionClient({
   const router = useRouter();
 
   const handleSuccess = () => {
+    router.refresh();
     router.push(`/${locale}/dashboard/courses/${course.id}/edit?tab=sessions`);
   };
 

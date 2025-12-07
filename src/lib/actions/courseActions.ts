@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, unstable_noStore as noStore } from 'next/cache';
 import {
   getAllCourses,
   getActiveCourses,
@@ -15,6 +15,7 @@ import { getCurrentUser } from '../auth/auth';
 
 // Get all courses (admin only)
 export async function getAllCoursesAction() {
+  noStore();
   const user = await getCurrentUser();
   
   if (!user || user.role !== 'admin') {
@@ -32,6 +33,7 @@ export async function getAllCoursesAction() {
 
 // Get active courses (accessible to all authenticated users)
 export async function getActiveCoursesAction() {
+  noStore();
   const user = await getCurrentUser();
   
   if (!user) {
@@ -49,6 +51,7 @@ export async function getActiveCoursesAction() {
 
 // Get course by ID
 export async function getCourseByIdAction(id: string) {
+  noStore();
   const user = await getCurrentUser();
   
   if (!user) {
@@ -79,7 +82,7 @@ export async function createCourseAction(input: CreateCourseInput) {
   
   try {
     const course = await createCourse(input);
-    revalidatePath('/[locale]/dashboard/courses');
+    revalidatePath('/[locale]/dashboard/courses', 'page');
     return { success: true, course };
   } catch (error) {
     console.error('Error creating course:', error);
@@ -105,7 +108,8 @@ export async function updateCourseAction(
       return { success: false, error: 'Course not found' };
     }
     
-    revalidatePath('/[locale]/dashboard/courses');
+    revalidatePath('/[locale]/dashboard/courses', 'page');
+    revalidatePath(`/[locale]/dashboard/courses/${id}/edit`, 'page');
     return { success: true, course };
   } catch (error) {
     console.error('Error updating course:', error);
@@ -128,7 +132,7 @@ export async function deleteCourseAction(id: string) {
       return { success: false, error: 'Course not found' };
     }
     
-    revalidatePath('/[locale]/dashboard/courses');
+    revalidatePath('/[locale]/dashboard/courses', 'page');
     return { success: true };
   } catch (error) {
     console.error('Error deleting course:', error);

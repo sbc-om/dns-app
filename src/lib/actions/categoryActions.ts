@@ -1,7 +1,7 @@
 
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, unstable_noStore as noStore } from 'next/cache';
 import {
   getAllCategories,
   createCategory,
@@ -12,6 +12,7 @@ import { getCurrentUser } from '../auth/auth';
 
 // Get all categories
 export async function getAllCategoriesAction() {
+  noStore();
   try {
     const categories = await getAllCategories();
     return { success: true, categories };
@@ -31,7 +32,7 @@ export async function createCategoryAction(input: CreateCategoryInput) {
   
   try {
     const category = await createCategory(input);
-    revalidatePath('/[locale]/dashboard/settings');
+    revalidatePath('/[locale]/dashboard/settings', 'page');
     return { success: true, category };
   } catch (error) {
     console.error('Error creating category:', error);
@@ -54,7 +55,7 @@ export async function deleteCategoryAction(id: string) {
       return { success: false, error: 'Category not found' };
     }
     
-    revalidatePath('/[locale]/dashboard/settings');
+    revalidatePath('/[locale]/dashboard/settings', 'page');
     return { success: true };
   } catch (error) {
     console.error('Error deleting category:', error);

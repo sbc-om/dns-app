@@ -161,6 +161,7 @@ export default function CreateCourseClient({ locale, dict }: CreateCourseClientP
         nameAr: formData.nameAr,
         description: formData.description || undefined,
         descriptionAr: formData.descriptionAr || undefined,
+        category: formData.category || undefined,
         price: formData.price,
         currency: formData.currency,
         duration: formData.duration,
@@ -204,6 +205,7 @@ export default function CreateCourseClient({ locale, dict }: CreateCourseClientP
         await bulkCreateSessionPlansAction(sessionPlans);
       }
 
+      router.refresh();
       router.push(`/${locale}/dashboard/courses`);
     } catch (error) {
       console.error('Error creating course:', error);

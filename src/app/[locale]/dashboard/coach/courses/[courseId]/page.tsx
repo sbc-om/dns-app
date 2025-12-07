@@ -81,6 +81,7 @@ export default async function CoachCourseDetailPage({
   const attendanceRoster = roster.map(({ student }) => ({
     id: student.id,
     name: student.fullName || student.username,
+    profilePicture: student.profilePicture,
   }));
   const attendanceText = {
     title: dictionary.coachCourse.attendanceSection,

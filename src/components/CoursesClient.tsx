@@ -2,16 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit, Trash2, Clock, Users } from 'lucide-react';
+import { Plus, Edit, Trash2, Clock, Users, Search, Filter } from 'lucide-react';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import {
   getAllCoursesAction,
   updateCourseAction,
   deleteCourseAction,
 } from '@/lib/actions/courseActions';
+import { getAllCategoriesAction } from '@/lib/actions/categoryActions';
 import type { Course } from '@/lib/db/repositories/courseRepository';
+import type { Category } from '@/lib/db/repositories/categoryRepository';
 
 interface CoursesClientProps {
   locale: string;
@@ -21,26 +25,62 @@ interface CoursesClientProps {
 export default function CoursesClient({ locale, dict }: CoursesClientProps) {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    loadCourses();
+    loadData();
   }, []);
 
-  const loadCourses = async () => {
+  const loadData = async () => {
     setLoading(true);
-    const result = await getAllCoursesAction();
-    if (result.success && result.courses) {
-      setCourses(result.courses);
+    const [coursesResult, categoriesResult] = await Promise.all([
+      getAllCoursesAction(),
+      getAllCategoriesAction()
+    ]);
+
+    if (coursesResult.success && coursesResult.courses) {
+      setCourses(coursesResult.courses);
+    }
+    if (categoriesResult.success && categoriesResult.categories) {
+      setCategories(categoriesResult.categories);
     }
     setLoading(false);
   };
 
-  const categories = ['All', ...Array.from(new Set(courses.map(c => c.category).filter(Boolean)))];
-  const filteredCourses = selectedCategory === 'All' 
-    ? courses 
-    : courses.filter(c => c.category === selectedCategory);
+  // Use all available categories for filtering
+  const filterOptions = ['All', ...categories.map(c => c.name)];
+
+  const getCategoryLabel = (name: string) => {
+    if (name === 'All') return locale === 'ar' ? 'الكل' : 'All';
+    const category = categories.find(c => c.name === name);
+    return category ? (locale === 'ar' ? category.nameAr : category.name) : name;
+  };
+
+  const filteredCourses = courses.filter(course => {
+    // Category filter
+    if (selectedCategory !== 'All' && course.category !== selectedCategory) {
+      return false;
+    }
+    
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const name = (course.name || '').toLowerCase();
+      const nameAr = (course.nameAr || '').toLowerCase();
+      const description = (course.description || '').toLowerCase();
+      const descriptionAr = (course.descriptionAr || '').toLowerCase();
+      
+      return name.includes(query) || 
+             nameAr.includes(query) || 
+             description.includes(query) || 
+             descriptionAr.includes(query);
+    }
+    
+    return true;
+  });
 
   const handleEditNavigate = (courseId: string) => {
     router.push(`/${locale}/dashboard/courses/${courseId}/edit`);
@@ -48,13 +88,15 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
 
   const handleToggleActive = async (course: Course) => {
     await updateCourseAction(course.id, { isActive: !course.isActive });
-    loadCourses();
+    loadData();
+    router.refresh();
   };
 
   const handleDelete = async (id: string) => {
     if (confirm(locale === 'ar' ? 'هل أنت متأكد من حذف هذه الدورة؟' : 'Are you sure you want to delete this course?')) {
       await deleteCourseAction(id);
-      loadCourses();
+      loadData();
+      router.refresh();
     }
   };
 
@@ -79,22 +121,47 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
         </Button>
       </div>
 
-      {/* Category Filter */}
-      {categories.length > 1 && (
-        <div className="flex flex-wrap gap-2 pb-2">
-          {categories.map((category) => (
-            <Button
-              key={category as string}
-              variant={selectedCategory === category ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSelectedCategory(category as string)}
-              className="rounded-full"
-            >
-              {category === 'All' ? (locale === 'ar' ? 'الكل' : 'All') : category}
-            </Button>
-          ))}
-        </div>
-      )}
+      {/* Search and Filter Bar */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className={`absolute top-2.5 h-4 w-4 text-muted-foreground ${locale === 'ar' ? 'right-3' : 'left-3'}`} />
+              <Input
+                placeholder={locale === 'ar' ? 'ابحث حسب الاسم أو الوصف...' : 'Search by name or description...'}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`${locale === 'ar' ? 'pr-9' : 'pl-9'}`}
+              />
+            </div>
+
+            {/* Category Filter Select */}
+            <div className="w-full md:w-64 flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={locale === 'ar' ? 'اختر فئة' : 'Select category'} />
+                </SelectTrigger>
+                <SelectContent>
+                  {filterOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {getCategoryLabel(option)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Results Summary */}
+          <div className="mt-4 text-sm text-muted-foreground">
+            {locale === 'ar' 
+              ? `عرض ${filteredCourses.length} من ${courses.length} دورة`
+              : `Showing ${filteredCourses.length} of ${courses.length} courses`}
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCourses.map((course) => (
@@ -110,7 +177,7 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
                   </CardDescription>
                   {course.category && (
                     <Badge variant="outline" className="mt-2">
-                      {course.category}
+                      {getCategoryLabel(course.category)}
                     </Badge>
                   )}
                 </div>

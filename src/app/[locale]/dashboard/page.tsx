@@ -4,11 +4,12 @@ import { Locale } from '@/config/i18n';
 import { ROLE_LABELS } from '@/config/roles';
 import { listUsers, getChildrenByParentId, getUsersByIds } from '@/lib/db/repositories/userRepository';
 import { getAllAppointments } from '@/lib/db/repositories/appointmentRepository';
-import { getCoursesByCoachId, type Course } from '@/lib/db/repositories/courseRepository';
-import { getPaidEnrollmentsByCourseId } from '@/lib/db/repositories/enrollmentRepository';
-import { Users, Calendar, Clock, CheckCircle, UserCheck, User } from 'lucide-react';
+import { getCoursesByCoachId, type Course, getAllCourses } from '@/lib/db/repositories/courseRepository';
+import { getPaidEnrollmentsByCourseId, getAllEnrollments } from '@/lib/db/repositories/enrollmentRepository';
+import { Users, Calendar, Clock, CheckCircle, UserCheck, User, GraduationCap, TrendingUp, DollarSign, Award } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChildMedalsPreview } from '@/components/ChildMedalsPreview';
 
 export default async function DashboardPage({
@@ -29,9 +30,12 @@ export default async function DashboardPage({
 
   // Fetch statistics for admin
   let stats = null;
+  let userGrowthData: { date: string; count: number }[] = [];
   if (user.role === 'admin') {
     const users = await listUsers();
     const appointments = await getAllAppointments();
+    const courses = await getAllCourses();
+    const enrollments = await getAllEnrollments();
     const today = new Date().toISOString().split('T')[0];
     
     stats = {
@@ -40,7 +44,25 @@ export default async function DashboardPage({
       totalAppointments: appointments.length,
       pendingAppointments: appointments.filter(a => a.status === 'pending').length,
       todayAppointments: appointments.filter(a => a.appointmentDate === today).length,
+      totalCourses: courses.length,
+      activeCourses: courses.filter(c => c.isActive).length,
+      totalEnrollments: enrollments.length,
+      paidEnrollments: enrollments.filter(e => e.paymentStatus === 'paid').length,
+      totalCoaches: users.filter(u => u.role === 'coach').length,
+      totalKids: users.filter(u => u.role === 'kid').length,
     };
+
+    // Calculate user growth data for last 30 days
+    const last30Days = Array.from({ length: 30 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (29 - i));
+      return date.toISOString().split('T')[0];
+    });
+
+    userGrowthData = last30Days.map(date => {
+      const count = users.filter(u => u.createdAt && u.createdAt.split('T')[0] <= date).length;
+      return { date, count };
+    });
   }
 
   // Fetch courses for coach
@@ -83,7 +105,7 @@ export default async function DashboardPage({
 
       {/* Statistics Cards for Admin */}
       {user.role === 'admin' && stats && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Total Users Card */}
@@ -170,6 +192,204 @@ export default async function DashboardPage({
                 </div>
               </div>
             </div>
+
+            {/* Total Courses Card */}
+            <div className="bg-white dark:bg-[#262626] p-6 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#FF5F02] mb-1">
+                    {locale === 'ar' ? 'إجمالي الدورات' : 'Total Courses'}
+                  </p>
+                  <p className="text-4xl font-bold text-[#262626] dark:text-white">
+                    {stats.totalCourses}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {stats.activeCourses} {locale === 'ar' ? 'نشط' : 'active'}
+                  </p>
+                </div>
+                <div className="bg-[#FF5F02] p-4 rounded-full">
+                  <GraduationCap className="w-8 h-8 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Total Enrollments Card */}
+            <div className="bg-white dark:bg-[#262626] p-6 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#FF5F02] mb-1">
+                    {locale === 'ar' ? 'إجمالي التسجيلات' : 'Total Enrollments'}
+                  </p>
+                  <p className="text-4xl font-bold text-[#262626] dark:text-white">
+                    {stats.totalEnrollments}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {stats.paidEnrollments} {locale === 'ar' ? 'مدفوع' : 'paid'}
+                  </p>
+                </div>
+                <div className="bg-[#FF5F02] p-4 rounded-full">
+                  <TrendingUp className="w-8 h-8 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Total Coaches Card */}
+            <div className="bg-white dark:bg-[#262626] p-6 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#FF5F02] mb-1">
+                    {locale === 'ar' ? 'إجمالي المدربين' : 'Total Coaches'}
+                  </p>
+                  <p className="text-4xl font-bold text-[#262626] dark:text-white">
+                    {stats.totalCoaches}
+                  </p>
+                </div>
+                <div className="bg-[#FF5F02] p-4 rounded-full">
+                  <Award className="w-8 h-8 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Total Kids Card */}
+            <div className="bg-white dark:bg-[#262626] p-6 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#FF5F02] mb-1">
+                    {locale === 'ar' ? 'إجمالي الأطفال' : 'Total Kids'}
+                  </p>
+                  <p className="text-4xl font-bold text-[#262626] dark:text-white">
+                    {stats.totalKids}
+                  </p>
+                </div>
+                <div className="bg-[#FF5F02] p-4 rounded-full">
+                  <User className="w-8 h-8 text-white" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            {/* User Growth Chart */}
+            <Card className="border-2">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold text-[#262626] dark:text-white">
+                  {locale === 'ar' ? 'نمو الأعضاء (آخر 30 يوم)' : 'User Growth (Last 30 Days)'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {userGrowthData.length > 0 && (
+                    <>
+                      <div className="text-sm text-muted-foreground">
+                        {locale === 'ar' ? 'نمو الأعضاء على مدار الشهر الماضي' : 'Member growth over the past month'}
+                      </div>
+                      <div className="space-y-2">
+                        {[...userGrowthData].reverse().slice(0, 10).map((data, index) => {
+                          const maxCount = Math.max(...userGrowthData.map(d => d.count));
+                          const percentage = maxCount > 0 ? (data.count / maxCount) * 100 : 0;
+                          return (
+                            <div key={index} className="flex items-center gap-3">
+                              <span className="text-xs text-muted-foreground w-16">
+                                {new Date(data.date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
+                              </span>
+                              <div className="flex-1 bg-muted rounded-full h-8 overflow-hidden">
+                                <div 
+                                  className="bg-orange-500 h-full rounded-full transition-all duration-500 flex items-center justify-end pr-2"
+                                  title={`${data.count} users`}
+                                  suppressHydrationWarning
+                                  dangerouslySetInnerHTML={{ 
+                                    __html: `<style>@keyframes grow-${index} { from { width: 0; } to { width: ${percentage}%; } } .bar-${index} { width: ${percentage}%; animation: grow-${index} 1s ease-out; }</style><div class="bar-${index} h-full bg-orange-500 rounded-full flex items-center justify-end pr-2"><span class="text-xs font-bold text-white">${data.count}</span></div>` 
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div className="mt-4 flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">{locale === 'ar' ? 'المجموع:' : 'Total:'}</span>
+                  <span className="font-bold text-orange-600">{stats.totalUsers} {locale === 'ar' ? 'مستخدم' : 'users'}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Summary Statistics Card */}
+            <Card className="border-2">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold text-[#262626] dark:text-white">
+                  {locale === 'ar' ? 'ملخص النظام' : 'System Summary'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* User Statistics */}
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center">
+                      <Users className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{locale === 'ar' ? 'نسبة المستخدمين النشطين' : 'Active Users Rate'}</p>
+                      <p className="text-xs text-muted-foreground">{locale === 'ar' ? 'من إجمالي المستخدمين' : 'of total users'}</p>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-orange-600">
+                    {stats.totalUsers > 0 ? Math.round((stats.activeUsers / stats.totalUsers) * 100) : 0}%
+                  </div>
+                </div>
+
+                {/* Appointment Statistics */}
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center">
+                      <Calendar className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{locale === 'ar' ? 'نسبة المواعيد المعلقة' : 'Pending Appointments Rate'}</p>
+                      <p className="text-xs text-muted-foreground">{locale === 'ar' ? 'من إجمالي المواعيد' : 'of total appointments'}</p>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-orange-600">
+                    {stats.totalAppointments > 0 ? Math.round((stats.pendingAppointments / stats.totalAppointments) * 100) : 0}%
+                  </div>
+                </div>
+
+                {/* Course Statistics */}
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center">
+                      <GraduationCap className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{locale === 'ar' ? 'نسبة الدورات النشطة' : 'Active Courses Rate'}</p>
+                      <p className="text-xs text-muted-foreground">{locale === 'ar' ? 'من إجمالي الدورات' : 'of total courses'}</p>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-orange-600">
+                    {stats.totalCourses > 0 ? Math.round((stats.activeCourses / stats.totalCourses) * 100) : 0}%
+                  </div>
+                </div>
+
+                {/* Enrollment Payment Statistics */}
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center">
+                      <TrendingUp className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{locale === 'ar' ? 'نسبة الدفع' : 'Payment Rate'}</p>
+                      <p className="text-xs text-muted-foreground">{locale === 'ar' ? 'من إجمالي التسجيلات' : 'of total enrollments'}</p>
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-orange-600">
+                    {stats.totalEnrollments > 0 ? Math.round((stats.paidEnrollments / stats.totalEnrollments) * 100) : 0}%
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       )}

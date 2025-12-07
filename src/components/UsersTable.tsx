@@ -49,6 +49,30 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
 
   const columns: ColumnDef<User>[] = [
     {
+      accessorKey: 'profilePicture',
+      header: '',
+      cell: ({ row }) => {
+        const user = row.original;
+        const fullName = user.fullName || user.username;
+        
+        return (
+          <div className="flex items-center justify-center">
+            {user.profilePicture ? (
+              <img
+                src={user.profilePicture}
+                alt={fullName}
+                className="w-12 h-12 rounded-full object-cover border-2 border-orange-500 shadow-md"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-base border-2 border-orange-400 shadow-md">
+                {fullName.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: 'fullName',
       header: ({ column }) => {
         return (

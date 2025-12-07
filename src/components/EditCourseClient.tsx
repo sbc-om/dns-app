@@ -147,6 +147,7 @@ export default function EditCourseClient({ locale, dict, course }: EditCourseCli
       nameAr: formData.nameAr,
       description: formData.description || undefined,
       descriptionAr: formData.descriptionAr || undefined,
+      category: formData.category || undefined,
       price: formData.price,
       currency: formData.currency,
       duration: formData.duration,
@@ -163,6 +164,7 @@ export default function EditCourseClient({ locale, dict, course }: EditCourseCli
     });
 
     if (result.success) {
+      router.refresh();
       router.push(`/${locale}/dashboard/courses`);
     } else {
       alert(result.error || 'Failed to update course');

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Save, Plus, Trash2, Tag } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
@@ -27,6 +28,7 @@ interface AdminSettingsClientProps {
 }
 
 export default function AdminSettingsClient({ locale, dict }: AdminSettingsClientProps) {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -79,6 +81,7 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
       toast.success(locale === 'ar' ? 'تم إضافة الفئة بنجاح' : 'Category added successfully');
       setNewCategory({ name: '', nameAr: '' });
       loadCategories();
+      router.refresh();
     } else {
       toast.error(locale === 'ar' ? 'فشل في إضافة الفئة' : 'Failed to add category');
     }
@@ -94,6 +97,7 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
     if (result.success) {
       toast.success(locale === 'ar' ? 'تم حذف الفئة بنجاح' : 'Category deleted successfully');
       loadCategories();
+      router.refresh();
     } else {
       toast.error(locale === 'ar' ? 'فشل في حذف الفئة' : 'Failed to delete category');
     }
