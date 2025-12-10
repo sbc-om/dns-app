@@ -130,32 +130,29 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
 
   return (
     <>
-      <Card className="bg-white dark:bg-[#262626] border-[#DDDDDD] dark:border-[#262626]">
-        <CardHeader className="border-b border-[#DDDDDD] dark:border-[#262626]">
+      <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 border-b-2 border-[#DDDDDD] dark:border-[#000000] py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2">
-                <Award className="w-5 h-5 text-[#FF5F02]" />
-                {dictionary.settings.medals}
-              </CardTitle>
-              <CardDescription className="text-[#262626] dark:text-[#DDDDDD]">
-                {dictionary.settings.medalsDescription}
-              </CardDescription>
-            </div>
+            <CardTitle className="text-xl font-bold text-[#262626] dark:text-white flex items-center gap-3">
+              <div className="p-2 bg-[#FF5F02]/10 dark:bg-[#FF5F02]/20 rounded-lg">
+                <Award className="h-5 w-5 text-[#FF5F02]" />
+              </div>
+              {dictionary.settings.medals}
+            </CardTitle>
             <Button
               onClick={() => handleOpenDialog()}
-              className="bg-[#FF5F02] hover:bg-[#262626] text-white"
+              className="h-12 bg-gradient-to-r from-[#FF5F02] to-[#FF8534] hover:from-[#FF8534] hover:to-[#FF5F02] text-white shadow-lg active:scale-95 transition-all"
             >
               <Plus className="w-4 h-4 mr-2" />
               {dictionary.settings.createMedal}
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 bg-white dark:bg-[#262626]">
           {medals.length === 0 ? (
-            <div className="text-center py-12">
-              <Award className="w-12 h-12 mx-auto text-[#DDDDDD] mb-4" />
-              <p className="text-[#262626] dark:text-[#DDDDDD]">
+            <div className="text-center py-12 bg-gray-50 dark:bg-[#1a1a1a] rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700">
+              <Award className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" />
+              <p className="text-gray-600 dark:text-gray-400 font-medium">
                 {dictionary.settings.noMedals}
               </p>
             </div>
@@ -164,26 +161,26 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
               {medals.map((medal) => (
                 <div
                   key={medal.id}
-                  className="p-4 rounded-lg border-2 border-[#DDDDDD] dark:border-[#262626] bg-white dark:bg-[#262626]"
+                  className="p-5 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-gradient-to-br from-white to-gray-50 dark:from-[#1a1a1a] dark:to-[#0a0a0a] hover:border-[#FF5F02] hover:shadow-xl transition-all shadow-md"
                 >
                   <div className="flex items-start gap-3 mb-3">
-                    <div className="text-4xl">{medal.icon}</div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-[#262626] dark:text-white">
+                    <div className="text-4xl flex-shrink-0">{medal.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-[#262626] dark:text-white truncate">
                         {medal.name}
                       </h4>
-                      <p className="text-sm text-[#262626] dark:text-[#DDDDDD] mt-1">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
                         {medal.description}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#DDDDDD] dark:border-[#262626]">
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t-2 border-[#DDDDDD] dark:border-[#000000]">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-white px-2 py-1 rounded bg-[#FF5F02]">
                         +{medal.points} pts
                       </span>
                       {!medal.isActive && (
-                        <span className="text-xs text-[#262626] dark:text-[#DDDDDD] px-2 py-1 rounded bg-[#DDDDDD] dark:bg-[#000000]">
+                        <span className="text-xs font-semibold text-white px-2 py-1 rounded bg-gray-500 dark:bg-gray-700">
                           Inactive
                         </span>
                       )}
@@ -193,7 +190,7 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
                         size="sm"
                         variant="ghost"
                         onClick={() => handleOpenDialog(medal)}
-                        className="h-8 w-8 p-0 hover:bg-[#DDDDDD] dark:hover:bg-[#000000]"
+                        className="h-8 w-8 p-0 hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20 active:scale-95 transition-all"
                       >
                         <Edit className="w-4 h-4 text-[#FF5F02]" />
                       </Button>
@@ -201,9 +198,9 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
                         size="sm"
                         variant="ghost"
                         onClick={() => openDeleteConfirm(medal.id)}
-                        className="h-8 w-8 p-0 hover:bg-[#DDDDDD] dark:hover:bg-[#000000]"
+                        className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-950/30 active:scale-95 transition-all"
                       >
-                        <Trash2 className="w-4 h-4 text-red-500" />
+                        <Trash2 className="w-4 h-4 text-red-600 dark:text-red-500" />
                       </Button>
                     </div>
                   </div>
@@ -216,9 +213,9 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#262626] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-[#262626] dark:text-white">
+            <DialogTitle className="text-[#262626] dark:text-white text-xl font-bold">
               {editingMedal ? dictionary.settings.editMedal : dictionary.settings.createMedal}
             </DialogTitle>
           </DialogHeader>
@@ -233,7 +230,7 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="bg-white dark:bg-[#262626] border-[#DDDDDD] dark:border-[#262626]"
+                  className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
               <div className="space-y-2">
@@ -244,7 +241,7 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
                   id="nameAr"
                   value={formData.nameAr}
                   onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
-                  className="bg-white dark:bg-[#262626] border-[#DDDDDD] dark:border-[#262626]"
+                  className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   dir="rtl"
                 />
               </div>
@@ -258,7 +255,8 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="bg-white dark:bg-[#262626] border-[#DDDDDD] dark:border-[#262626]"
+                className="resize-none bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                rows={3}
               />
             </div>
 
@@ -270,8 +268,9 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
                 id="descriptionAr"
                 value={formData.descriptionAr}
                 onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
-                className="bg-white dark:bg-[#262626] border-[#DDDDDD] dark:border-[#262626]"
+                className="resize-none bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 dir="rtl"
+                rows={3}
               />
             </div>
 
@@ -284,7 +283,7 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
                   id="icon"
                   value={formData.icon}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="bg-white dark:bg-[#262626] border-[#DDDDDD] dark:border-[#262626]"
+                  className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   placeholder="🏆"
                 />
               </div>
@@ -297,12 +296,12 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
                   type="number"
                   value={formData.points}
                   onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) || 0 })}
-                  className="bg-white dark:bg-[#262626] border-[#DDDDDD] dark:border-[#262626]"
+                  className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-4 rounded-lg border-2 border-[#DDDDDD] dark:border-[#262626]">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000]">
               <Label htmlFor="isActive" className="text-[#262626] dark:text-white">
                 {dictionary.settings.isActive}
               </Label>
@@ -319,14 +318,14 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
               type="button"
               variant="outline"
               onClick={() => setDialogOpen(false)}
-              className="border-[#DDDDDD] dark:border-[#262626]"
+              className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] text-[#262626] dark:text-white hover:bg-gray-100 dark:hover:bg-[#0a0a0a] active:scale-95 transition-all"
             >
               {dictionary.common.cancel}
             </Button>
             <Button
               onClick={handleSave}
               disabled={!formData.name || !formData.nameAr}
-              className="bg-[#FF5F02] hover:bg-[#262626] text-white"
+              className="h-12 bg-gradient-to-r from-[#FF5F02] to-[#FF8534] hover:from-[#FF8534] hover:to-[#FF5F02] text-white shadow-lg active:scale-95 transition-all disabled:opacity-50"
             >
               {dictionary.common.save}
             </Button>

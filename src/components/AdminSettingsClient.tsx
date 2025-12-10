@@ -120,148 +120,148 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
-      <div>
-        <h1 className="text-3xl font-bold">
+      <div className="space-y-3">
+        <h1 className="text-3xl font-bold text-[#262626] dark:text-white">
           {locale === 'ar' ? 'إعدادات النظام' : 'System Settings'}
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-gray-600 dark:text-gray-400">
           {locale === 'ar' ? 'إدارة معلومات الحساب البنكي وتعليمات الدفع والفئات' : 'Manage bank account, payment instructions, and categories'}
         </p>
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="general">{locale === 'ar' ? 'عام' : 'General'}</TabsTrigger>
-          <TabsTrigger value="categories">
+        <TabsList className="bg-gray-100 dark:bg-[#1a1a1a] p-1 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
+          <TabsTrigger value="general" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#262626] data-[state=active]:shadow-lg rounded-lg transition-all text-gray-600 dark:text-gray-400 data-[state=active]:text-[#FF5F02]">{locale === 'ar' ? 'عام' : 'General'}</TabsTrigger>
+          <TabsTrigger value="categories" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#262626] data-[state=active]:shadow-lg rounded-lg transition-all text-gray-600 dark:text-gray-400 data-[state=active]:text-[#FF5F02]">
             <Tag className="w-4 h-4 mr-2" />
             {locale === 'ar' ? 'فئات الدورات' : 'Course Categories'}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{locale === 'ar' ? 'المعلومات الشخصية' : 'Personal Information'}</CardTitle>
-              <CardDescription>
-                {locale === 'ar' ? 'معلومات الاتصال الخاصة بك' : 'Your contact information'}
-              </CardDescription>
+          <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] shadow-lg">
+            <CardHeader className="py-4">
+              <CardTitle className="text-[#262626] dark:text-white">{locale === 'ar' ? 'المعلومات الشخصية' : 'Personal Information'}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="fullName">{locale === 'ar' ? 'الاسم الكامل' : 'Full Name'}</Label>
+                  <Label htmlFor="fullName" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'الاسم الكامل' : 'Full Name'}</Label>
                   <Input
                     id="fullName"
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     placeholder={locale === 'ar' ? 'أدخل اسمك الكامل' : 'Enter your full name'}
+                    className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email">{locale === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
+                  <Label htmlFor="email" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
                   <Input
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder={locale === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
+                    className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
               </div>
               <div>
-                <Label htmlFor="phoneNumber">{locale === 'ar' ? 'رقم الهاتف' : 'Phone Number'}</Label>
+                <Label htmlFor="phoneNumber" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'رقم الهاتف' : 'Phone Number'}</Label>
                 <Input
                   id="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                   placeholder={locale === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone number'}
+                  className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>{locale === 'ar' ? 'معلومات الحساب البنكي' : 'Bank Account Information'}</CardTitle>
-              <CardDescription>
-                {locale === 'ar' ? 'سيتم عرض هذه المعلومات للآباء عند الدفع' : 'This information will be displayed to parents during payment'}
-              </CardDescription>
+          <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] shadow-lg">
+            <CardHeader className="py-4">
+              <CardTitle className="text-[#262626] dark:text-white">{locale === 'ar' ? 'معلومات الحساب البنكي' : 'Bank Account Information'}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="bankName">{locale === 'ar' ? 'اسم البنك' : 'Bank Name'}</Label>
+                  <Label htmlFor="bankName" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'اسم البنك' : 'Bank Name'}</Label>
                   <Input
                     id="bankName"
                     value={formData.bankName}
                     onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
                     placeholder={locale === 'ar' ? 'أدخل اسم البنك' : 'Enter bank name'}
+                    className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="bankAccountHolder">{locale === 'ar' ? 'اسم صاحب الحساب' : 'Account Holder Name'}</Label>
+                  <Label htmlFor="bankAccountHolder" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'اسم صاحب الحساب' : 'Account Holder Name'}</Label>
                   <Input
                     id="bankAccountHolder"
                     value={formData.bankAccountHolder}
                     onChange={(e) => setFormData({ ...formData, bankAccountHolder: e.target.value })}
                     placeholder={locale === 'ar' ? 'أدخل اسم صاحب الحساب' : 'Enter account holder name'}
+                    className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="bankAccountNumber">{locale === 'ar' ? 'رقم الحساب' : 'Account Number'}</Label>
+                  <Label htmlFor="bankAccountNumber" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'رقم الحساب' : 'Account Number'}</Label>
                   <Input
                     id="bankAccountNumber"
                     value={formData.bankAccountNumber}
                     onChange={(e) => setFormData({ ...formData, bankAccountNumber: e.target.value })}
                     placeholder={locale === 'ar' ? 'أدخل رقم الحساب' : 'Enter account number'}
+                    className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="iban">{locale === 'ar' ? 'رقم الآيبان (IBAN)' : 'IBAN'}</Label>
+                  <Label htmlFor="iban" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'رقم الآيبان (IBAN)' : 'IBAN'}</Label>
                   <Input
                     id="iban"
                     value={formData.iban}
                     onChange={(e) => setFormData({ ...formData, iban: e.target.value })}
                     placeholder={locale === 'ar' ? 'أدخل رقم الآيبان' : 'Enter IBAN'}
+                    className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="swiftCode">{locale === 'ar' ? 'رمز السويفت (SWIFT)' : 'SWIFT Code'}</Label>
+                <Label htmlFor="swiftCode" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'رمز السويفت (SWIFT)' : 'SWIFT Code'}</Label>
                 <Input
                   id="swiftCode"
                   value={formData.swiftCode}
                   onChange={(e) => setFormData({ ...formData, swiftCode: e.target.value })}
                   placeholder={locale === 'ar' ? 'أدخل رمز السويفت' : 'Enter SWIFT code'}
+                  className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>{locale === 'ar' ? 'تعليمات الدفع' : 'Payment Instructions'}</CardTitle>
-              <CardDescription>
-                {locale === 'ar' ? 'إرشادات إضافية للآباء حول كيفية الدفع' : 'Additional instructions for parents on how to pay'}
-              </CardDescription>
+          <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] shadow-lg">
+            <CardHeader className="py-4">
+              <CardTitle className="text-[#262626] dark:text-white">{locale === 'ar' ? 'تعليمات الدفع' : 'Payment Instructions'}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="paymentInstructions">{locale === 'ar' ? 'التعليمات (إنجليزي)' : 'Instructions (English)'}</Label>
+                <Label htmlFor="paymentInstructions" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'التعليمات (إنجليزي)' : 'Instructions (English)'}</Label>
                 <Textarea
                   id="paymentInstructions"
                   value={formData.paymentInstructions}
                   onChange={(e) => setFormData({ ...formData, paymentInstructions: e.target.value })}
                   placeholder="Please transfer the amount to the account above and upload the receipt..."
                   rows={4}
+                  className="resize-none bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
               <div>
-                <Label htmlFor="paymentInstructionsAr">{locale === 'ar' ? 'التعليمات (عربي)' : 'Instructions (Arabic)'}</Label>
+                <Label htmlFor="paymentInstructionsAr" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'التعليمات (عربي)' : 'Instructions (Arabic)'}</Label>
                 <Textarea
                   id="paymentInstructionsAr"
                   value={formData.paymentInstructionsAr}
@@ -269,13 +269,14 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
                   placeholder="يرجى تحويل المبلغ إلى الحساب أعلاه ورفع إيصال الدفع..."
                   dir="rtl"
                   rows={4}
+                  className="resize-none bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
             </CardContent>
           </Card>
 
           <div className="flex justify-end">
-            <Button onClick={handleSave} disabled={saving}>
+            <Button onClick={handleSave} disabled={saving} className="h-12 bg-gradient-to-r from-[#FF5F02] to-[#FF8534] hover:from-[#FF8534] hover:to-[#FF5F02] text-white shadow-lg active:scale-95 transition-all">
               <Save className="h-4 w-4 mr-2" />
               {saving ? (locale === 'ar' ? 'جاري الحفظ...' : 'Saving...') : (locale === 'ar' ? 'حفظ الإعدادات' : 'Save Settings')}
             </Button>
@@ -283,34 +284,33 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
         </TabsContent>
 
         <TabsContent value="categories">
-          <Card>
-            <CardHeader>
-              <CardTitle>{locale === 'ar' ? 'إدارة الفئات' : 'Category Management'}</CardTitle>
-              <CardDescription>
-                {locale === 'ar' ? 'إضافة وتعديل فئات الدورات' : 'Add and manage course categories'}
-              </CardDescription>
+          <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] shadow-lg">
+            <CardHeader className="py-4">
+              <CardTitle className="text-[#262626] dark:text-white">{locale === 'ar' ? 'إدارة الفئات' : 'Category Management'}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Add New Category */}
-              <div className="flex flex-col md:flex-row gap-4 items-end bg-muted/50 p-4 rounded-lg">
+              <div className="flex flex-col md:flex-row gap-4 items-end bg-gray-100 dark:bg-[#1a1a1a] p-4 rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000]">
                 <div className="flex-1 space-y-2 w-full">
-                  <Label>{locale === 'ar' ? 'اسم الفئة (إنجليزي)' : 'Category Name (English)'}</Label>
+                  <Label className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'اسم الفئة (إنجليزي)' : 'Category Name (English)'}</Label>
                   <Input
                     value={newCategory.name}
                     onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
                     placeholder="e.g. Football"
+                    className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
                 <div className="flex-1 space-y-2 w-full">
-                  <Label>{locale === 'ar' ? 'اسم الفئة (عربي)' : 'Category Name (Arabic)'}</Label>
+                  <Label className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'اسم الفئة (عربي)' : 'Category Name (Arabic)'}</Label>
                   <Input
                     value={newCategory.nameAr}
                     onChange={(e) => setNewCategory({ ...newCategory, nameAr: e.target.value })}
                     placeholder="مثال: كرة القدم"
                     dir="rtl"
+                    className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
-                <Button onClick={handleAddCategory} disabled={addingCategory}>
+                <Button onClick={handleAddCategory} disabled={addingCategory} className="h-12 bg-gradient-to-r from-[#FF5F02] to-[#FF8534] hover:from-[#FF8534] hover:to-[#FF5F02] text-white shadow-lg active:scale-95 transition-all">
                   <Plus className="w-4 h-4 mr-2" />
                   {addingCategory ? (locale === 'ar' ? 'جاري الإضافة...' : 'Adding...') : (locale === 'ar' ? 'إضافة' : 'Add')}
                 </Button>
@@ -321,21 +321,21 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
                 {categories.map((category) => (
                   <div
                     key={category.id}
-                    className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors"
+                    className="flex items-center justify-between p-4 border-2 border-[#DDDDDD] dark:border-[#000000] rounded-lg bg-white dark:bg-[#1a1a1a] hover:bg-gray-50 dark:hover:bg-[#0a0a0a] transition-colors"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="p-2 bg-primary/10 rounded-full text-primary">
+                      <div className="p-2 bg-[#FF5F02]/10 dark:bg-[#FF5F02]/20 rounded-full text-[#FF5F02]">
                         <Tag className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="font-medium">{category.name}</p>
-                        <p className="text-sm text-muted-foreground">{category.nameAr}</p>
+                        <p className="font-medium text-[#262626] dark:text-white">{category.name}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{category.nameAr}</p>
                       </div>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-950/30 active:scale-95 transition-all"
                       onClick={() => handleDeleteCategory(category.id)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -343,7 +343,7 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
                   </div>
                 ))}
                 {categories.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     {locale === 'ar' ? 'لا توجد فئات مضافة' : 'No categories added yet'}
                   </div>
                 )}

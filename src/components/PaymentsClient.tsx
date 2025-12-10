@@ -393,10 +393,10 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
           {/* Pending Tab */}
           <TabsContent value="pending" className="space-y-4">
             {pendingEnrollments.length === 0 ? (
-              <Card className="border-2 border-dashed">
+              <Card className="border-2 border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-[#262626]">
                 <CardContent className="p-12 text-center">
-                  <Clock className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-                  <p className="text-muted-foreground text-lg">
+                  <Clock className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
+                  <p className="text-gray-500 dark:text-gray-400 text-lg">
                     {locale === 'ar' ? 'لا توجد مدفوعات قيد المراجعة' : 'No pending payments'}
                   </p>
                 </CardContent>
@@ -549,7 +549,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                               setNotes('');
                               setStatusDialogOpen(true);
                             }}
-                            className="cursor-pointer"
+                            className="cursor-pointer text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20"
                           >
                             <AlertCircle className="w-4 h-4 mr-2 text-orange-600" />
                             <span>{locale === 'ar' ? 'قيد الانتظار' : 'Mark as Pending'}</span>
@@ -561,7 +561,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                               setNotes('');
                               setStatusDialogOpen(true);
                             }}
-                            className="cursor-pointer"
+                            className="cursor-pointer text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20"
                           >
                             <X className="w-4 h-4 mr-2 text-red-600" />
                             <span>{locale === 'ar' ? 'رفض' : 'Mark as Rejected'}</span>
@@ -622,16 +622,16 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button 
+صف                          <Button 
                             className="w-full h-10 bg-gradient-to-r from-[#FF5F02] to-[#FF8534] hover:from-[#FF8534] hover:to-[#FF5F02] text-white shadow-lg active:scale-95 transition-all"
                           >
                             <MoreVertical className="w-4 h-4 mr-2" />
                             {locale === 'ar' ? 'تغيير الحالة' : 'Change Status'}
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuLabel>{locale === 'ar' ? 'تحديث حالة الدفع' : 'Update Payment Status'}</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
+                        <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                          <DropdownMenuLabel className="text-[#262626] dark:text-white">{locale === 'ar' ? 'تحديث حالة الدفع' : 'Update Payment Status'}</DropdownMenuLabel>
+                          <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
                           <DropdownMenuItem 
                             onClick={() => {
                               setSelectedEnrollment(enrollment);
@@ -639,7 +639,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                               setNotes('');
                               setStatusDialogOpen(true);
                             }}
-                            className="cursor-pointer"
+                            className="cursor-pointer text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20"
                           >
                             <Check className="w-4 h-4 mr-2 text-green-600" />
                             <span>{locale === 'ar' ? 'تم الدفع نقداً' : 'Mark as Paid (Cash)'}</span>
@@ -651,7 +651,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                               setNotes('');
                               setStatusDialogOpen(true);
                             }}
-                            className="cursor-pointer"
+                            className="cursor-pointer text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20"
                           >
                             <X className="w-4 h-4 mr-2 text-red-600" />
                             <span>{locale === 'ar' ? 'رفض' : 'Mark as Rejected'}</span>
@@ -663,7 +663,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                               setNotes('');
                               setStatusDialogOpen(true);
                             }}
-                            className="cursor-pointer"
+                            className="cursor-pointer text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20"
                           >
                             <AlertCircle className="w-4 h-4 mr-2 text-orange-600" />
                             <span>{locale === 'ar' ? 'قيد الانتظار' : 'Mark as Pending'}</span>
@@ -721,15 +721,15 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                           <Button 
                             variant="outline"
                             size="sm"
-                            className="w-full hover:bg-gray-100 active:scale-95 transition-all"
+                            className="w-full h-10 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] text-[#262626] dark:text-white hover:bg-gray-100 dark:hover:bg-[#0a0a0a] active:scale-95 transition-all"
                           >
                             <MoreVertical className="w-4 h-4 mr-2" />
                             {locale === 'ar' ? 'تغيير الحالة' : 'Change Status'}
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuLabel>{locale === 'ar' ? 'تحديث حالة الدفع' : 'Update Payment Status'}</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
+                        <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                          <DropdownMenuLabel className="text-[#262626] dark:text-white">{locale === 'ar' ? 'تحديث حالة الدفع' : 'Update Payment Status'}</DropdownMenuLabel>
+                          <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
                           <DropdownMenuItem 
                             onClick={() => {
                               setSelectedEnrollment(enrollment);
@@ -737,7 +737,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                               setNotes('');
                               setStatusDialogOpen(true);
                             }}
-                            className="cursor-pointer"
+                            className="cursor-pointer text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20"
                           >
                             <Check className="w-4 h-4 mr-2 text-green-600" />
                             <span>{locale === 'ar' ? 'موافقة' : 'Approve'}</span>
@@ -749,7 +749,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                               setNotes('');
                               setStatusDialogOpen(true);
                             }}
-                            className="cursor-pointer"
+                            className="cursor-pointer text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20"
                           >
                             <AlertCircle className="w-4 h-4 mr-2 text-orange-600" />
                             <span>{locale === 'ar' ? 'قيد الانتظار' : 'Mark as Pending'}</span>
@@ -817,7 +817,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="notes" className="text-sm font-semibold">
+                <Label htmlFor="notes" className="text-sm font-semibold text-[#262626] dark:text-white">
                   {locale === 'ar' ? 'ملاحظات (اختياري)' : 'Notes (Optional)'}
                 </Label>
                 <Textarea
@@ -898,19 +898,19 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-5xl mx-auto pb-24 md:pb-6">
       <div>
-        <h1 className="text-3xl font-bold bg-linear-to-r from-[#30B2D2] to-[#1E3A8A] bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#FF5F02] to-[#FF8534] bg-clip-text text-transparent">
           {locale === 'ar' ? 'المدفوعات' : 'Payments'}
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
           {locale === 'ar' ? 'إدارة مدفوعات الدورات التدريبية' : 'Manage course payments'}
         </p>
       </div>
 
       {enrollments.length === 0 ? (
-        <Card>
+        <Card className="border-2 border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-[#262626]">
           <CardContent className="p-12 text-center">
-            <DollarSign className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-            <p className="text-muted-foreground text-lg">
+            <DollarSign className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
+            <p className="text-gray-500 dark:text-gray-400 text-lg">
               {locale === 'ar' ? 'لا توجد مدفوعات' : 'No payments found'}
             </p>
           </CardContent>
@@ -918,14 +918,14 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {enrollments.map((enrollment) => (
-            <Card key={enrollment.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <CardHeader className="bg-linear-to-r from-blue-50 to-cyan-50">
+            <Card key={enrollment.id} className="overflow-hidden border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] hover:shadow-xl transition-shadow">
+              <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">
+                    <CardTitle className="text-lg text-[#262626] dark:text-white">
                       {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
                     </CardTitle>
-                    <CardDescription className="mt-2">
+                    <CardDescription className="mt-2 text-[#FF5F02] font-bold">
                       {enrollment.course?.price} {enrollment.course?.currency}
                     </CardDescription>
                   </div>
@@ -935,15 +935,15 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
               <CardContent className="p-4">
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{locale === 'ar' ? 'تاريخ التسجيل' : 'Enrollment Date'}:</span>
-                    <span className="font-medium">
+                    <span className="text-gray-600 dark:text-gray-400">{locale === 'ar' ? 'تاريخ التسجيل' : 'Enrollment Date'}:</span>
+                    <span className="font-medium text-[#262626] dark:text-white">
                       {new Date(enrollment.enrollmentDate).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US')}
                     </span>
                   </div>
                   {enrollment.paymentDate && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">{locale === 'ar' ? 'تاريخ الدفع' : 'Payment Date'}:</span>
-                      <span className="font-medium">
+                      <span className="text-gray-600 dark:text-gray-400">{locale === 'ar' ? 'تاريخ الدفع' : 'Payment Date'}:</span>
+                      <span className="font-medium text-[#262626] dark:text-white">
                         {new Date(enrollment.paymentDate).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US')}
                       </span>
                     </div>
