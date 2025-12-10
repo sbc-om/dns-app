@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChildMedalsPreview } from '@/components/ChildMedalsPreview';
+import { UserGrowthChartClient } from '@/components/charts/UserGrowthChartClient';
 
 export default async function DashboardPage({
   params,
@@ -30,7 +31,6 @@ export default async function DashboardPage({
 
   // Fetch statistics for admin
   let stats = null;
-  let userGrowthData: { date: string; count: number }[] = [];
   if (user.role === 'admin') {
     const users = await listUsers();
     const appointments = await getAllAppointments();
@@ -51,18 +51,6 @@ export default async function DashboardPage({
       totalCoaches: users.filter(u => u.role === 'coach').length,
       totalKids: users.filter(u => u.role === 'kid').length,
     };
-
-    // Calculate user growth data for last 30 days
-    const last30Days = Array.from({ length: 30 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - (29 - i));
-      return date.toISOString().split('T')[0];
-    });
-
-    userGrowthData = last30Days.map(date => {
-      const count = users.filter(u => u.createdAt && u.createdAt.split('T')[0] <= date).length;
-      return { date, count };
-    });
   }
 
   // Fetch courses for coach
@@ -269,55 +257,13 @@ export default async function DashboardPage({
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-            {/* User Growth Chart */}
-            <Card className="border-2">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold text-[#262626] dark:text-white">
-                  {locale === 'ar' ? 'نمو الأعضاء (آخر 30 يوم)' : 'User Growth (Last 30 Days)'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {userGrowthData.length > 0 && (
-                    <>
-                      <div className="text-sm text-muted-foreground">
-                        {locale === 'ar' ? 'نمو الأعضاء على مدار الشهر الماضي' : 'Member growth over the past month'}
-                      </div>
-                      <div className="space-y-2">
-                        {[...userGrowthData].reverse().slice(0, 10).map((data, index) => {
-                          const maxCount = Math.max(...userGrowthData.map(d => d.count));
-                          const percentage = maxCount > 0 ? (data.count / maxCount) * 100 : 0;
-                          return (
-                            <div key={index} className="flex items-center gap-3">
-                              <span className="text-xs text-muted-foreground w-16">
-                                {new Date(data.date).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
-                              </span>
-                              <div className="flex-1 bg-muted rounded-full h-8 overflow-hidden">
-                                <div 
-                                  className="bg-orange-500 h-full rounded-full transition-all duration-500 flex items-center justify-end pr-2"
-                                  title={`${data.count} users`}
-                                  suppressHydrationWarning
-                                  dangerouslySetInnerHTML={{ 
-                                    __html: `<style>@keyframes grow-${index} { from { width: 0; } to { width: ${percentage}%; } } .bar-${index} { width: ${percentage}%; animation: grow-${index} 1s ease-out; }</style><div class="bar-${index} h-full bg-orange-500 rounded-full flex items-center justify-end pr-2"><span class="text-xs font-bold text-white">${data.count}</span></div>` 
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-                </div>
-                <div className="mt-4 flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">{locale === 'ar' ? 'المجموع:' : 'Total:'}</span>
-                  <span className="font-bold text-orange-600">{stats.totalUsers} {locale === 'ar' ? 'مستخدم' : 'users'}</span>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="mt-6">
+            {/* User Growth Chart - Full Width */}
+            <UserGrowthChartClient locale={locale} />
+          </div>
 
-            {/* Summary Statistics Card */}
+          {/* Summary Statistics Card */}
+          <div className="mt-6">
             <Card className="border-2">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-[#262626] dark:text-white">

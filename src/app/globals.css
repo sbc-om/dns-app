@@ -77,6 +77,10 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #000000;
   --sidebar-ring: #FF5F02;
+  
+  /* Chart colors */
+  --grid-color: #e5e7eb;
+  --text-secondary: #6b7280;
 }
 
 .dark {
@@ -112,6 +116,10 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #262626;
   --sidebar-ring: #FF5F02;
+  
+  /* Chart colors for dark mode */
+  --grid-color: #374151;
+  --text-secondary: #9ca3af;
 }
 
 @layer base {
