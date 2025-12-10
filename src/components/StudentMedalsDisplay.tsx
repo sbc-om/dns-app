@@ -58,7 +58,7 @@ export function StudentMedalsDisplay({
 
   if (loading) {
     return (
-      <Card className="bg-white dark:bg-[#262626] border-[#DDDDDD] dark:border-[#262626]">
+      <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg">
         <CardHeader>
           <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2">
             <Award className="w-5 h-5 text-[#FF5F02]" />
@@ -76,7 +76,7 @@ export function StudentMedalsDisplay({
 
   if (medals.length === 0) {
     return (
-      <Card className="bg-white dark:bg-[#262626] border-[#DDDDDD] dark:border-[#262626]">
+      <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg">
         <CardHeader>
           <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2">
             <Award className="w-5 h-5 text-[#FF5F02]" />
@@ -116,7 +116,7 @@ export function StudentMedalsDisplay({
   const uniqueMedals = Object.values(medalCounts);
 
   return (
-    <Card className="bg-white dark:bg-[#262626] border-[#DDDDDD] dark:border-[#262626]">
+    <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg">
       <CardHeader>
         <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2">
           <Award className="w-5 h-5 text-[#FF5F02]" />
@@ -131,7 +131,7 @@ export function StudentMedalsDisplay({
           {uniqueMedals.map(({ medal, count, lastAwarded }) => (
             <div
               key={medal.id}
-              className="p-4 rounded-lg border-2 border-[#DDDDDD] dark:border-[#262626] bg-white dark:bg-[#262626] hover:border-[#FF5F02] transition-all"
+              className="p-4 rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] hover:border-[#FF5F02] transition-all shadow-md"
             >
               <div className="flex items-start gap-3">
                 <div className="text-4xl">{medal.icon}</div>

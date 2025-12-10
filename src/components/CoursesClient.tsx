@@ -122,30 +122,36 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
       </div>
 
       {/* Search and Filter Bar */}
-      <Card>
+      <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg">
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search Input */}
             <div className="relative flex-1">
-              <Search className={`absolute top-2.5 h-4 w-4 text-muted-foreground ${locale === 'ar' ? 'right-3' : 'left-3'}`} />
+              <Search className={`absolute top-3 h-5 w-5 text-[#FF5F02] ${locale === 'ar' ? 'right-3' : 'left-3'}`} />
               <Input
                 placeholder={locale === 'ar' ? 'ابحث حسب الاسم أو الوصف...' : 'Search by name or description...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`${locale === 'ar' ? 'pr-9' : 'pl-9'}`}
+                className={`${locale === 'ar' ? 'pr-10' : 'pl-10'} h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500`}
               />
             </div>
 
             {/* Category Filter Select */}
             <div className="w-full md:w-64 flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
+              <div className="p-2 bg-[#FF5F02]/10 dark:bg-[#FF5F02]/20 rounded-lg">
+                <Filter className="h-5 w-5 text-[#FF5F02]" />
+              </div>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#0a0a0a]">
                   <SelectValue placeholder={locale === 'ar' ? 'اختر فئة' : 'Select category'} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
                   {filterOptions.map((option) => (
-                    <SelectItem key={option} value={option}>
+                    <SelectItem 
+                      key={option} 
+                      value={option}
+                      className="text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20 focus:bg-[#FF5F02]/10 dark:focus:bg-[#FF5F02]/20 cursor-pointer"
+                    >
                       {getCategoryLabel(option)}
                     </SelectItem>
                   ))}
@@ -155,10 +161,13 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
           </div>
 
           {/* Results Summary */}
-          <div className="mt-4 text-sm text-muted-foreground">
-            {locale === 'ar' 
-              ? `عرض ${filteredCourses.length} من ${courses.length} دورة`
-              : `Showing ${filteredCourses.length} of ${courses.length} courses`}
+          <div className="mt-4 flex items-center gap-2 px-4 py-2 bg-[#FF5F02]/5 dark:bg-[#FF5F02]/10 rounded-lg border border-[#FF5F02]/20">
+            <div className="h-2 w-2 rounded-full bg-[#FF5F02] animate-pulse"></div>
+            <span className="text-sm font-medium text-[#262626] dark:text-white">
+              {locale === 'ar' 
+                ? `عرض ${filteredCourses.length} من ${courses.length} دورة`
+                : `Showing ${filteredCourses.length} of ${courses.length} courses`}
+            </span>
           </div>
         </CardContent>
       </Card>

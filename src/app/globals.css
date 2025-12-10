@@ -223,6 +223,10 @@
   }
 }
 
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
+}
+
 @keyframes shake {
   0%, 100% {
     transform: translateX(0);
@@ -245,6 +249,19 @@
   75% {
     transform: rotate(5deg);
   }
+}
+
+/* Animation delays */
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
+.animation-delay-700 {
+  animation-delay: 0.7s;
 }
 
 @keyframes float {
@@ -443,6 +460,41 @@
     .scrollbar-custom::-webkit-scrollbar-thumb:hover {
       background: #555;
     }
+  }
+  
+  /* Custom scrollbar with dark mode support */
+  .scrollbar-custom-dark::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .scrollbar-custom-dark::-webkit-scrollbar-track {
+    background: #e5e5e5;
+    border-radius: 4px;
+  }
+  
+  .scrollbar-custom-dark::-webkit-scrollbar-thumb {
+    background: #a0a0a0;
+    border-radius: 4px;
+  }
+  
+  .scrollbar-custom-dark::-webkit-scrollbar-thumb:hover {
+    background: #FF5F02;
+  }
+  
+  /* Dark mode scrollbar */
+  .dark .scrollbar-custom-dark::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border: 1px solid #000000;
+  }
+  
+  .dark .scrollbar-custom-dark::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 4px;
+  }
+  
+  .dark .scrollbar-custom-dark::-webkit-scrollbar-thumb:hover {
+    background: #FF5F02;
   }
 }
 

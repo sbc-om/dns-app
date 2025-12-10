@@ -197,7 +197,7 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Users List */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
@@ -222,16 +222,17 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
                   placeholder={locale === 'ar' ? 'البحث...' : 'Search...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
               <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectTrigger className="w-full sm:w-[200px] h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#0a0a0a]">
                   <SelectValue placeholder={locale === 'ar' ? 'فلترة حسب الدور' : 'Filter by role'} />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{locale === 'ar' ? 'الكل' : 'All'}</SelectItem>
+                <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                  <SelectItem value="all" className="text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20 cursor-pointer">{locale === 'ar' ? 'الكل' : 'All'}</SelectItem>
                   {uniqueRoles.map(role => (
-                    <SelectItem key={role} value={role}>
+                    <SelectItem key={role} value={role} className="text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20 cursor-pointer">
                       {role.charAt(0).toUpperCase() + role.slice(1)}
                     </SelectItem>
                   ))}
@@ -247,7 +248,7 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
                   checked={selectedUsers.size === filteredUsers.length && filteredUsers.length > 0}
                   onCheckedChange={handleSelectAll}
                 />
-                <Label htmlFor="select-all" className="cursor-pointer font-medium">
+                <Label htmlFor="select-all" className="cursor-pointer font-medium text-[#262626] dark:text-white">
                   {locale === 'ar' ? 'تحديد الكل' : 'Select All'}
                 </Label>
               </div>
@@ -263,7 +264,7 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
                 {locale === 'ar' ? 'لم يتم العثور على مستخدمين' : 'No users found'}
               </div>
             ) : (
-              <div className="space-y-2 max-h-[500px] overflow-y-auto">
+              <div className="space-y-2 max-h-[500px] overflow-y-auto scrollbar-custom-dark pr-2">
                 {filteredUsers.map((user) => (
                   <div
                     key={user.id}
@@ -278,8 +279,8 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
                       htmlFor={`user-${user.id}`}
                       className="flex-1 cursor-pointer"
                     >
-                      <div className="font-medium">{user.fullName || user.email}</div>
-                      <div className="text-sm text-gray-500 flex items-center gap-2">
+                      <div className="font-medium text-[#262626] dark:text-white">{user.fullName || user.email}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                         <span>{user.phoneNumber}</span>
                         <span className="text-xs px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded">
                           {user.role}
@@ -294,7 +295,7 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
         </Card>
 
         {/* Message Form */}
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg">
           <CardHeader>
             <CardTitle>{locale === 'ar' ? 'الرسالة' : 'Message'}</CardTitle>
             <CardDescription>
@@ -305,12 +306,13 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="wahaUrl">{locale === 'ar' ? 'رابط WAHA API' : 'WAHA API URL'}</Label>
+              <Label htmlFor="wahaUrl" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'رابط WAHA API' : 'WAHA API URL'}</Label>
               <Input
                 id="wahaUrl"
                 value={wahaUrl}
                 onChange={(e) => setWahaUrl(e.target.value)}
                 placeholder="http://localhost:3000"
+                className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white"
               />
               <p className="text-xs text-gray-500">
                 {locale === 'ar' 
@@ -320,13 +322,14 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="wahaApiKey">{locale === 'ar' ? 'مفتاح API' : 'API Key'}</Label>
+              <Label htmlFor="wahaApiKey" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'مفتاح API' : 'API Key'}</Label>
               <Input
                 id="wahaApiKey"
                 type="password"
                 value={wahaApiKey}
                 onChange={(e) => setWahaApiKey(e.target.value)}
                 placeholder={locale === 'ar' ? 'أدخل مفتاح API' : 'Enter API key'}
+                className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white"
               />
               <p className="text-xs text-gray-500">
                 {locale === 'ar' 
@@ -336,12 +339,13 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="session">{locale === 'ar' ? 'الجلسة' : 'Session'}</Label>
+              <Label htmlFor="session" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'الجلسة' : 'Session'}</Label>
               <Input
                 id="session"
                 value={session}
                 onChange={(e) => setSession(e.target.value)}
                 placeholder="Milad"
+                className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white"
               />
               <p className="text-xs text-gray-500">
                 {locale === 'ar' 
@@ -351,21 +355,21 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="message">{locale === 'ar' ? 'نص الرسالة' : 'Message Text'}</Label>
+              <Label htmlFor="message" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'نص الرسالة' : 'Message Text'}</Label>
               <Textarea
                 id="message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder={locale === 'ar' ? 'اكتب رسالتك هنا...' : 'Write your message here...'}
                 rows={8}
-                className="resize-none"
+                className="resize-none bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
             </div>
 
             <Button
               onClick={handleSendMessages}
               disabled={isLoading || selectedUsers.size === 0 || !message.trim()}
-              className="w-full"
+              className="w-full h-12 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
             >
               {isLoading ? (
                 <>

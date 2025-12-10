@@ -161,7 +161,7 @@ export function KidProfileClient({
             )}
             <div className="flex-1 space-y-2">
               <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold text-gray-900">{currentKid.fullName || currentKid.username}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{currentKid.fullName || currentKid.username}</h1>
                 {currentUser.role === 'admin' && (
                   <Button
                     onClick={() => window.location.href = `/${locale}/dashboard/kids/${currentKid.id}/edit`}
@@ -243,17 +243,17 @@ export function KidProfileClient({
               {editingCourse && currentUser.role === 'admin' ? (
                 <div className="space-y-4 bg-white dark:bg-[#262626] rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700">
                   <div>
-                    <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300">{locale === 'ar' ? 'اختر الدورة' : 'Select Course'}</Label>
+                    <Label className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'اختر الدورة' : 'Select Course'}</Label>
                     <Select
                       value={selectedCourseId}
                       onValueChange={setSelectedCourseId}
                     >
-                      <SelectTrigger className="mt-2 border-2 border-gray-300 dark:border-gray-600 focus:border-[#FF5F02] h-12">
+                      <SelectTrigger className="mt-2 h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#0a0a0a]">
                         <SelectValue placeholder={locale === 'ar' ? 'اختر دورة جديدة' : 'Select new course'} />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
                         {availableCourses.map((course) => (
-                          <SelectItem key={course.id} value={course.id}>
+                          <SelectItem key={course.id} value={course.id} className="text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20 cursor-pointer">
                             {locale === 'ar' ? course.nameAr : course.name} - {course.price} {course.currency}
                           </SelectItem>
                         ))}

@@ -5,7 +5,7 @@ import {
   CheckCircle, XCircle, Clock, DollarSign, Calendar, 
   User as UserIcon, Eye, FileText, MoreVertical, 
   Check, X, AlertCircle, RefreshCw, Search,
-  TrendingUp, TrendingDown, Minus, Download
+  TrendingUp, TrendingDown, Minus, Download, CreditCard
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
@@ -162,29 +162,29 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
     switch (status) {
       case 'paid':
         return (
-          <Badge className="bg-linear-to-r from-green-500 to-emerald-500 text-white border-0 shadow-lg">
-            <CheckCircle className="w-3.5 h-3.5 mr-1" />
+          <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 shadow-lg flex items-center gap-1">
+            <CheckCircle className="w-3.5 h-3.5" />
             {locale === 'ar' ? 'مدفوع' : 'Paid'}
           </Badge>
         );
       case 'pending':
         return (
-          <Badge className="bg-linear-to-r from-orange-500 to-yellow-500 text-white border-0 shadow-lg">
-            <Clock className="w-3.5 h-3.5 mr-1" />
+          <Badge className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white border-0 shadow-lg flex items-center gap-1">
+            <Clock className="w-3.5 h-3.5" />
             {locale === 'ar' ? 'قيد المراجعة' : 'Pending'}
           </Badge>
         );
       case 'rejected':
         return (
-          <Badge className="bg-linear-to-r from-red-500 to-rose-500 text-white border-0 shadow-lg">
-            <XCircle className="w-3.5 h-3.5 mr-1" />
+          <Badge className="bg-gradient-to-r from-red-500 to-rose-500 text-white border-0 shadow-lg flex items-center gap-1">
+            <XCircle className="w-3.5 h-3.5" />
             {locale === 'ar' ? 'مرفوض' : 'Rejected'}
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="border-gray-300">
-            <Minus className="w-3.5 h-3.5 mr-1" />
+          <Badge variant="outline" className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] text-[#262626] dark:text-white flex items-center gap-1">
+            <Minus className="w-3.5 h-3.5" />
             {locale === 'ar' ? 'غير مدفوع' : 'Unpaid'}
           </Badge>
         );
@@ -217,8 +217,8 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center gap-4">
-          <RefreshCw className="w-12 h-12 animate-spin text-[#30B2D2]" />
-          <p className="text-muted-foreground text-lg">
+          <RefreshCw className="w-12 h-12 animate-spin text-[#FF5F02]" />
+          <p className="text-gray-600 dark:text-gray-400 text-lg">
             {locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}
           </p>
         </div>
@@ -233,17 +233,18 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold bg-linear-to-r from-[#30B2D2] to-[#1E3A8A] bg-clip-text text-transparent">
-              {locale === 'ar' ? '💰 إدارة المدفوعات' : '💰 Payment Management'}
+            <h1 className="text-3xl md:text-4xl font-bold text-[#262626] dark:text-white flex items-center gap-3">
+              <CreditCard className="h-8 w-8 text-[#FF5F02]" />
+              {locale === 'ar' ? 'إدارة المدفوعات' : 'Payment Management'}
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
               {locale === 'ar' ? 'مراجعة وإدارة مدفوعات الطلاب' : 'Review and manage student payments'}
             </p>
           </div>
           <Button 
             onClick={loadData} 
             variant="outline"
-            className="flex items-center gap-2 hover:bg-gray-100 active:scale-95 transition-all"
+            className="flex items-center gap-2 h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#0a0a0a] hover:border-[#FF5F02] dark:hover:border-[#FF5F02] active:scale-95 transition-all"
           >
             <RefreshCw className="w-4 h-4" />
             {locale === 'ar' ? 'تحديث' : 'Refresh'}
@@ -252,85 +253,85 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="border-0 shadow-lg bg-linear-to-br from-green-50 to-emerald-50">
+          <Card className="border-2 border-green-200 dark:border-green-900 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 dark:bg-[#262626]">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-700">
+                  <p className="text-sm font-semibold text-green-700 dark:text-green-400">
                     {locale === 'ar' ? 'المدفوعات' : 'Paid'}
                   </p>
-                  <p className="text-2xl font-bold text-green-900 mt-2">
+                  <p className="text-2xl font-bold text-green-900 dark:text-green-300 mt-2">
                     {paidAmount.toLocaleString()} {locale === 'ar' ? 'ر.ع' : 'OMR'}
                   </p>
-                  <p className="text-xs text-green-600 mt-1">
+                  <p className="text-xs text-green-600 dark:text-green-500 mt-1">
                     {paidEnrollments.length} {locale === 'ar' ? 'معاملة' : 'transactions'}
                   </p>
                 </div>
-                <div className="p-3 bg-green-100 rounded-2xl">
-                  <TrendingUp className="w-6 h-6 text-green-700" />
+                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-2xl">
+                  <TrendingUp className="w-6 h-6 text-green-700 dark:text-green-400" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-linear-to-br from-orange-50 to-yellow-50">
+          <Card className="border-2 border-orange-200 dark:border-orange-900 shadow-lg bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20 dark:bg-[#262626]">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-orange-700">
+                  <p className="text-sm font-semibold text-orange-700 dark:text-orange-400">
                     {locale === 'ar' ? 'قيد المراجعة' : 'Pending'}
                   </p>
-                  <p className="text-2xl font-bold text-orange-900 mt-2">
+                  <p className="text-2xl font-bold text-orange-900 dark:text-orange-300 mt-2">
                     {pendingAmount.toLocaleString()} {locale === 'ar' ? 'ر.ع' : 'OMR'}
                   </p>
-                  <p className="text-xs text-orange-600 mt-1">
+                  <p className="text-xs text-orange-600 dark:text-orange-500 mt-1">
                     {pendingEnrollments.length} {locale === 'ar' ? 'معاملة' : 'transactions'}
                   </p>
                 </div>
-                <div className="p-3 bg-orange-100 rounded-2xl">
-                  <Clock className="w-6 h-6 text-orange-700" />
+                <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-2xl">
+                  <Clock className="w-6 h-6 text-orange-700 dark:text-orange-400" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-linear-to-br from-red-50 to-rose-50">
+          <Card className="border-2 border-red-200 dark:border-red-900 shadow-lg bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/20 dark:to-rose-950/20 dark:bg-[#262626]">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-red-700">
+                  <p className="text-sm font-semibold text-red-700 dark:text-red-400">
                     {locale === 'ar' ? 'غير مدفوع' : 'Unpaid'}
                   </p>
-                  <p className="text-2xl font-bold text-red-900 mt-2">
+                  <p className="text-2xl font-bold text-red-900 dark:text-red-300 mt-2">
                     {unpaidAmount.toLocaleString()} {locale === 'ar' ? 'ر.ع' : 'OMR'}
                   </p>
-                  <p className="text-xs text-red-600 mt-1">
+                  <p className="text-xs text-red-600 dark:text-red-500 mt-1">
                     {unpaidEnrollments.length} {locale === 'ar' ? 'معاملة' : 'transactions'}
                   </p>
                 </div>
-                <div className="p-3 bg-red-100 rounded-2xl">
-                  <TrendingDown className="w-6 h-6 text-red-700" />
+                <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-2xl">
+                  <TrendingDown className="w-6 h-6 text-red-700 dark:text-red-400" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-linear-to-br from-blue-50 to-cyan-50">
+          <Card className="border-2 border-[#FF5F02] dark:border-[#FF5F02] shadow-lg bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 dark:bg-[#262626]">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-700">
+                  <p className="text-sm font-semibold text-[#FF5F02]">
                     {locale === 'ar' ? 'الإجمالي' : 'Total'}
                   </p>
-                  <p className="text-2xl font-bold text-blue-900 mt-2">
+                  <p className="text-2xl font-bold text-[#262626] dark:text-white mt-2">
                     {totalAmount.toLocaleString()} {locale === 'ar' ? 'ر.ع' : 'OMR'}
                   </p>
-                  <p className="text-xs text-blue-600 mt-1">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                     {enrollments.length} {locale === 'ar' ? 'معاملة' : 'transactions'}
                   </p>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-2xl">
-                  <DollarSign className="w-6 h-6 text-blue-700" />
+                <div className="p-3 bg-[#FF5F02]/10 dark:bg-[#FF5F02]/20 rounded-2xl">
+                  <DollarSign className="w-6 h-6 text-[#FF5F02]" />
                 </div>
               </div>
             </CardContent>
@@ -339,49 +340,53 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
 
         {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+          <div className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <div className="p-1.5 bg-[#FF5F02]/10 dark:bg-[#FF5F02]/20 rounded-lg">
+              <Search className="w-4 h-4 text-[#FF5F02]" />
+            </div>
+          </div>
           <Input
             placeholder={locale === 'ar' ? 'بحث عن طالب أو دورة...' : 'Search for student or course...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-12 border-2 focus:border-[#30B2D2] transition-colors"
+            className="pl-12 rtl:pl-4 rtl:pr-12 h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
           />
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="pending" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-gray-100 p-1 rounded-xl">
+          <TabsList className="grid w-full grid-cols-4 bg-gray-100 dark:bg-[#1a1a1a] p-1 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
             <TabsTrigger 
               value="pending" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-lg rounded-lg transition-all"
+              className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-[#262626] data-[state=active]:shadow-lg rounded-lg transition-all text-gray-600 dark:text-gray-400 data-[state=active]:text-[#FF5F02]"
             >
               <Clock className="w-4 h-4" />
               <span className="hidden sm:inline">{locale === 'ar' ? 'قيد المراجعة' : 'Pending'}</span>
-              <Badge variant="secondary" className="ml-1">{pendingEnrollments.length}</Badge>
+              <Badge variant="secondary" className="ml-1 rtl:ml-0 rtl:mr-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400">{pendingEnrollments.length}</Badge>
             </TabsTrigger>
             <TabsTrigger 
               value="paid" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-lg rounded-lg transition-all"
+              className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-[#262626] data-[state=active]:shadow-lg rounded-lg transition-all text-gray-600 dark:text-gray-400 data-[state=active]:text-[#FF5F02]"
             >
               <CheckCircle className="w-4 h-4" />
               <span className="hidden sm:inline">{locale === 'ar' ? 'مدفوع' : 'Paid'}</span>
-              <Badge variant="secondary" className="ml-1">{paidEnrollments.length}</Badge>
+              <Badge variant="secondary" className="ml-1 rtl:ml-0 rtl:mr-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">{paidEnrollments.length}</Badge>
             </TabsTrigger>
             <TabsTrigger 
               value="unpaid" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-lg rounded-lg transition-all"
+              className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-[#262626] data-[state=active]:shadow-lg rounded-lg transition-all text-gray-600 dark:text-gray-400 data-[state=active]:text-[#FF5F02]"
             >
               <XCircle className="w-4 h-4" />
               <span className="hidden sm:inline">{locale === 'ar' ? 'غير مدفوع' : 'Unpaid'}</span>
-              <Badge variant="secondary" className="ml-1">{unpaidEnrollments.length}</Badge>
+              <Badge variant="secondary" className="ml-1 rtl:ml-0 rtl:mr-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">{unpaidEnrollments.length}</Badge>
             </TabsTrigger>
             <TabsTrigger 
               value="rejected" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-lg rounded-lg transition-all"
+              className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-[#262626] data-[state=active]:shadow-lg rounded-lg transition-all text-gray-600 dark:text-gray-400 data-[state=active]:text-[#FF5F02]"
             >
               <AlertCircle className="w-4 h-4" />
               <span className="hidden sm:inline">{locale === 'ar' ? 'مرفوض' : 'Rejected'}</span>
-              <Badge variant="secondary" className="ml-1">{rejectedEnrollments.length}</Badge>
+              <Badge variant="secondary" className="ml-1 rtl:ml-0 rtl:mr-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">{rejectedEnrollments.length}</Badge>
             </TabsTrigger>
           </TabsList>
 
@@ -399,14 +404,14 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {pendingEnrollments.map((enrollment) => (
-                  <Card key={enrollment.id} className="overflow-hidden border-2 border-orange-200 hover:shadow-xl transition-shadow">
-                    <CardHeader className="bg-linear-to-r from-orange-50 to-yellow-50 pb-3">
+                  <Card key={enrollment.id} className="overflow-hidden border-2 border-orange-200 dark:border-orange-900 hover:shadow-xl transition-shadow bg-white dark:bg-[#262626]">
+                    <CardHeader className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/30 dark:to-yellow-950/30 pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg line-clamp-1">
+                          <CardTitle className="text-lg line-clamp-1 text-[#262626] dark:text-white">
                             {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
                           </CardTitle>
-                          <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
                             <UserIcon className="w-4 h-4 shrink-0" />
                             <span className="line-clamp-1">{enrollment.student?.fullName}</span>
                           </div>
@@ -417,14 +422,14 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                     <CardContent className="p-4 space-y-4">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">{locale === 'ar' ? 'المبلغ' : 'Amount'}</span>
-                          <span className="font-bold text-lg bg-linear-to-r from-[#30B2D2] to-[#1E3A8A] bg-clip-text text-transparent">
+                          <span className="text-gray-600 dark:text-gray-400">{locale === 'ar' ? 'المبلغ' : 'Amount'}</span>
+                          <span className="font-bold text-lg text-[#FF5F02]">
                             {enrollment.course?.price} {enrollment.course?.currency}
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">{locale === 'ar' ? 'تاريخ التسجيل' : 'Enrollment Date'}</span>
-                          <span className="font-medium">
+                          <span className="text-gray-600 dark:text-gray-400">{locale === 'ar' ? 'تاريخ التسجيل' : 'Enrollment Date'}</span>
+                          <span className="font-medium text-[#262626] dark:text-white">
                             {new Date(enrollment.enrollmentDate).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US')}
                           </span>
                         </div>
@@ -436,9 +441,9 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                               setSelectedImage(enrollment.paymentProofUrl || null);
                               setImageDialogOpen(true);
                             }}
-                            className="w-full mt-2 hover:bg-blue-50"
+                            className="w-full mt-2 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] text-[#262626] dark:text-white hover:bg-blue-50 dark:hover:bg-blue-950/20 hover:border-[#FF5F02] dark:hover:border-[#FF5F02]"
                           >
-                            <Eye className="w-4 h-4 mr-2" />
+                            <Eye className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" />
                             {locale === 'ar' ? 'عرض إثبات الدفع' : 'View Payment Proof'}
                           </Button>
                         )}
@@ -452,9 +457,9 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                             setNotes('');
                             setStatusDialogOpen(true);
                           }}
-                          className="flex-1 bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg active:scale-95 transition-all"
+                          className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg active:scale-95 transition-all"
                         >
-                          <Check className="w-4 h-4 mr-2" />
+                          <Check className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" />
                           {locale === 'ar' ? 'موافقة' : 'Approve'}
                         </Button>
                         <Button 
@@ -467,7 +472,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                           variant="destructive"
                           className="flex-1 shadow-lg active:scale-95 transition-all"
                         >
-                          <X className="w-4 h-4 mr-2" />
+                          <X className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" />
                           {locale === 'ar' ? 'رفض' : 'Reject'}
                         </Button>
                       </div>
@@ -481,10 +486,10 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
           {/* Paid Tab */}
           <TabsContent value="paid" className="space-y-4">
             {paidEnrollments.length === 0 ? (
-              <Card className="border-2 border-dashed">
+              <Card className="border-2 border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-[#262626]">
                 <CardContent className="p-12 text-center">
-                  <CheckCircle className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-                  <p className="text-muted-foreground text-lg">
+                  <CheckCircle className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
+                  <p className="text-gray-500 dark:text-gray-400 text-lg">
                     {locale === 'ar' ? 'لا توجد مدفوعات مكتملة' : 'No completed payments'}
                   </p>
                 </CardContent>
@@ -492,14 +497,14 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {paidEnrollments.map((enrollment) => (
-                  <Card key={enrollment.id} className="overflow-hidden border-2 border-green-200 hover:shadow-xl transition-shadow">
-                    <CardHeader className="bg-linear-to-r from-green-50 to-emerald-50 pb-3">
+                  <Card key={enrollment.id} className="overflow-hidden border-2 border-green-200 dark:border-green-800 bg-white dark:bg-[#262626] hover:shadow-xl transition-shadow">
+                    <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg line-clamp-1">
+                          <CardTitle className="text-lg line-clamp-1 text-[#262626] dark:text-white">
                             {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
                           </CardTitle>
-                          <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
                             <UserIcon className="w-4 h-4 shrink-0" />
                             <span className="line-clamp-1">{enrollment.student?.fullName}</span>
                           </div>
@@ -510,14 +515,14 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                     <CardContent className="p-4 space-y-4">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">{locale === 'ar' ? 'المبلغ' : 'Amount'}</span>
-                          <span className="font-bold text-lg text-green-700">
+                          <span className="text-gray-600 dark:text-gray-400">{locale === 'ar' ? 'المبلغ' : 'Amount'}</span>
+                          <span className="font-bold text-lg text-green-700 dark:text-green-400">
                             {enrollment.course?.price} {enrollment.course?.currency}
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">{locale === 'ar' ? 'تاريخ الدفع' : 'Payment Date'}</span>
-                          <span className="font-medium">
+                          <span className="text-gray-600 dark:text-gray-400">{locale === 'ar' ? 'تاريخ الدفع' : 'Payment Date'}</span>
+                          <span className="font-medium text-[#262626] dark:text-white">
                             {enrollment.paymentDate ? new Date(enrollment.paymentDate).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US') : '-'}
                           </span>
                         </div>
@@ -573,10 +578,10 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
           {/* Unpaid Tab */}
           <TabsContent value="unpaid" className="space-y-4">
             {unpaidEnrollments.length === 0 ? (
-              <Card className="border-2 border-dashed">
+              <Card className="border-2 border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-[#262626]">
                 <CardContent className="p-12 text-center">
-                  <DollarSign className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-                  <p className="text-muted-foreground text-lg">
+                  <DollarSign className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
+                  <p className="text-gray-500 dark:text-gray-400 text-lg">
                     {locale === 'ar' ? 'جميع الطلاب دفعوا' : 'All students have paid'}
                   </p>
                 </CardContent>
@@ -584,14 +589,14 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {unpaidEnrollments.map((enrollment) => (
-                  <Card key={enrollment.id} className="overflow-hidden border-2 border-red-200 hover:shadow-xl transition-shadow">
-                    <CardHeader className="bg-linear-to-r from-red-50 to-rose-50 pb-3">
+                  <Card key={enrollment.id} className="overflow-hidden border-2 border-red-200 dark:border-red-900 bg-white dark:bg-[#262626] hover:shadow-xl transition-shadow">
+                    <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950 dark:to-rose-950 pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg line-clamp-1">
+                          <CardTitle className="text-lg line-clamp-1 text-[#262626] dark:text-white">
                             {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
                           </CardTitle>
-                          <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
                             <UserIcon className="w-4 h-4 shrink-0" />
                             <span className="line-clamp-1">{enrollment.student?.fullName}</span>
                           </div>
@@ -602,14 +607,14 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                     <CardContent className="p-4 space-y-4">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">{locale === 'ar' ? 'المبلغ المطلوب' : 'Amount Due'}</span>
-                          <span className="font-bold text-lg text-red-700">
+                          <span className="text-gray-600 dark:text-gray-400">{locale === 'ar' ? 'المبلغ المطلوب' : 'Amount Due'}</span>
+                          <span className="font-bold text-lg text-red-700 dark:text-red-400">
                             {enrollment.course?.price} {enrollment.course?.currency}
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">{locale === 'ar' ? 'تاريخ التسجيل' : 'Enrollment Date'}</span>
-                          <span className="font-medium">
+                          <span className="text-gray-600 dark:text-gray-400">{locale === 'ar' ? 'تاريخ التسجيل' : 'Enrollment Date'}</span>
+                          <span className="font-medium text-[#262626] dark:text-white">
                             {new Date(enrollment.enrollmentDate).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US')}
                           </span>
                         </div>
@@ -618,7 +623,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button 
-                            className="w-full bg-linear-to-r from-[#30B2D2] to-[#1E3A8A] hover:from-[#1E3A8A] hover:to-[#30B2D2] text-white shadow-lg active:scale-95 transition-all"
+                            className="w-full h-10 bg-gradient-to-r from-[#FF5F02] to-[#FF8534] hover:from-[#FF8534] hover:to-[#FF5F02] text-white shadow-lg active:scale-95 transition-all"
                           >
                             <MoreVertical className="w-4 h-4 mr-2" />
                             {locale === 'ar' ? 'تغيير الحالة' : 'Change Status'}
@@ -675,10 +680,10 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
           {/* Rejected Tab */}
           <TabsContent value="rejected" className="space-y-4">
             {rejectedEnrollments.length === 0 ? (
-              <Card className="border-2 border-dashed">
+              <Card className="border-2 border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-[#262626]">
                 <CardContent className="p-12 text-center">
-                  <XCircle className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-                  <p className="text-muted-foreground text-lg">
+                  <XCircle className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
+                  <p className="text-gray-500 dark:text-gray-400 text-lg">
                     {locale === 'ar' ? 'لا توجد مدفوعات مرفوضة' : 'No rejected payments'}
                   </p>
                 </CardContent>
@@ -686,14 +691,14 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {rejectedEnrollments.map((enrollment) => (
-                  <Card key={enrollment.id} className="overflow-hidden border-2 border-red-300 hover:shadow-xl transition-shadow">
-                    <CardHeader className="bg-linear-to-r from-red-50 to-rose-50 pb-3">
+                  <Card key={enrollment.id} className="overflow-hidden border-2 border-red-300 dark:border-red-900 bg-white dark:bg-[#262626] hover:shadow-xl transition-shadow">
+                    <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950 dark:to-rose-950 pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg line-clamp-1">
+                          <CardTitle className="text-lg line-clamp-1 text-[#262626] dark:text-white">
                             {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
                           </CardTitle>
-                          <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
                             <UserIcon className="w-4 h-4 shrink-0" />
                             <span className="line-clamp-1">{enrollment.student?.fullName}</span>
                           </div>
@@ -704,8 +709,8 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                     <CardContent className="p-4 space-y-4">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">{locale === 'ar' ? 'المبلغ' : 'Amount'}</span>
-                          <span className="font-bold text-lg text-red-700">
+                          <span className="text-gray-600 dark:text-gray-400">{locale === 'ar' ? 'المبلغ' : 'Amount'}</span>
+                          <span className="font-bold text-lg text-red-700 dark:text-red-400">
                             {enrollment.course?.price} {enrollment.course?.currency}
                           </span>
                         </div>
@@ -793,18 +798,18 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
               {selectedEnrollment && (
                 <div className="space-y-3 p-4 bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground font-medium">{locale === 'ar' ? 'الدورة' : 'Course'}:</span>
-                    <span className="font-semibold">
+                    <span className="text-gray-600 dark:text-gray-400 font-medium">{locale === 'ar' ? 'الدورة' : 'Course'}:</span>
+                    <span className="font-semibold text-[#262626] dark:text-white">
                       {locale === 'ar' ? selectedEnrollment.course?.nameAr : selectedEnrollment.course?.name}
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground font-medium">{locale === 'ar' ? 'الطالب' : 'Student'}:</span>
-                    <span className="font-semibold">{selectedEnrollment.student?.fullName}</span>
+                    <span className="text-gray-600 dark:text-gray-400 font-medium">{locale === 'ar' ? 'الطالب' : 'Student'}:</span>
+                    <span className="font-semibold text-[#262626] dark:text-white">{selectedEnrollment.student?.fullName}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground font-medium">{locale === 'ar' ? 'المبلغ' : 'Amount'}:</span>
-                    <span className="font-bold text-lg bg-linear-to-r from-[#30B2D2] to-[#1E3A8A] bg-clip-text text-transparent">
+                    <span className="text-gray-600 dark:text-gray-400 font-medium">{locale === 'ar' ? 'المبلغ' : 'Amount'}:</span>
+                    <span className="font-bold text-lg text-[#FF5F02]">
                       {selectedEnrollment.course?.price} {selectedEnrollment.course?.currency}
                     </span>
                   </div>
@@ -820,7 +825,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder={locale === 'ar' ? 'أضف ملاحظات أو سبب التغيير...' : 'Add notes or reason for change...'}
-                  className="h-24 resize-none border-2 focus:border-[#30B2D2] transition-colors"
+                  className="h-24 resize-none bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                 />
               </div>
             </div>
@@ -830,7 +835,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                 variant="outline"
                 onClick={() => setStatusDialogOpen(false)}
                 disabled={updating}
-                className="hover:bg-gray-100 active:scale-95 transition-all"
+                className="bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] text-[#262626] dark:text-white hover:bg-gray-100 dark:hover:bg-[#0a0a0a] active:scale-95 transition-all"
               >
                 {locale === 'ar' ? 'إلغاء' : 'Cancel'}
               </Button>
@@ -839,10 +844,10 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                 disabled={updating}
                 className={`shadow-lg active:scale-95 transition-all ${
                   newStatus === 'paid'
-                    ? 'bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white'
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white'
                     : newStatus === 'rejected'
-                    ? 'bg-linear-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white'
-                    : 'bg-linear-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white'
+                    ? 'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white'
+                    : 'bg-gradient-to-r from-[#FF5F02] to-[#FF8534] hover:from-[#FF8534] hover:to-[#FF5F02] text-white'
                 }`}
               >
                 {updating ? (
@@ -870,7 +875,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
               <DialogTitle>{locale === 'ar' ? 'إثبات الدفع' : 'Payment Proof'}</DialogTitle>
             </DialogHeader>
             {selectedImage && (
-              <div className="relative w-full h-[500px] bg-gray-100 rounded-lg overflow-hidden">
+              <div className="relative w-full h-[500px] bg-gray-100 dark:bg-[#1a1a1a] rounded-lg overflow-hidden">
                 <img
                   src={selectedImage}
                   alt="Payment Proof"
