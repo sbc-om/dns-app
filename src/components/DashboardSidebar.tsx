@@ -14,7 +14,8 @@ import {
   ChevronRight,
   Settings,
   BookOpen,
-  DollarSign
+  DollarSign,
+  MessageCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Dictionary } from '@/lib/i18n/getDictionary';
@@ -56,6 +57,13 @@ const menuItems: MenuItem[] = [
     labelKey: 'messages',
     href: '/dashboard/messages',
     icon: MessageSquare,
+  },
+  {
+    key: 'whatsapp',
+    resourceKey: 'dashboard.whatsapp',
+    labelKey: 'whatsapp',
+    href: '/dashboard/whatsapp',
+    icon: MessageCircle,
   },
   {
     key: 'courses',

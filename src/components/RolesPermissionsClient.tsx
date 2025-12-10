@@ -108,6 +108,7 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions }: R
     canSendPushNotifications: { en: 'Send Push Notifications', ar: 'إرسال إشعارات' },
     canManageCourses: { en: 'Manage Courses', ar: 'إدارة الدورات' },
     canViewPayments: { en: 'View Payments', ar: 'عرض المدفوعات' },
+    canSendWhatsApp: { en: 'Send WhatsApp Messages', ar: 'إرسال رسائل واتساب' },
   };
 
   return (

@@ -9,17 +9,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { UserCircle, Trophy, Activity, Star, Calendar, CreditCard, Edit, BookOpen, Save, Trash2, Pencil, DollarSign, CheckCircle2, Award, Plus, X, Check } from 'lucide-react';
-import { PlayerCardGenerator } from '@/components/PlayerCardGenerator';
-import { PlayerCardDisplay } from '@/components/PlayerCardDisplay';
+import { UserCircle, Trophy, Activity, Star, Calendar, Edit, BookOpen, Save, Trash2, Pencil, DollarSign, CheckCircle2, Award, Plus, X, Check } from 'lucide-react';
 import { ImageUpload } from '@/components/ImageUpload';
 import { StudentMedalsDisplay } from '@/components/StudentMedalsDisplay';
-import { getPlayerCardAction } from '@/lib/actions/playerCardActions';
 import { updateUserProfilePictureAction } from '@/lib/actions/userActions';
 import { getEnrollmentsByStudentIdAction, updateEnrollmentCourseAction, createEnrollmentAction, deleteEnrollmentAction } from '@/lib/actions/enrollmentActions';
 import { getActiveCoursesAction } from '@/lib/actions/courseActions';
 import { useEffect, useState } from 'react';
-import { PlayerCardData } from '@/lib/db/repositories/playerCardRepository';
 import type { Enrollment } from '@/lib/db/repositories/enrollmentRepository';
 import type { Course } from '@/lib/db/repositories/courseRepository';
 
@@ -36,8 +32,6 @@ export function KidProfileClient({
   kid,
   currentUser,
 }: KidProfileClientProps) {
-  const [playerCard, setPlayerCard] = useState<PlayerCardData | null>(null);
-  const [loadingCard, setLoadingCard] = useState(true);
   const [currentKid, setCurrentKid] = useState<User>(kid);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
@@ -63,27 +57,7 @@ export function KidProfileClient({
 
   useEffect(() => {
     loadEnrollmentAndCourses();
-    
-    // Only load player card for admin
-    if (currentUser.role !== 'admin') {
-      setLoadingCard(false);
-      return;
-    }
-
-    async function loadPlayerCard() {
-      try {
-        const result = await getPlayerCardAction(kid.id);
-        if (result.success && result.card) {
-          setPlayerCard(result.card);
-        }
-      } catch (error) {
-        console.error('Failed to load player card:', error);
-      } finally {
-        setLoadingCard(false);
-      }
-    }
-    loadPlayerCard();
-  }, [kid.id, currentUser.role]);
+  }, [kid.id]);
 
   const loadEnrollmentAndCourses = async () => {
     // Load kid's enrollments (can have multiple)
@@ -454,31 +428,7 @@ export function KidProfileClient({
         locale={locale}
       />
 
-      {/* Player Card Section - Admin Only */}
-      {currentUser.role === 'admin' && (
-        <Card className="shadow-lg">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-purple-600" />
-              <CardTitle className="text-lg">Player Card</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loadingCard ? (
-              <div className="text-center py-8 text-gray-500">Loading player card...</div>
-            ) : playerCard ? (
-              <PlayerCardDisplay card={playerCard} />
-            ) : (
-              <PlayerCardGenerator 
-                dictionary={dictionary} 
-                locale={locale} 
-                userId={currentKid.id} 
-                userName={currentKid.fullName || currentKid.username} 
-              />
-            )}
-          </CardContent>
-        </Card>
-      )}
+
 
     </div>
   );

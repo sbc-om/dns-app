@@ -37,6 +37,7 @@
     "schedules": "Schedules",
     "notifications": "Notifications",
     "messages": "Messages",
+    "whatsapp": "WhatsApp",
     "courses": "Courses",
     "payments": "Payments",
     "settings": "Settings"
@@ -511,70 +512,6 @@
     "admins": "Admins",
     "coaches": "Coaches",
     "parents": "Parents"
-  },
-  "playerCard": {
-    "title": "Player Card",
-    "createCard": "Create Player Card",
-    "updateCard": "Update Player Card",
-    "basicInfo": "Basic Information",
-    "physicalTests": "Physical Tests",
-    "playerName": "Player Name",
-    "age": "Age",
-    "position": "Position",
-    "preferredFoot": "Preferred Foot",
-    "height": "Height (cm)",
-    "weight": "Weight (kg)",
-    "photo": "Photo",
-    "uploadPhoto": "Upload Photo",
-    "next": "Next",
-    "previous": "Previous",
-    "generate": "Generate Card",
-    "download": "Download Card",
-    "share": "Share Card",
-    "overallRating": "Overall Rating",
-    "physicalStats": "Physical Stats",
-    "speed": "Speed",
-    "agility": "Agility",
-    "physicalStrength": "Physical Strength",
-    "upperBodyStrength": "Upper Body Strength",
-    "motorControl": "Motor Control",
-    "endurance": "Endurance",
-    "tests": {
-      "verticalJump": "Vertical Jump (cm)",
-      "broadJump": "Broad Jump (cm)",
-      "sprint10m": "10m Sprint (seconds)",
-      "sprint20m": "20m Sprint (seconds)",
-      "sprint30m": "30m Sprint (seconds)",
-      "agilityTest": "Agility Test (seconds)",
-      "balanceTest": "Balance Test (seconds)",
-      "cooperTest": "Cooper Test (meters)",
-      "pushUps": "Push-ups (count)",
-      "sitUps": "Sit-ups (count)",
-      "pullUps": "Pull-ups (count)"
-    },
-    "positions": {
-      "goalkeeper": "Goalkeeper",
-      "defender": "Defender",
-      "midfielder": "Midfielder",
-      "forward": "Forward",
-      "winger": "Winger"
-    },
-    "foot": {
-      "left": "Left",
-      "right": "Right",
-      "both": "Both"
-    },
-    "cardColors": {
-      "bronze": "Bronze",
-      "silver": "Silver",
-      "gold": "Gold",
-      "platinum": "Platinum",
-      "diamond": "Diamond"
-    },
-    "cardCreated": "Player card created successfully",
-    "cardUpdated": "Player card updated successfully",
-    "loadingCard": "Loading player card...",
-    "noCard": "No player card yet"
   },
   "courses": {
     "title": "Courses Management",

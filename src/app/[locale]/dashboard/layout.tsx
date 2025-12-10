@@ -46,6 +46,9 @@ export default async function DashboardLayout({
   if (permissions?.canAccessMessages) {
     accessibleResources.push('dashboard.messages');
   }
+  if (permissions?.canSendWhatsApp) {
+    accessibleResources.push('dashboard.whatsapp');
+  }
   if (permissions?.canManageCourses) {
     accessibleResources.push('dashboard.courses');
   }
