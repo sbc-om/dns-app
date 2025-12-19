@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, Calendar as CalendarIcon, Plus, X } from 'lucide-react';
+import { Save, Calendar as CalendarIcon, Plus, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
@@ -223,13 +223,6 @@ export default function CreateCourseClient({ locale, dict }: CreateCourseClientP
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleCancel}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
         <div>
           <h1 className="text-3xl font-bold">
             {dict.courses?.createCourse || 'Create New Course'}

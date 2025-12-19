@@ -89,16 +89,8 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
       cell: ({ row }) => {
         const fullName = row.getValue('fullName') as string;
         const user = row.original;
-        
-        // Make parent and kid names clickable
-        if (user.role === 'parent') {
-          return (
-            <Link href={`/${locale}/dashboard/users/${user.id}`} className="font-semibold text-[#30B2D2] hover:text-[#1E3A8A] hover:underline">
-              {fullName || '-'}
-            </Link>
-          );
-        }
-        
+
+        // Make user names clickable
         if (user.role === 'kid') {
           return (
             <Link href={`/${locale}/dashboard/kids/${user.id}`} className="font-semibold text-[#F2574C] hover:text-[#E8A12D] hover:underline">
@@ -106,8 +98,15 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
             </Link>
           );
         }
-        
-        return <div className="font-semibold text-gray-900 dark:text-gray-100">{fullName || '-'}</div>;
+
+        return (
+          <Link
+            href={`/${locale}/dashboard/users/${user.id}`}
+            className="font-semibold text-[#262626] dark:text-white hover:underline"
+          >
+            {fullName || '-'}
+          </Link>
+        );
       },
     },
     {

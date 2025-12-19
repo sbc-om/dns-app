@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Calendar, Trophy, Activity, Star, Medal, Target, CheckCircle, XCircle, CalendarDays } from 'lucide-react';
+import { Calendar, Trophy, Activity, Star, Medal, Target, CheckCircle, XCircle, CalendarDays } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getStudentCourseAttendanceAction } from '@/lib/actions/attendanceActions';
 import { getSessionPlansAction } from '@/lib/actions/sessionPlanActions';
@@ -82,19 +82,6 @@ export function CourseDetailClient({
   return (
     <div className="min-h-screen bg-[#DDDDDD] dark:bg-[#000000]">
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        {/* Header with Back Button */}
-        <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => window.history.back()}
-          className="hover:bg-gray-100"
-        >
-          <ArrowLeft className="h-4 w-4 me-2" />
-          {locale === 'ar' ? 'رجوع' : 'Back'}
-        </Button>
-      </div>
-
         {/* Course Header Card */}
         <Card className="shadow-lg border-2 border-[#DDDDDD] dark:border-[#262626] bg-white dark:bg-[#262626]">
           <CardHeader className="bg-white dark:bg-[#262626] border-b border-[#DDDDDD] dark:border-[#262626]">
@@ -444,7 +431,7 @@ export function CourseDetailClient({
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
-                <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-[#FF5F02] to-orange-600 border-4 border-orange-300 shadow-lg mb-4">
+                <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-linear-to-br from-[#FF5F02] to-orange-600 border-4 border-orange-300 shadow-lg mb-4">
                   <div className="text-center">
                     <p className="text-4xl font-bold text-white">{totalMedalPoints}</p>
                     <p className="text-xs text-white/80 font-medium mt-1">
@@ -517,7 +504,7 @@ export function CourseDetailClient({
                     {totalMedalPoints}
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#FF5F02] to-orange-600 rounded-lg shadow-md">
+                <div className="flex items-center justify-between p-4 bg-linear-to-r from-[#FF5F02] to-orange-600 rounded-lg shadow-md">
                   <span className="text-sm font-bold text-white">
                     {locale === 'ar' ? '🏆 المجموع الكلي:' : '🏆 Grand Total:'}
                   </span>

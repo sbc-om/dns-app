@@ -1,11 +1,14 @@
-import { requireAuth } from '@/lib/auth/auth';
+import { requireRole } from '@/lib/auth/auth';
 import { requireAcademyContext } from '@/lib/academies/academyContext';
 import { getDictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import { findUserById, getChildrenByParentId } from '@/lib/db/repositories/userRepository';
+import { ROLES } from '@/config/roles';
+import { getAcademyMembership, getUserAcademyRoles } from '@/lib/db/repositories/academyMembershipRepository';
+import { getAllAcademies } from '@/lib/db/repositories/academyRepository';
 import { notFound } from 'next/navigation';
-import { ParentProfileClient } from '@/components/ParentProfileClient';
 import { KidProfileClient } from '@/components/KidProfileClient';
+import { UserDetailsClient, type UserAcademyMembershipView } from '@/components/UserDetailsClient';
 
 export default async function UserProfilePage({
   params,
@@ -14,7 +17,7 @@ export default async function UserProfilePage({
 }) {
   const { locale, userId } = await params as { locale: Locale; userId: string };
   const dictionary = await getDictionary(locale);
-  const currentUser = await requireAuth(locale);
+  const currentUser = await requireRole([ROLES.ADMIN, ROLES.MANAGER], locale);
   const academyCtx = await requireAcademyContext(locale);
 
   // Get user
@@ -24,29 +27,65 @@ export default async function UserProfilePage({
     notFound();
   }
 
+  // Managers can only view users in their current academy.
+  if (currentUser.role === ROLES.MANAGER) {
+    // Admin users do not have academy memberships.
+    if (targetUser.role === ROLES.ADMIN) {
+      notFound();
+    }
+    const membership = await getAcademyMembership(academyCtx.academyId, userId);
+    if (!membership) {
+      notFound();
+    }
+  }
+
   // If user is a kid, show kid profile
   if (targetUser.role === 'kid') {
     return (
-      <KidProfileClient
-        dictionary={dictionary}
-        locale={locale}
-        kid={targetUser}
-        currentUser={currentUser}
-        academyId={academyCtx.academyId}
-      />
+      <div className="h-full overflow-y-auto">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl space-y-6">
+          <KidProfileClient
+            dictionary={dictionary}
+            locale={locale}
+            kid={targetUser}
+            currentUser={currentUser}
+            academyId={academyCtx.academyId}
+          />
+        </div>
+      </div>
     );
   }
 
-  // Get children of this parent
-  const children = await getChildrenByParentId(userId);
+  const [academyRoles, academies, children] = await Promise.all([
+    getUserAcademyRoles(userId),
+    getAllAcademies(),
+    targetUser.role === ROLES.PARENT ? getChildrenByParentId(userId) : Promise.resolve([]),
+  ]);
+
+  const memberships: UserAcademyMembershipView[] = Object.entries(academyRoles)
+    .map(([academyId, memberRole]) => {
+      const academy = academies.find((a) => a.id === academyId);
+      return {
+        academyId,
+        academyName: academy?.name ?? academyId,
+        academyNameAr: academy?.nameAr ?? academyId,
+        academyIsActive: academy?.isActive ?? false,
+        memberRole,
+      };
+    })
+    .sort((a, b) => a.academyName.localeCompare(b.academyName));
 
   return (
-    <ParentProfileClient
-      dictionary={dictionary}
-      locale={locale}
-      parent={targetUser}
-      children={children}
-      currentUser={currentUser}
-    />
+    <div className="h-full overflow-y-auto">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl space-y-6">
+        <UserDetailsClient
+          dictionary={dictionary}
+          locale={locale}
+          user={targetUser}
+          memberships={memberships}
+          children={children}
+        />
+      </div>
+    </div>
   );
 }

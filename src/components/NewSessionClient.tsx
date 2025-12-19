@@ -1,8 +1,6 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from './ui/button';
 import { SessionPlanEditor } from './SessionPlanEditor';
 import { PageContainer, PageHeader } from './ui/page-layout';
 import type { Course } from '@/lib/db/repositories/courseRepository';
@@ -42,17 +40,6 @@ export default function NewSessionClient({
           locale === 'ar' 
             ? `${course.nameAr} - الجلسة رقم ${nextSessionNumber}`
             : `${course.name} - Session #${nextSessionNumber}`
-        }
-        backButton={
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCancel}
-            className="gap-2 active-scale"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">{dictionary.common?.back || 'Back'}</span>
-          </Button>
         }
       />
 

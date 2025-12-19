@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { User, Plus, ArrowLeft, Mail, Phone, UserCircle, Calendar } from 'lucide-react';
+import { User, Plus, Mail, Phone, UserCircle, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -82,20 +82,15 @@ export function ParentProfileClient({
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-        <Link href={`/${locale}/dashboard/users`}>
-          <Button variant="outline" size="icon">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold text-[#262626] dark:text-white">
-            {dictionary.users.parentProfile || 'Parent Profile'}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {dictionary.users.viewParentDetails || 'View and manage parent and their children'}
-          </p>
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-[#262626] dark:text-white">
+              {dictionary.users.parentProfile || 'Parent Profile'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {dictionary.users.viewParentDetails || 'View and manage parent and their children'}
+            </p>
+          </div>
         </div>
-      </div>
 
       {/* Parent Information Card */}
       <Card className="border-2 border-[#DDDDDD] dark:border-[#262626]">

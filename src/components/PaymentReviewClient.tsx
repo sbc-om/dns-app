@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check, X, AlertCircle } from 'lucide-react';
+import { Check, X, AlertCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -69,13 +69,6 @@ export default function PaymentReviewClient({
     <div className="container max-w-5xl mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => router.push(`/${locale}/dashboard/payments`)}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
         <div>
           <h1 className="text-3xl font-bold">
             {locale === 'ar' ? 'مراجعة الدفع' : 'Review Payment'}

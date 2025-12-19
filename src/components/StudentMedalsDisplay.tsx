@@ -58,9 +58,9 @@ export function StudentMedalsDisplay({
 
   if (loading) {
     return (
-      <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
-        <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a]">
-          <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2">
+      <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] rounded-2xl overflow-hidden">
+        <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000] flex items-center justify-center min-h-14">
+          <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2 text-center">
             <Award className="w-5 h-5 text-gray-700 dark:text-gray-200" />
             {title}
           </CardTitle>
@@ -76,9 +76,9 @@ export function StudentMedalsDisplay({
 
   if (medals.length === 0) {
     return (
-      <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
-        <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a]">
-          <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2">
+      <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] rounded-2xl overflow-hidden">
+        <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000] flex flex-col items-center justify-center text-center gap-1">
+          <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2 justify-center">
             <Award className="w-5 h-5 text-gray-700 dark:text-gray-200" />
             {title}
           </CardTitle>
@@ -116,9 +116,9 @@ export function StudentMedalsDisplay({
   const uniqueMedals = Object.values(medalCounts);
 
   return (
-    <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] overflow-hidden">
-      <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a]">
-        <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2">
+    <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] overflow-hidden rounded-2xl">
+      <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000] flex flex-col items-center justify-center text-center gap-1">
+        <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2 justify-center">
           <Award className="w-5 h-5 text-gray-700 dark:text-gray-200" />
           {title}
         </CardTitle>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Upload, CheckCircle, XCircle, Receipt, FileText } from 'lucide-react';
+import { Upload, CheckCircle, XCircle, Receipt, FileText } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -58,13 +58,6 @@ export default function PaymentUploadClient({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => router.push(`/${locale}/dashboard/payments`)}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
         <div>
           <h1 className="text-3xl font-bold">
             {locale === 'ar' ? 'رفع إثبات الدفع' : 'Upload Payment Proof'}

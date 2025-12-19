@@ -1,19 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowLeft, Save, User as UserIcon, Mail, Phone, IdCard, Sparkles, Building2 } from 'lucide-react';
+import { Save, User as UserIcon, Mail, Phone, IdCard, Sparkles, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import type { User } from '@/lib/db/repositories/userRepository';
 import type { Academy } from '@/lib/db/repositories/academyRepository';
 import { updateUserAction } from '@/lib/actions/userActions';
-import { addUserToAcademy, removeUserFromAcademy } from '@/lib/db/repositories/academyMembershipRepository';
 import { useRouter } from 'next/navigation';
-import { Checkbox } from '@/components/ui/checkbox';
 
 interface EditKidProfileClientProps {
   dictionary: Dictionary;
@@ -38,17 +37,7 @@ export function EditKidProfileClient({
     phoneNumber: kid.phoneNumber || '',
     nationalId: kid.nationalId || '',
   });
-  const [selectedAcademyIds, setSelectedAcademyIds] = useState<string[]>(currentAcademyIds);
-
-  const handleAcademyToggle = (academyId: string) => {
-    setSelectedAcademyIds(prev => {
-      if (prev.includes(academyId)) {
-        return prev.filter(id => id !== academyId);
-      } else {
-        return [...prev, academyId];
-      }
-    });
-  };
+  const [selectedAcademyId, setSelectedAcademyId] = useState<string>(currentAcademyIds[0] || '');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,31 +45,15 @@ export function EditKidProfileClient({
 
     try {
       // Update user profile
-      const result = await updateUserAction(kid.id, formData);
+      const result = await updateUserAction(kid.id, formData, {
+        locale,
+        academyId: selectedAcademyId || undefined,
+      });
 
       if (!result.success) {
         alert(result.error || 'Failed to update profile');
         setLoading(false);
         return;
-      }
-
-      // Update academy memberships
-      const academiesToAdd = selectedAcademyIds.filter(id => !currentAcademyIds.includes(id));
-      const academiesToRemove = currentAcademyIds.filter(id => !selectedAcademyIds.includes(id));
-
-      // Add to new academies
-      for (const academyId of academiesToAdd) {
-        await addUserToAcademy({
-          academyId,
-          userId: kid.id,
-          role: 'kid',
-          createdBy: 'admin'
-        });
-      }
-
-      // Remove from old academies
-      for (const academyId of academiesToRemove) {
-        await removeUserFromAcademy(academyId, kid.id);
       }
 
       alert(dictionary.users?.profileUpdated || 'Profile updated successfully!');
@@ -101,16 +74,8 @@ export function EditKidProfileClient({
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       <div className="space-y-6 animate-fade-in">
-        {/* Header with back button */}
+        {/* Header */}
         <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={handleCancel}
-            className="bg-white dark:bg-[#262626] hover:bg-gray-50 dark:hover:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5 text-gray-700 dark:text-gray-200" />
-          </Button>
           <div className="flex-1">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-black/5 dark:bg-white/5 rounded-xl">
@@ -234,7 +199,7 @@ export function EditKidProfileClient({
                     {locale === 'ar' ? 'الأكاديميات' : 'Academies'}
                   </CardTitle>
                   <CardDescription className="text-gray-600 dark:text-gray-400">
-                    {locale === 'ar' ? 'حدد الأكاديميات التي ينتمي إليها هذا الطفل' : 'Select the academies this kid belongs to'}
+                    {locale === 'ar' ? 'حدد الأكاديمية التي ينتمي إليها هذا الطفل' : 'Select the academy this kid belongs to'}
                   </CardDescription>
                 </div>
               </div>
@@ -245,26 +210,30 @@ export function EditKidProfileClient({
                   {locale === 'ar' ? 'لا توجد أكاديميات متاحة' : 'No academies available'}
                 </p>
               ) : (
-                <div className="space-y-3">
-                  {academies.map((academy) => (
-                    <div 
-                      key={academy.id}
-                      className="flex items-center gap-3 p-3 rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-colors"
-                    >
-                      <Checkbox
-                        id={`academy-${academy.id}`}
-                        checked={selectedAcademyIds.includes(academy.id)}
-                        onCheckedChange={() => handleAcademyToggle(academy.id)}
-                        className="h-5 w-5"
-                      />
-                      <Label
-                        htmlFor={`academy-${academy.id}`}
-                        className="flex-1 cursor-pointer text-sm font-medium text-[#262626] dark:text-white"
-                      >
-                        {locale === 'ar' ? academy.nameAr : academy.name}
-                      </Label>
-                    </div>
-                  ))}
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-[#262626] dark:text-white">
+                    {locale === 'ar' ? 'الأكاديمية' : 'Academy'}
+                  </Label>
+                  <Select value={selectedAcademyId || 'none'} onValueChange={(v) => setSelectedAcademyId(v === 'none' ? '' : v)}>
+                    <SelectTrigger className="w-full h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] text-[#262626] dark:text-white">
+                      <SelectValue placeholder={locale === 'ar' ? 'اختر أكاديمية' : 'Select an academy'} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                      <SelectItem value="none" className="text-[#262626] dark:text-white cursor-pointer">
+                        {locale === 'ar' ? 'بدون' : 'None'}
+                      </SelectItem>
+                      {academies.map((academy) => (
+                        <SelectItem key={academy.id} value={academy.id} className="text-[#262626] dark:text-white cursor-pointer">
+                          {locale === 'ar' ? academy.nameAr : academy.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {locale === 'ar'
+                      ? 'سيتم تحديث عضوية الأكاديمية تلقائياً عند الحفظ'
+                      : 'Academy membership will be updated automatically on save'}
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -279,7 +248,6 @@ export function EditKidProfileClient({
               disabled={loading}
               className="bg-white dark:bg-[#262626] hover:bg-gray-50 dark:hover:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] text-[#262626] dark:text-white h-12 px-8 font-semibold transition-colors"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
               {dictionary.common?.cancel || 'Cancel'}
             </Button>
             <Button

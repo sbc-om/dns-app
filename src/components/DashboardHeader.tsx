@@ -1,6 +1,6 @@
 'use client';
 
-import { LogOut, User, Menu, X, Download, Bell, Globe, Building2, ChevronDown } from 'lucide-react';
+import { LogOut, User, Menu, X, Download, Bell, Globe, Building2, ChevronDown, ArrowLeft } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
@@ -115,6 +115,14 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
     }
   };
 
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back();
+      return;
+    }
+    router.push(`/${locale}/dashboard`);
+  };
+
   const handleInstall = async () => {
     if (!installPrompt) return;
 
@@ -149,7 +157,19 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
       <div className="flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4 lg:px-6 gap-2 sm:gap-3">
         {/* Left Section: Menu + Title */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-          {/* Mobile Menu Button */}
+          {/* Back + Mobile Menu */}
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleBack}
+              className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-all border-2 border-transparent hover:border-black/10 dark:hover:border-white/10"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="h-5 w-5 text-gray-800 dark:text-gray-100 rtl:rotate-180" />
+            </Button>
+
+            {/* Mobile Menu Button */}
           <Button
             variant="ghost"
             size="icon"
@@ -163,6 +183,8 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
               <Menu className="h-5 w-5 text-gray-800 dark:text-gray-100" />
             )}
           </Button>
+
+          </div>
 
           {/* Title - Responsive visibility */}
           <h1 className="hidden sm:block text-base md:text-lg font-bold text-[#262626] dark:text-white truncate">
