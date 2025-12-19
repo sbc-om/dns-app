@@ -235,23 +235,57 @@ export function EditKidProfileDialog({
               </div>
               
               <div>
-                <Label htmlFor="height">Height (cm)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="height">Height (cm)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.height || '0'}
+                  </div>
+                </div>
+                <input
                   id="height"
-                  type="number"
-                  value={formData.height}
+                  type="range"
+                  min="50"
+                  max="250"
+                  step="1"
+                  value={formData.height || '50'}
                   onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.height || '50') - 50) / 200) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.height || '50') - 50) / 200) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <span>50</span>
+                  <span>150</span>
+                  <span>250</span>
+                </div>
               </div>
               
               <div>
-                <Label htmlFor="weight">Weight (kg)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="weight">Weight (kg)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.weight || '0'}
+                  </div>
+                </div>
+                <input
                   id="weight"
-                  type="number"
-                  value={formData.weight}
+                  type="range"
+                  min="10"
+                  max="150"
+                  step="1"
+                  value={formData.weight || '10'}
                   onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.weight || '10') - 10) / 140) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.weight || '10') - 10) / 140) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <span>10</span>
+                  <span>80</span>
+                  <span>150</span>
+                </div>
               </div>
             </div>
           </div>

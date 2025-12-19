@@ -472,17 +472,17 @@ export default async function DashboardPage({
       {user.role === 'coach' && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-[#262626] dark:text-white">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
               {dictionary.dashboard.coachCourses}
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600 dark:text-gray-400">
               {dictionary.dashboard.coachCoursesDescription}
             </p>
           </div>
 
           {coachCourses.length === 0 ? (
-            <div className="bg-white p-8 rounded-xl border-2 border-dashed border-gray-300 text-center">
-              <p className="text-gray-500 text-lg">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-center">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
                 {dictionary.dashboard.noCoachCourses}
               </p>
             </div>
@@ -494,9 +494,9 @@ export default async function DashboardPage({
                   href={`/${locale}/dashboard/coach/courses/${course.id}`}
                   className="group block"
                 >
-                  <div className="bg-white dark:bg-[#262626] p-6 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] h-full flex flex-col gap-4">
+                  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-lg transition-all h-full flex flex-col gap-4">
                     {course.courseImage && (
-                      <div className="h-40 w-full rounded-lg overflow-hidden bg-gray-100">
+                      <div className="h-40 w-full rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
                         <img
                           src={course.courseImage}
                           alt={locale === 'ar' ? course.nameAr : course.name}
@@ -507,35 +507,35 @@ export default async function DashboardPage({
 
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center justify-between gap-3">
-                        <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                           {locale === 'ar' ? course.nameAr : course.name}
                         </h3>
-                        <span className={`text-sm font-semibold px-3 py-1 rounded-full ${course.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}>
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${course.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'}`}>
                           {course.isActive ? dictionary.users.active : dictionary.users.inactive}
                         </span>
                       </div>
 
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
                         {course.startDate && (
                           <span>
-                            <strong>{dictionary.dashboard.startsOn}:</strong>{' '}
+                            <strong className="text-gray-700 dark:text-gray-300">{dictionary.dashboard.startsOn}:</strong>{' '}
                             {new Date(course.startDate).toLocaleDateString(locale)}
                           </span>
                         )}
                         {course.endDate && (
                           <span>
-                            <strong>{dictionary.dashboard.endsOn}:</strong>{' '}
+                            <strong className="text-gray-700 dark:text-gray-300">{dictionary.dashboard.endsOn}:</strong>{' '}
                             {new Date(course.endDate).toLocaleDateString(locale)}
                           </span>
                         )}
                       </div>
 
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
                         <div>
-                          <p className="text-sm text-gray-500">{dictionary.dashboard.activePlayers}</p>
-                          <p className="text-2xl font-bold text-[#262626] dark:text-white">{activePlayers}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{dictionary.dashboard.activePlayers}</p>
+                          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{activePlayers}</p>
                         </div>
-                        <Button variant="outline" className="border-2 border-[#DDDDDD] dark:border-[#000000]">
+                        <Button variant="outline" size="sm" className="border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-500">
                           {dictionary.dashboard.viewRoster}
                         </Button>
                       </div>

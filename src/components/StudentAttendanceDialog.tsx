@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
 import { 
   UserCircle, 
   CheckCircle, 
@@ -131,8 +132,8 @@ export function StudentAttendanceDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#262626] max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="border-b-2 border-[#DDDDDD] dark:border-[#262626] pb-4">
+        <DialogContent className="rounded-lg max-w-2xl bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] max-h-[90vh] overflow-hidden flex flex-col p-0">
+          <DialogHeader className="border-b-2 border-[#DDDDDD] dark:border-[#000000] pb-4 px-6 pt-6">
             <DialogTitle className="text-xl md:text-2xl font-bold text-[#262626] dark:text-white flex items-center gap-3">
               {student.profilePicture ? (
                 <img
@@ -141,7 +142,7 @@ export function StudentAttendanceDialog({
                   className="w-12 h-12 rounded-full object-cover border-2 border-[#FF5F02]"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-linear-to-br from-[#FF5F02] to-orange-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-[#262626] dark:bg-[#1a1a1a] flex items-center justify-center border-2 border-[#DDDDDD] dark:border-[#000000]">
                   <UserCircle className="h-8 w-8 text-white" />
                 </div>
               )}
@@ -159,12 +160,20 @@ export function StudentAttendanceDialog({
             </DialogTitle>
           </DialogHeader>
 
-          {loading ? (
-            <div className="py-12 text-center text-gray-500 dark:text-gray-400">
-              {locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-            </div>
-          ) : (
-            <div className="space-y-6 py-4">
+          <OverlayScrollbarsComponent
+            defer
+            options={{
+              scrollbars: { autoHide: 'leave', autoHideDelay: 200 },
+              overflow: { x: 'hidden' }
+            }}
+            className="flex-1"
+          >
+            {loading ? (
+              <div className="py-12 text-center text-gray-500 dark:text-gray-400 px-6">
+                {locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+              </div>
+            ) : (
+              <div className="space-y-6 py-4 px-6">
               {/* Attendance Status */}
               <div className="space-y-3">
                 <Label className="text-base font-semibold text-[#262626] dark:text-white">
@@ -176,14 +185,14 @@ export function StudentAttendanceDialog({
                     variant={present ? 'default' : 'outline'}
                     size="lg"
                     onClick={() => setPresent(true)}
-                    className={`h-20 flex flex-col items-center justify-center gap-2 ${
+                    className={`rounded-lg h-20 flex flex-col items-center justify-center gap-2 ${
                       present
-                        ? 'bg-green-500 hover:bg-green-600 text-white border-2 border-green-600'
-                        : 'border-2 border-[#DDDDDD] dark:border-[#262626] hover:border-green-500'
+                        ? 'bg-green-500 hover:bg-green-600 text-white'
+                        : 'border-2 border-[#DDDDDD] dark:border-[#000000] hover:border-green-500'
                     }`}
                   >
-                    <CheckCircle className="h-8 w-8" />
-                    <span className="font-bold">
+                    <CheckCircle className="h-7 w-7" />
+                    <span className="font-semibold">
                       {locale === 'ar' ? 'حاضر' : 'Present'}
                     </span>
                   </Button>
@@ -196,14 +205,14 @@ export function StudentAttendanceDialog({
                       setPresent(false);
                       setScore(undefined);
                     }}
-                    className={`h-20 flex flex-col items-center justify-center gap-2 ${
+                    className={`rounded-lg h-20 flex flex-col items-center justify-center gap-2 ${
                       !present
-                        ? 'bg-red-500 hover:bg-red-600 text-white border-2 border-red-600'
-                        : 'border-2 border-[#DDDDDD] dark:border-[#262626] hover:border-red-500'
+                        ? 'bg-red-500 hover:bg-red-600 text-white'
+                        : 'border-2 border-[#DDDDDD] dark:border-[#000000] hover:border-red-500'
                     }`}
                   >
-                    <XCircle className="h-8 w-8" />
-                    <span className="font-bold">
+                    <XCircle className="h-7 w-7" />
+                    <span className="font-semibold">
                       {locale === 'ar' ? 'غائب' : 'Absent'}
                     </span>
                   </Button>
@@ -212,35 +221,56 @@ export function StudentAttendanceDialog({
 
               {/* Performance Score (only if present) */}
               {present && (
-                <div className="space-y-3">
-                  <Label htmlFor="score" className="text-base font-semibold text-[#262626] dark:text-white flex items-center gap-2">
-                    <Star className="h-5 w-5 text-[#FF5F02]" />
-                    {locale === 'ar' ? 'النقاط (1-10)' : 'Score (1-10)'}
-                  </Label>
-                  <div className="flex items-center gap-4">
-                    <Input
-                      id="score"
-                      type="number"
-                      min={1}
-                      max={10}
-                      value={score ?? ''}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value);
-                        setScore(isNaN(val) ? undefined : Math.min(Math.max(val, 1), 10));
-                      }}
-                      placeholder={locale === 'ar' ? 'أدخل النقاط' : 'Enter score'}
-                      className="text-lg font-bold text-center bg-white dark:bg-[#000000] border-2 border-[#DDDDDD] dark:border-[#262626]"
-                    />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-semibold text-[#262626] dark:text-white flex items-center gap-2">
+                      <Star className="h-5 w-5 text-blue-500" fill="currentColor" />
+                      {locale === 'ar' ? 'تقييم الأداء' : 'Performance Rating'}
+                    </Label>
                     {score && (
-                      <Badge className="text-lg px-4 py-2 bg-[#FF5F02] hover:bg-[#FF5F02]/90">
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 text-white font-bold text-2xl">
                         {score}/10
-                      </Badge>
+                      </div>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+
+                  {/* Slider */}
+                  <div className="space-y-3">
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      value={score ?? 5}
+                      onChange={(e) => setScore(parseInt(e.target.value))}
+                      className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) ${((score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) 100%)`
+                      }}
+                      aria-label={locale === 'ar' ? 'تقييم الأداء' : 'Performance Rating'}
+                      title={locale === 'ar' ? 'تقييم الأداء' : 'Performance Rating'}
+                    />
+                    
+                    {/* Score labels */}
+                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                        <span
+                          key={num}
+                          className={`font-semibold transition-all ${
+                            score === num
+                              ? 'text-blue-600 dark:text-blue-400 text-sm scale-125'
+                              : ''
+                          }`}
+                        >
+                          {num}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
                     {locale === 'ar' 
-                      ? 'قيم أداء الطالب من 1 إلى 10'
-                      : 'Rate student performance from 1 to 10'
+                      ? 'اسحب المؤشر لتقييم أداء الطالب'
+                      : 'Slide to rate student performance'
                     }
                   </p>
                 </div>
@@ -249,7 +279,7 @@ export function StudentAttendanceDialog({
               {/* Session Notes */}
               <div className="space-y-3">
                 <Label htmlFor="notes" className="text-base font-semibold text-[#262626] dark:text-white flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-[#FF5F02]" />
+                  <FileText className="h-5 w-5 text-gray-700 dark:text-gray-200" />
                   {locale === 'ar' ? 'ملاحظات الجلسة' : 'Session Notes'}
                 </Label>
                 <Textarea
@@ -261,7 +291,7 @@ export function StudentAttendanceDialog({
                     : 'Add notes about student performance, behavior, or any important information...'
                   }
                   rows={4}
-                  className="resize-none bg-white dark:bg-[#000000] border-2 border-[#DDDDDD] dark:border-[#262626]"
+                  className="rounded-lg resize-none"
                 />
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {locale === 'ar' 
@@ -273,50 +303,51 @@ export function StudentAttendanceDialog({
 
               {/* Medal Award Button */}
               {present && (
-                <div className="p-4 bg-linear-to-r from-orange-50 to-white dark:from-orange-950/20 dark:to-[#262626] border-2 border-[#FF5F02] rounded-xl">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-[#262626] dark:text-white flex items-center gap-2">
-                        <Award className="h-5 w-5 text-[#FF5F02]" />
-                        {locale === 'ar' ? 'منح ميدالية' : 'Award Medal'}
-                      </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        {locale === 'ar' 
-                          ? 'قم بحفظ الحضور أولاً، ثم امنح الطالب ميدالية'
-                          : 'Save attendance first, then award a medal to this student'
-                        }
-                      </p>
+                <div className="p-4 rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-50 dark:bg-[#1a1a1a]">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <Award className="h-6 w-6 text-yellow-500" />
+                      <div>
+                        <h4 className="font-semibold text-[#262626] dark:text-white">
+                          {locale === 'ar' ? 'منح ميدالية' : 'Award Medal'}
+                        </h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {locale === 'ar' 
+                            ? 'قم بحفظ الحضور أولاً، ثم امنح الطالب ميدالية'
+                            : 'Save attendance first, then award a medal to this student'
+                          }
+                        </p>
+                      </div>
                     </div>
                     <Button
                       type="button"
-                      variant="outline"
-                      size="lg"
                       onClick={openMedalDialog}
                       disabled={!attendanceId && !saving}
-                      className="border-[#FF5F02] text-[#FF5F02] hover:bg-[#FF5F02] hover:text-white"
+                      className="rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white"
                     >
-                      <Award className="h-5 w-5 me-2" />
+                      <Award className="h-4 w-4 me-2" />
                       {locale === 'ar' ? 'منح' : 'Award'}
                     </Button>
                   </div>
                 </div>
               )}
-            </div>
-          )}
+              </div>
+            )}
+          </OverlayScrollbarsComponent>
 
-          <DialogFooter className="border-t-2 border-[#DDDDDD] dark:border-[#262626] pt-4">
+          <DialogFooter className="border-t-2 border-[#DDDDDD] dark:border-[#000000] pt-4 px-6 pb-6">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={saving}
-              className="border-2 border-[#DDDDDD] dark:border-[#262626]"
+              className="rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000]"
             >
               {locale === 'ar' ? 'إلغاء' : 'Cancel'}
             </Button>
             <Button
               onClick={handleSave}
               disabled={saving || loading}
-              className="bg-[#FF5F02] hover:bg-[#FF5F02]/90 text-white"
+              className="rounded-lg bg-blue-500 hover:bg-blue-600 text-white"
             >
               <Save className="h-4 w-4 me-2" />
               {saving 

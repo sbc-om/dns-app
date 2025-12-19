@@ -1077,23 +1077,34 @@ export function KidProfileClient({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {(
                 [
-                  { key: 'speed', step: '0.01' },
-                  { key: 'agility', step: '0.01' },
-                  { key: 'balance', step: '0.1' },
-                  { key: 'power', step: '0.1' },
-                  { key: 'reaction', step: '1' },
-                  { key: 'coordination', step: '1' },
-                  { key: 'flexibility', step: '0.1' },
+                  { key: 'speed', min: 0, max: 20, step: 0.1, unit: 's' },
+                  { key: 'agility', min: 0, max: 30, step: 0.1, unit: 's' },
+                  { key: 'balance', min: 0, max: 120, step: 1, unit: 's' },
+                  { key: 'power', min: 0, max: 300, step: 5, unit: 'cm' },
+                  { key: 'reaction', min: 0, max: 1000, step: 10, unit: 'ms' },
+                  { key: 'coordination', min: 0, max: 100, step: 1, unit: '' },
+                  { key: 'flexibility', min: 0, max: 50, step: 1, unit: 'cm' },
                 ] as const
               ).map((f) => (
                 <div key={f.key} className="grid gap-2">
-                  <Label htmlFor={f.key}>{categoryLabel(f.key)}</Label>
-                  <Input
+                  <div className="flex items-center justify-between mb-2">
+                    <Label htmlFor={f.key}>{categoryLabel(f.key)}</Label>
+                    <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                      {assessmentForm[f.key] || '0'} {f.unit}
+                    </div>
+                  </div>
+                  <input
                     id={f.key}
-                    type="number"
+                    type="range"
+                    min={f.min}
+                    max={f.max}
                     step={f.step}
-                    value={assessmentForm[f.key]}
+                    value={assessmentForm[f.key] || f.min.toString()}
                     onChange={(e) => setAssessmentForm((p) => ({ ...p, [f.key]: e.target.value }))}
+                    className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(assessmentForm[f.key] || f.min.toString()) - f.min) / (f.max - f.min)) * 100}%, rgb(229, 231, 235) ${((parseFloat(assessmentForm[f.key] || f.min.toString()) - f.min) / (f.max - f.min)) * 100}%, rgb(229, 231, 235) 100%)`
+                    }}
                   />
                 </div>
               ))}

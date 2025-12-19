@@ -254,20 +254,40 @@ export default function CoachAttendanceClient({ text, courseId, roster, dictiona
 
                     <div className="flex items-center gap-4">
                       <div className="space-y-2 flex-1">
-                        <label htmlFor={scoreInputId} className="text-sm font-medium text-gray-700 block">
-                          {text.scoreLabel}
-                        </label>
-                        <Input
+                        <div className="flex items-center justify-between mb-2">
+                          <label htmlFor={scoreInputId} className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {text.scoreLabel}
+                          </label>
+                          <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-lg">
+                            {state.score ?? 5}
+                          </div>
+                        </div>
+                        <input
                           id={scoreInputId}
-                          type="number"
-                          min={1}
-                          max={10}
-                          inputMode="numeric"
-                          value={state.score ?? ''}
+                          type="range"
+                          min="1"
+                          max="10"
+                          value={state.score ?? 5}
                           onChange={(event) => updateScore(student.id, event.target.value)}
-                          placeholder="-"
-                          className="w-full max-w-[140px] text-base"
+                          className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                          style={{
+                            background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((state.score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) ${((state.score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) 100%)`
+                          }}
                         />
+                        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                            <span
+                              key={num}
+                              className={`transition-all ${
+                                num === (state.score ?? 5)
+                                  ? 'text-blue-600 dark:text-blue-400 font-bold scale-125'
+                                  : ''
+                              }`}
+                            >
+                              {num}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                       <Button
                         type="button"
@@ -315,21 +335,43 @@ export default function CoachAttendanceClient({ text, courseId, roster, dictiona
                       </label>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <label htmlFor={`${scoreInputId}-desktop`} className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                        {text.scoreLabel}:
-                      </label>
-                      <Input
-                        id={`${scoreInputId}-desktop`}
-                        type="number"
-                        min={1}
-                        max={10}
-                        inputMode="numeric"
-                        value={state.score ?? ''}
-                        onChange={(event) => updateScore(student.id, event.target.value)}
-                        placeholder="-"
-                        className="w-20"
-                      />
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center justify-between mb-2">
+                          <label htmlFor={`${scoreInputId}-desktop`} className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                            {text.scoreLabel}
+                          </label>
+                          <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold">
+                            {state.score ?? 5}
+                          </div>
+                        </div>
+                        <input
+                          id={`${scoreInputId}-desktop`}
+                          type="range"
+                          min="1"
+                          max="10"
+                          value={state.score ?? 5}
+                          onChange={(event) => updateScore(student.id, event.target.value)}
+                          className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                          style={{
+                            background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((state.score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) ${((state.score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) 100%)`
+                          }}
+                        />
+                        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                            <span
+                              key={num}
+                              className={`transition-all ${
+                                num === (state.score ?? 5)
+                                  ? 'text-blue-600 dark:text-blue-400 font-bold scale-125'
+                                  : ''
+                              }`}
+                            >
+                              {num}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                       <Button
                         type="button"
                         variant="outline"

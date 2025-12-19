@@ -3,60 +3,101 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  Home, 
-  Calendar,
+  LayoutDashboard,
+  CalendarClock,
   MessageSquare,
   User,
-  BookOpen
+  BookOpen,
+  Users,
+  Settings,
+  DollarSign
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MobileBottomNavProps {
   locale: string;
-  userRole?: string;
+  accessibleResources: string[];
 }
 
-export function MobileBottomNav({ locale, userRole }: MobileBottomNavProps) {
+interface NavItem {
+  key: string;
+  resourceKey: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>,
+  label: string;
+}
+
+// Define all possible nav items matching DashboardSidebar
+const allNavItems: NavItem[] = [
+  {
+    key: 'dashboard',
+    resourceKey: 'dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard,
+    label: 'Dashboard'
+  },
+  {
+    key: 'appointments',
+    resourceKey: 'dashboard.appointments',
+    href: '/dashboard/appointments',
+    icon: CalendarClock,
+    label: 'Schedule'
+  },
+  {
+    key: 'users',
+    resourceKey: 'dashboard.users',
+    href: '/dashboard/users',
+    icon: Users,
+    label: 'Users'
+  },
+  {
+    key: 'courses',
+    resourceKey: 'dashboard.courses',
+    href: '/dashboard/courses',
+    icon: BookOpen,
+    label: 'Courses'
+  },
+  {
+    key: 'payments',
+    resourceKey: 'dashboard.payments',
+    href: '/dashboard/payments',
+    icon: DollarSign,
+    label: 'Payments'
+  },
+  {
+    key: 'messages',
+    resourceKey: 'dashboard.messages',
+    href: '/dashboard/messages',
+    icon: MessageSquare,
+    label: 'Messages'
+  },
+  {
+    key: 'settings',
+    resourceKey: 'dashboard.settings',
+    href: '/dashboard/settings',
+    icon: Settings,
+    label: 'Settings'
+  },
+  {
+    key: 'profile',
+    resourceKey: 'dashboard.profile',
+    href: '/dashboard/profile',
+    icon: User,
+    label: 'Profile'
+  }
+];
+
+export function MobileBottomNav({ locale, accessibleResources }: MobileBottomNavProps) {
   const pathname = usePathname();
 
-  const navItems = [
-    {
-      key: 'home',
-      href: `/dashboard`,
-      icon: Home,
-      label: 'Home'
-    },
-    {
-      key: 'courses',
-      href: `/dashboard/courses`,
-      icon: BookOpen,
-      label: 'Courses',
-      roles: ['admin', 'coach', 'parent']
-    },
-    {
-      key: 'appointments',
-      href: `/dashboard/appointments`,
-      icon: Calendar,
-      label: 'Schedule',
-      roles: ['admin', 'coach', 'parent']
-    },
-    {
-      key: 'messages',
-      href: `/dashboard/messages`,
-      icon: MessageSquare,
-      label: 'Messages'
-    },
-    {
-      key: 'profile',
-      href: `/dashboard/profile`,
-      icon: User,
-      label: 'Profile'
-    }
-  ];
-
-  const filteredItems = navItems.filter(item => 
-    !item.roles || (userRole && item.roles.includes(userRole))
-  );
+  // Filter items based on accessible resources (same logic as DashboardSidebar)
+  const filteredItems = allNavItems
+    .filter(item => 
+      item.resourceKey === 'dashboard' || 
+      item.resourceKey === 'dashboard.profile' ||
+      accessibleResources.includes(item.resourceKey)
+    )
+    .slice(0, 5); // Limit to 5 items for mobile bottom nav
 
   return (
     <nav 

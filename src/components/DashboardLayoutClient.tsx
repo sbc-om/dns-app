@@ -105,7 +105,7 @@ export function DashboardLayoutClient({
         </OverlayScrollbarsComponent>
 
         {/* Mobile Bottom Navigation */}
-        <MobileBottomNav locale={locale} userRole={user.role} />
+        <MobileBottomNav locale={locale} accessibleResources={accessibleResources} />
       </div>
     </div>
   );

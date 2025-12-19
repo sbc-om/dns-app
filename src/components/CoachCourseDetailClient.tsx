@@ -136,14 +136,14 @@ export function CoachCourseDetailClient({
   const courseName = locale === 'ar' ? (course.nameAr || course.name) : course.name;
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] dark:bg-[#0A0A0A]">
+    <div className="min-h-screen bg-white dark:bg-[#1a1a1a]">
       <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
         {/* Course Header */}
-        <Card className="border border-gray-200 dark:border-[#1F1F1F] bg-white dark:bg-[#111111] shadow-xl dark:shadow-[#FF5F02]/5">
-          <CardHeader className="bg-linear-to-r from-white to-gray-50 dark:from-[#111111] dark:to-[#151515] border-b border-gray-200 dark:border-[#1F1F1F]">
+        <Card className="rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] shadow-sm">
+          <CardHeader className="border-b-2 border-[#DDDDDD] dark:border-[#000000] pb-6">
             <div className="flex flex-col gap-4">
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold bg-linear-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
+                <h1 className="text-2xl md:text-3xl font-bold text-[#262626] dark:text-white mb-2">
                   {courseName}
                 </h1>
                 {course.description && (
@@ -153,17 +153,17 @@ export function CoachCourseDetailClient({
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
-                <Badge className={`${course.isActive ? 'bg-linear-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'bg-gray-400 hover:bg-gray-500'} text-white shadow-lg`}>
+                <Badge className={`rounded-lg ${course.isActive ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 hover:bg-gray-500'} text-white`}>
                   {course.isActive 
                     ? (locale === 'ar' ? 'نشط' : 'Active')
                     : (locale === 'ar' ? 'غير نشط' : 'Inactive')
                   }
                 </Badge>
-                <Badge className="bg-linear-to-r from-[#FF5F02] to-orange-600 text-white shadow-lg">
+                <Badge className="rounded-lg bg-blue-500 hover:bg-blue-600 text-white">
                   {totalStudents} {locale === 'ar' ? 'طالب' : 'Students'}
                 </Badge>
                 {course.totalSessions && (
-                  <Badge className="bg-linear-to-r from-blue-500 to-indigo-600 text-white shadow-lg">
+                  <Badge className="rounded-lg bg-blue-500 hover:bg-blue-600 text-white">
                     {course.totalSessions} {locale === 'ar' ? 'جلسة' : 'Sessions'}
                   </Badge>
                 )}
@@ -172,43 +172,54 @@ export function CoachCourseDetailClient({
           </CardHeader>
         </Card>
 
-        {/* Session Date & Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Date Selector Card */}
-          <Card className="border-2 border-[#DDDDDD] dark:border-[#262626] bg-white dark:bg-[#262626]">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center gap-3 mb-3">
-                <Calendar className="h-5 w-5 text-[#FF5F02]" />
-                <h3 className="font-semibold text-[#262626] dark:text-white">
-                  {locale === 'ar' ? 'تاريخ الجلسة' : 'Session Date'}
-                </h3>
+        {/* Session Date Selector - Full Width Professional */}
+        <Card className="rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] shadow-lg">
+          <CardContent className="p-6 md:p-8">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-500 shadow-lg">
+                  <Calendar className="h-7 w-7 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-[#262626] dark:text-white mb-1">
+                    {locale === 'ar' ? 'تاريخ الجلسة' : 'Session Date'}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {locale === 'ar' ? 'اختر التاريخ لعرض سجل الحضور' : 'Select date to view attendance records'}
+                  </p>
+                </div>
               </div>
-              <Input
-                type="date"
-                value={sessionDate}
-                onChange={(e) => setSessionDate(e.target.value)}
-                className="w-full bg-white dark:bg-[#000000] border-[#DDDDDD] dark:border-[#262626]"
-              />
-            </CardContent>
-          </Card>
+              <div className="flex-shrink-0 w-full md:w-80">
+                <Input
+                  type="date"
+                  value={sessionDate}
+                  onChange={(e) => setSessionDate(e.target.value)}
+                  className="w-full h-14 text-lg font-semibold text-center rounded-lg border-2 border-blue-500 dark:border-blue-400 bg-white dark:bg-[#1a1a1a] text-[#262626] dark:text-white shadow-sm hover:border-blue-600 focus:border-blue-600 transition-colors"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Present Count */}
-          <Card className="border-2 border-green-200 dark:border-green-900 bg-linear-to-br from-green-50 to-white dark:from-green-950/30 dark:to-[#262626]">
+          <Card className="rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]">
             <CardContent className="p-4 md:p-6 text-center">
-              <CheckCircle className="h-10 w-10 mx-auto mb-2 text-green-600 dark:text-green-400" />
-              <p className="text-3xl font-bold text-green-700 dark:text-green-300">{presentCount}</p>
-              <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+              <CheckCircle className="h-10 w-10 mx-auto mb-2 text-green-500" />
+              <p className="text-3xl font-bold text-[#262626] dark:text-white">{presentCount}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium mt-1">
                 {locale === 'ar' ? 'حاضر' : 'Present'}
               </p>
             </CardContent>
           </Card>
 
           {/* Absent Count */}
-          <Card className="border-2 border-red-200 dark:border-red-900 bg-linear-to-br from-red-50 to-white dark:from-red-950/30 dark:to-[#262626]">
+          <Card className="rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]">
             <CardContent className="p-4 md:p-6 text-center">
-              <XCircle className="h-10 w-10 mx-auto mb-2 text-red-600 dark:text-red-400" />
-              <p className="text-3xl font-bold text-red-700 dark:text-red-300">{absentCount}</p>
-              <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+              <XCircle className="h-10 w-10 mx-auto mb-2 text-red-500" />
+              <p className="text-3xl font-bold text-[#262626] dark:text-white">{absentCount}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium mt-1">
                 {locale === 'ar' ? 'غائب' : 'Absent'}
               </p>
             </CardContent>
@@ -217,32 +228,28 @@ export function CoachCourseDetailClient({
 
         {/* Average Score Card */}
         {avgScore > 0 && (
-          <Card className="border-2 border-[#FF5F02] bg-linear-to-r from-orange-50 to-white dark:from-orange-950/20 dark:to-[#262626]">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Star className="h-8 w-8 text-[#FF5F02]" />
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {locale === 'ar' ? 'متوسط النقاط' : 'Average Score'}
-                  </p>
-                  <p className="text-2xl font-bold text-[#FF5F02]">{avgScore}/10</p>
-                </div>
+          <Card className="rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]">
+            <CardContent className="p-4 md:p-6 flex items-center gap-3">
+              <Star className="h-8 w-8 text-yellow-500" fill="currentColor" />
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {locale === 'ar' ? 'متوسط النقاط' : 'Average Score'}
+                </p>
+                <p className="text-2xl font-bold text-[#262626] dark:text-white">{avgScore}/10</p>
               </div>
             </CardContent>
           </Card>
         )}
 
         {/* Students Grid */}
-        <Card className="border-2 border-[#DDDDDD] dark:border-[#262626] bg-white dark:bg-[#262626]">
-          <CardHeader className="bg-white dark:bg-[#262626] border-b-2 border-[#DDDDDD] dark:border-[#262626]">
+        <Card className="rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]">
+          <CardHeader className="border-b-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-[#FF5F02]" />
-                <CardTitle className="text-lg text-[#262626] dark:text-white">
-                  {locale === 'ar' ? 'الطلاب' : 'Students'}
-                </CardTitle>
-              </div>
-              <Badge variant="outline" className="border-[#FF5F02] text-[#FF5F02]">
+              <CardTitle className="text-lg font-bold text-[#262626] dark:text-white flex items-center gap-2">
+                <Users className="h-5 w-5 text-gray-700 dark:text-gray-200" />
+                {locale === 'ar' ? 'الطلاب' : 'Students'}
+              </CardTitle>
+              <Badge className="rounded-lg bg-blue-500 text-white">
                 {totalStudents} {locale === 'ar' ? 'طالب' : 'Total'}
               </Badge>
             </div>
@@ -272,23 +279,23 @@ export function CoachCourseDetailClient({
                     <Card
                       key={student.id}
                       onClick={() => openStudentDialog(student)}
-                      className="group cursor-pointer border-2 border-[#DDDDDD] dark:border-[#262626] bg-white dark:bg-[#000000] hover:border-[#FF5F02] hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                      className="group cursor-pointer rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] hover:border-blue-500 hover:shadow-lg transition-all duration-200"
                     >
                       <CardContent className="p-4">
                         {/* Status Badge */}
                         <div className="flex justify-end mb-2">
                           {status ? (
                             status.present ? (
-                              <Badge className="bg-green-500 text-white text-xs">
+                              <Badge className="rounded-lg bg-green-500 text-white text-xs">
                                 {locale === 'ar' ? '✓ حاضر' : '✓ Present'}
                               </Badge>
                             ) : (
-                              <Badge className="bg-red-500 text-white text-xs">
+                              <Badge className="rounded-lg bg-red-500 text-white text-xs">
                                 {locale === 'ar' ? '✗ غائب' : '✗ Absent'}
                               </Badge>
                             )
                           ) : (
-                            <Badge variant="outline" className="text-xs border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400">
+                            <Badge className="rounded-lg bg-gray-100 dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 text-xs">
                               {locale === 'ar' ? 'لم يتم التسجيل' : 'Not Marked'}
                             </Badge>
                           )}
@@ -300,10 +307,10 @@ export function CoachCourseDetailClient({
                             <img
                               src={student.profilePicture}
                               alt={studentName}
-                              className="w-20 h-20 rounded-full object-cover border-4 border-[#FF5F02] shadow-lg"
+                              className="w-20 h-20 rounded-full object-cover border-2 border-[#DDDDDD] dark:border-[#000000]"
                             />
                           ) : (
-                            <div className="w-20 h-20 rounded-full bg-linear-to-br from-[#FF5F02] to-orange-600 flex items-center justify-center border-4 border-orange-300 shadow-lg">
+                            <div className="w-20 h-20 rounded-full bg-[#262626] dark:bg-[#1a1a1a] flex items-center justify-center border-2 border-[#DDDDDD] dark:border-[#000000]">
                               <UserCircle className="h-12 w-12 text-white" />
                             </div>
                           )}
@@ -317,8 +324,8 @@ export function CoachCourseDetailClient({
                         {/* Score Badge */}
                         {status?.score && (
                           <div className="flex items-center justify-center gap-1 mb-2">
-                            <Star className="h-4 w-4 text-yellow-500" />
-                            <span className="text-lg font-bold text-[#FF5F02]">
+                            <Star className="h-4 w-4 text-yellow-500" fill="currentColor" />
+                            <span className="text-base font-bold text-[#262626] dark:text-white">
                               {status.score}/10
                             </span>
                           </div>
@@ -326,9 +333,9 @@ export function CoachCourseDetailClient({
 
                         {/* Action Button */}
                         <Button
-                          variant="outline"
                           size="sm"
-                          className="w-full border-[#FF5F02] text-[#FF5F02] hover:bg-[#FF5F02] hover:text-white transition-colors"
+                          variant="outline"
+                          className="w-full rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] text-[#262626] dark:text-white hover:border-[#262626] dark:hover:border-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-all"
                           onClick={(e) => {
                             e.stopPropagation();
                             openStudentDialog(student);
@@ -342,7 +349,7 @@ export function CoachCourseDetailClient({
                         {/* Notes Indicator */}
                         {status?.notes && (
                           <div className="mt-2 text-center">
-                            <Badge variant="outline" className="text-xs">
+                            <Badge className="rounded-lg text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
                               {locale === 'ar' ? '📝 ملاحظات' : '📝 Notes'}
                             </Badge>
                           </div>

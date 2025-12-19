@@ -127,62 +127,122 @@ export function PhysicalTestDialog({
             {/* Jump Tests */}
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="verticalJump">Vertical Jump (cm)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="verticalJump">Vertical Jump (cm)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.verticalJump || '0'}
+                  </div>
+                </div>
+                <input
                   id="verticalJump"
-                  type="number"
-                  step="0.1"
-                  value={formData.verticalJump}
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={formData.verticalJump || '0'}
                   onChange={(e) => setFormData({ ...formData, verticalJump: e.target.value })}
-                  placeholder="e.g., 45"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.verticalJump || '0')) / 100) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.verticalJump || '0')) / 100) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <span>0</span>
+                  <span>50</span>
+                  <span>100</span>
+                </div>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="broadJump">Broad Jump (cm)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="broadJump">Broad Jump (cm)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.broadJump || '0'}
+                  </div>
+                </div>
+                <input
                   id="broadJump"
-                  type="number"
-                  step="0.1"
-                  value={formData.broadJump}
+                  type="range"
+                  min="0"
+                  max="300"
+                  step="5"
+                  value={formData.broadJump || '0'}
                   onChange={(e) => setFormData({ ...formData, broadJump: e.target.value })}
-                  placeholder="e.g., 180"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.broadJump || '0')) / 300) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.broadJump || '0')) / 300) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <span>0</span>
+                  <span>150</span>
+                  <span>300</span>
+                </div>
               </div>
             </div>
 
             {/* Sprint Tests */}
             <div className="grid grid-cols-3 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="sprint10m">Sprint 10m (s)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="sprint10m">Sprint 10m (s)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.sprint10m || '0.0'}
+                  </div>
+                </div>
+                <input
                   id="sprint10m"
-                  type="number"
-                  step="0.01"
-                  value={formData.sprint10m}
+                  type="range"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={formData.sprint10m || '0'}
                   onChange={(e) => setFormData({ ...formData, sprint10m: e.target.value })}
-                  placeholder="e.g., 1.8"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.sprint10m || '0')) / 10) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.sprint10m || '0')) / 10) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="sprint20m">Sprint 20m (s)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="sprint20m">Sprint 20m (s)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.sprint20m || '0.0'}
+                  </div>
+                </div>
+                <input
                   id="sprint20m"
-                  type="number"
-                  step="0.01"
-                  value={formData.sprint20m}
+                  type="range"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={formData.sprint20m || '0'}
                   onChange={(e) => setFormData({ ...formData, sprint20m: e.target.value })}
-                  placeholder="e.g., 3.2"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.sprint20m || '0')) / 10) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.sprint20m || '0')) / 10) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="sprint30m">Sprint 30m (s)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="sprint30m">Sprint 30m (s)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.sprint30m || '0.0'}
+                  </div>
+                </div>
+                <input
                   id="sprint30m"
-                  type="number"
-                  step="0.01"
-                  value={formData.sprint30m}
+                  type="range"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={formData.sprint30m || '0'}
                   onChange={(e) => setFormData({ ...formData, sprint30m: e.target.value })}
-                  placeholder="e.g., 4.8"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.sprint30m || '0')) / 10) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.sprint30m || '0')) / 10) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
               </div>
             </div>
@@ -190,36 +250,66 @@ export function PhysicalTestDialog({
             {/* Agility Tests */}
             <div className="grid grid-cols-3 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="illinoisAgilityTest">Illinois Test (s)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="illinoisAgilityTest">Illinois Test (s)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.illinoisAgilityTest || '0.0'}
+                  </div>
+                </div>
+                <input
                   id="illinoisAgilityTest"
-                  type="number"
-                  step="0.01"
-                  value={formData.illinoisAgilityTest}
+                  type="range"
+                  min="0"
+                  max="30"
+                  step="0.1"
+                  value={formData.illinoisAgilityTest || '0'}
                   onChange={(e) => setFormData({ ...formData, illinoisAgilityTest: e.target.value })}
-                  placeholder="e.g., 15.5"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.illinoisAgilityTest || '0')) / 30) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.illinoisAgilityTest || '0')) / 30) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="tTest">T-Test (s)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="tTest">T-Test (s)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.tTest || '0.0'}
+                  </div>
+                </div>
+                <input
                   id="tTest"
-                  type="number"
-                  step="0.01"
-                  value={formData.tTest}
+                  type="range"
+                  min="0"
+                  max="30"
+                  step="0.1"
+                  value={formData.tTest || '0'}
                   onChange={(e) => setFormData({ ...formData, tTest: e.target.value })}
-                  placeholder="e.g., 10.2"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.tTest || '0')) / 30) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.tTest || '0')) / 30) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="agility505Test">5-0-5 Test (s)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="agility505Test">5-0-5 Test (s)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.agility505Test || '0.0'}
+                  </div>
+                </div>
+                <input
                   id="agility505Test"
-                  type="number"
-                  step="0.01"
-                  value={formData.agility505Test}
+                  type="range"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={formData.agility505Test || '0'}
                   onChange={(e) => setFormData({ ...formData, agility505Test: e.target.value })}
-                  placeholder="e.g., 2.8"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.agility505Test || '0')) / 10) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.agility505Test || '0')) / 10) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
               </div>
             </div>
@@ -227,25 +317,45 @@ export function PhysicalTestDialog({
             {/* Balance and Strength Tests */}
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="singleLegBalance">Single-Leg Balance (s)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="singleLegBalance">Single-Leg Balance (s)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.singleLegBalance || '0'}
+                  </div>
+                </div>
+                <input
                   id="singleLegBalance"
-                  type="number"
-                  step="0.1"
-                  value={formData.singleLegBalance}
+                  type="range"
+                  min="0"
+                  max="120"
+                  step="1"
+                  value={formData.singleLegBalance || '0'}
                   onChange={(e) => setFormData({ ...formData, singleLegBalance: e.target.value })}
-                  placeholder="e.g., 30"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.singleLegBalance || '0')) / 120) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.singleLegBalance || '0')) / 120) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="plankHold">Plank Hold (s)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="plankHold">Plank Hold (s)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.plankHold || '0'}
+                  </div>
+                </div>
+                <input
                   id="plankHold"
-                  type="number"
-                  step="0.1"
-                  value={formData.plankHold}
+                  type="range"
+                  min="0"
+                  max="300"
+                  step="5"
+                  value={formData.plankHold || '0'}
                   onChange={(e) => setFormData({ ...formData, plankHold: e.target.value })}
-                  placeholder="e.g., 60"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.plankHold || '0')) / 300) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.plankHold || '0')) / 300) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
               </div>
             </div>
@@ -253,25 +363,45 @@ export function PhysicalTestDialog({
             {/* Endurance and Pull-ups */}
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="enduranceTest">Endurance Test (m)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="enduranceTest">Endurance Test (m)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.enduranceTest || '0'}
+                  </div>
+                </div>
+                <input
                   id="enduranceTest"
-                  type="number"
-                  step="1"
-                  value={formData.enduranceTest}
+                  type="range"
+                  min="0"
+                  max="5000"
+                  step="50"
+                  value={formData.enduranceTest || '0'}
                   onChange={(e) => setFormData({ ...formData, enduranceTest: e.target.value })}
-                  placeholder="e.g., 2400"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.enduranceTest || '0')) / 5000) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.enduranceTest || '0')) / 5000) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="pullUpTest">Pull-Up Test (count)</Label>
-                <Input
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="pullUpTest">Pull-Up Test (count)</Label>
+                  <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
+                    {formData.pullUpTest || '0'}
+                  </div>
+                </div>
+                <input
                   id="pullUpTest"
-                  type="number"
+                  type="range"
+                  min="0"
+                  max="50"
                   step="1"
-                  value={formData.pullUpTest}
+                  value={formData.pullUpTest || '0'}
                   onChange={(e) => setFormData({ ...formData, pullUpTest: e.target.value })}
-                  placeholder="e.g., 10"
+                  className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(formData.pullUpTest || '0')) / 50) * 100}%, rgb(229, 231, 235) ${((parseFloat(formData.pullUpTest || '0')) / 50) * 100}%, rgb(229, 231, 235) 100%)`
+                  }}
                 />
               </div>
             </div>
