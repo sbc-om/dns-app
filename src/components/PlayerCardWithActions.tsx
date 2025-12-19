@@ -2,8 +2,8 @@
 
 import { useRef } from 'react';
 import { PlayerCard } from './PlayerCard';
-import { User } from '@/lib/db/repositories/userRepository';
-import { PhysicalTest } from '@/lib/db/repositories/physicalTestRepository';
+import type { User } from '@/lib/db/repositories/userRepository';
+import type { PhysicalTest } from '@/lib/db/repositories/physicalTestRepository';
 import { Button } from './ui/button';
 import { Download, Share2 } from 'lucide-react';
 import html2canvas from 'html2canvas';

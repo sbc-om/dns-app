@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Award, Plus, Edit, Trash2 } from 'lucide-react';
-import { Medal } from '@/lib/db/repositories/medalRepository';
+import type { Medal } from '@/lib/db/repositories/medalRepository';
 import { getMedalsAction, createMedalAction, updateMedalAction, deleteMedalAction } from '@/lib/actions/medalActions';
 import { ConfirmDialog } from './ConfirmDialog';
 

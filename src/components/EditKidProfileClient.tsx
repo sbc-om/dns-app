@@ -1,27 +1,34 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowLeft, Save, User as UserIcon, Mail, Phone, IdCard, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, User as UserIcon, Mail, Phone, IdCard, Sparkles, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
-import { User } from '@/lib/db/repositories/userRepository';
+import type { User } from '@/lib/db/repositories/userRepository';
+import type { Academy } from '@/lib/db/repositories/academyRepository';
 import { updateUserAction } from '@/lib/actions/userActions';
+import { addUserToAcademy, removeUserFromAcademy } from '@/lib/db/repositories/academyMembershipRepository';
 import { useRouter } from 'next/navigation';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface EditKidProfileClientProps {
   dictionary: Dictionary;
   locale: Locale;
   kid: User;
+  academies: Academy[];
+  currentAcademyIds: string[];
 }
 
 export function EditKidProfileClient({
   dictionary,
   locale,
   kid,
+  academies,
+  currentAcademyIds,
 }: EditKidProfileClientProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -31,20 +38,59 @@ export function EditKidProfileClient({
     phoneNumber: kid.phoneNumber || '',
     nationalId: kid.nationalId || '',
   });
+  const [selectedAcademyIds, setSelectedAcademyIds] = useState<string[]>(currentAcademyIds);
+
+  const handleAcademyToggle = (academyId: string) => {
+    setSelectedAcademyIds(prev => {
+      if (prev.includes(academyId)) {
+        return prev.filter(id => id !== academyId);
+      } else {
+        return [...prev, academyId];
+      }
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const result = await updateUserAction(kid.id, formData);
+    try {
+      // Update user profile
+      const result = await updateUserAction(kid.id, formData);
 
-    setLoading(false);
+      if (!result.success) {
+        alert(result.error || 'Failed to update profile');
+        setLoading(false);
+        return;
+      }
 
-    if (result.success) {
+      // Update academy memberships
+      const academiesToAdd = selectedAcademyIds.filter(id => !currentAcademyIds.includes(id));
+      const academiesToRemove = currentAcademyIds.filter(id => !selectedAcademyIds.includes(id));
+
+      // Add to new academies
+      for (const academyId of academiesToAdd) {
+        await addUserToAcademy({
+          academyId,
+          userId: kid.id,
+          role: 'kid',
+          createdBy: 'admin'
+        });
+      }
+
+      // Remove from old academies
+      for (const academyId of academiesToRemove) {
+        await removeUserFromAcademy(academyId, kid.id);
+      }
+
       alert(dictionary.users?.profileUpdated || 'Profile updated successfully!');
       router.push(`/${locale}/dashboard/kids/${kid.id}`);
-    } else {
-      alert(result.error || 'Failed to update profile');
+      router.refresh();
+    } catch (error) {
+      console.error('Update error:', error);
+      alert('Failed to update profile');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -173,6 +219,54 @@ export function EditKidProfileClient({
                   className="bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-gray-400 dark:focus:border-gray-600 text-[#262626] dark:text-white h-12 text-base transition-colors"
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Academy Selection */}
+          <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] overflow-hidden">
+            <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000]">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg">
+                  <Building2 className="h-5 w-5 text-gray-700 dark:text-gray-200" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-bold text-[#262626] dark:text-white">
+                    {locale === 'ar' ? 'الأكاديميات' : 'Academies'}
+                  </CardTitle>
+                  <CardDescription className="text-gray-600 dark:text-gray-400">
+                    {locale === 'ar' ? 'حدد الأكاديميات التي ينتمي إليها هذا الطفل' : 'Select the academies this kid belongs to'}
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {academies.length === 0 ? (
+                <p className="text-sm text-gray-600 dark:text-gray-400 text-center py-4">
+                  {locale === 'ar' ? 'لا توجد أكاديميات متاحة' : 'No academies available'}
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {academies.map((academy) => (
+                    <div 
+                      key={academy.id}
+                      className="flex items-center gap-3 p-3 rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000] hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-colors"
+                    >
+                      <Checkbox
+                        id={`academy-${academy.id}`}
+                        checked={selectedAcademyIds.includes(academy.id)}
+                        onCheckedChange={() => handleAcademyToggle(academy.id)}
+                        className="h-5 w-5"
+                      />
+                      <Label
+                        htmlFor={`academy-${academy.id}`}
+                        className="flex-1 cursor-pointer text-sm font-medium text-[#262626] dark:text-white"
+                      >
+                        {locale === 'ar' ? academy.nameAr : academy.name}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 

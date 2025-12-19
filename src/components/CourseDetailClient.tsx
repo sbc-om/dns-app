@@ -1,10 +1,10 @@
 'use client';
 
-import { User } from '@/lib/db/repositories/userRepository';
-import { Course } from '@/lib/db/repositories/courseRepository';
-import { AuthUser } from '@/lib/auth/auth';
-import { Dictionary } from '@/lib/i18n/getDictionary';
-import { Locale } from '@/config/i18n';
+import type { User } from '@/lib/db/repositories/userRepository';
+import type { Course } from '@/lib/db/repositories/courseRepository';
+import type { AuthUser } from '@/lib/auth/auth';
+import type { Dictionary } from '@/lib/i18n/getDictionary';
+import type { Locale } from '@/config/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

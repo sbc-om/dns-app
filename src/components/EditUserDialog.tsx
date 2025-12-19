@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User } from '@/lib/db/repositories/userRepository';
+import type { User } from '@/lib/db/repositories/userRepository';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { UserRole, ROLES, ROLE_LABELS } from '@/config/roles';
 import {
@@ -18,10 +18,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { updateUserAction } from '@/lib/actions/userActions';
+import { getAcademyUiContextAction, getUserPrimaryAcademyIdAction } from '@/lib/actions/academyActions';
 import { getActiveCoursesAction } from '@/lib/actions/courseActions';
 import { getEnrollmentsByStudentIdAction, updateEnrollmentCourseAction, createEnrollmentAction } from '@/lib/actions/enrollmentActions';
 import type { Course } from '@/lib/db/repositories/courseRepository';
 import type { Enrollment } from '@/lib/db/repositories/enrollmentRepository';
+import type { Academy } from '@/lib/db/repositories/academyRepository';
 
 export interface EditUserDialogProps {
   user: User;
@@ -43,6 +45,9 @@ export function EditUserDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [currentEnrollment, setCurrentEnrollment] = useState<Enrollment | null>(null);
+  const [academies, setAcademies] = useState<Academy[]>([]);
+  const [currentUserRole, setCurrentUserRole] = useState<UserRole | null>(null);
+  const [academyId, setAcademyId] = useState<string>('');
   const [formData, setFormData] = useState({
     email: user.email,
     username: user.username,
@@ -59,6 +64,26 @@ export function EditUserDialog({
       loadCoursesAndEnrollment();
     }
   }, [open, user.role]);
+
+  useEffect(() => {
+    if (open) {
+      loadAcademyContext();
+    }
+  }, [open]);
+
+  const loadAcademyContext = async () => {
+    const ctxResult = await getAcademyUiContextAction(locale);
+    if (ctxResult.success) {
+      setAcademies(ctxResult.academies);
+      setCurrentUserRole(ctxResult.userRole as UserRole);
+      setAcademyId(ctxResult.currentAcademyId);
+    }
+
+    const userAcademyResult = await getUserPrimaryAcademyIdAction({ locale, userId: user.id });
+    if (userAcademyResult.success && userAcademyResult.academyId) {
+      setAcademyId(userAcademyResult.academyId);
+    }
+  };
 
   const loadCoursesAndEnrollment = async () => {
     // Load active courses
@@ -80,6 +105,8 @@ export function EditUserDialog({
     e.preventDefault();
     setIsSubmitting(true);
 
+    const canPickAcademy = currentUserRole === ROLES.ADMIN;
+
     const updateData: any = {
       email: formData.email,
       username: formData.username,
@@ -93,7 +120,10 @@ export function EditUserDialog({
       updateData.password = formData.password;
     }
 
-    const result = await updateUserAction(user.id, updateData);
+    const result = await updateUserAction(user.id, updateData, {
+      locale,
+      academyId: canPickAcademy ? academyId : undefined,
+    });
 
     if (result.success && result.user) {
       // Handle enrollment changes for kids
@@ -132,6 +162,38 @@ export function EditUserDialog({
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
+            {(academies.length > 0 || academyId) && (
+              <div className="grid gap-2">
+                <Label htmlFor="academy">{dictionary.users.academy}</Label>
+                {currentUserRole === ROLES.ADMIN ? (
+                  <Select value={academyId} onValueChange={setAcademyId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={dictionary.users.selectAcademy} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {academies.map((academy) => (
+                        <SelectItem key={academy.id} value={academy.id}>
+                          {locale === 'ar' ? academy.nameAr : academy.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id="academy"
+                    value={
+                      academies.find((a) => a.id === academyId)
+                        ? locale === 'ar'
+                          ? academies.find((a) => a.id === academyId)!.nameAr
+                          : academies.find((a) => a.id === academyId)!.name
+                        : academyId
+                    }
+                    disabled
+                  />
+                )}
+              </div>
+            )}
+
             <div className="grid gap-2">
               <Label htmlFor="email">{dictionary.common.email}</Label>
               <Input

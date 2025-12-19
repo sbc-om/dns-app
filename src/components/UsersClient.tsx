@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Dictionary } from '@/lib/i18n/getDictionary';
-import { User } from '@/lib/db/repositories/userRepository';
+import type { Dictionary } from '@/lib/i18n/getDictionary';
+import type { User } from '@/lib/db/repositories/userRepository';
 import { Button } from '@/components/ui/button';
 import { Plus, Shield } from 'lucide-react';
 import { UsersTable } from '@/components/UsersTable';
 import { CreateUserDialog } from '@/components/CreateUserDialog';
 import Link from 'next/link';
-import { Locale } from '@/config/i18n';
+import type { Locale } from '@/config/i18n';
 
 export interface UsersClientProps {
   dictionary: Dictionary;

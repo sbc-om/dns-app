@@ -9,7 +9,7 @@ import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import { useConfirm } from '@/components/ConfirmDialog';
 import { PushNotificationSetup } from '@/components/PushNotificationSetup';
-import { RolePermission } from '@/lib/db/repositories/rolePermissionRepository';
+import type { RolePermission } from '@/lib/db/repositories/rolePermissionRepository';
 import AdminSettingsClient from '@/components/AdminSettingsClient';
 import { MedalsManagement } from '@/components/MedalsManagement';
 import { AcademiesManagement } from '@/components/AcademiesManagement';

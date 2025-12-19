@@ -8,10 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dictionary } from '@/lib/i18n/getDictionary';
-import { Locale } from '@/config/i18n';
-import { AuthUser } from '@/lib/auth/auth';
-import { User } from '@/lib/db/repositories/userRepository';
+import type { Dictionary } from '@/lib/i18n/getDictionary';
+import type { Locale } from '@/config/i18n';
+import type { AuthUser } from '@/lib/auth/auth';
+import type { User } from '@/lib/db/repositories/userRepository';
 import EmojiPicker, { Theme, type EmojiClickData } from 'emoji-picker-react';
 import {
   sendMessageAction,
@@ -23,9 +23,9 @@ import {
   createGroupAction,
   markMessageAsReadAction,
 } from '@/lib/actions/messageActions';
-import { Message, MessageGroup } from '@/lib/db/repositories/messageRepository';
+import type { Message, MessageGroup } from '@/lib/db/repositories/messageRepository';
 import { useConfirm } from '@/components/ConfirmDialog';
-import { RolePermission } from '@/lib/db/repositories/rolePermissionRepository';
+import type { RolePermission } from '@/lib/db/repositories/rolePermissionRepository';
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
 
 interface MessagesClientProps {

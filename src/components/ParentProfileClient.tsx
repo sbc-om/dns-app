@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
-import { User as UserType } from '@/lib/db/repositories/userRepository';
+import type { User as UserType } from '@/lib/db/repositories/userRepository';
 import { createUserAction } from '@/lib/actions/userActions';
 
 interface ParentProfileClientProps {
@@ -61,7 +61,7 @@ export function ParentProfileClient({
       password: '11111111',
       role: 'kid',
       parentId: parent.id,
-    });
+    }, { locale });
 
     setLoading(false);
 

@@ -34,8 +34,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dictionary } from '@/lib/i18n/getDictionary';
-import { Locale } from '@/config/i18n';
+import type { Dictionary } from '@/lib/i18n/getDictionary';
+import type { Locale } from '@/config/i18n';
 import { cn } from '@/lib/utils';
 import { 
   getNotificationsAction, 
@@ -43,7 +43,7 @@ import {
   markAllAsReadAction, 
   deleteNotificationAction 
 } from '@/lib/actions/notificationActions';
-import { Notification } from '@/lib/db/repositories/notificationRepository';
+import type { Notification } from '@/lib/db/repositories/notificationRepository';
 
 interface NotificationsClientProps {
   dictionary: Dictionary;

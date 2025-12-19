@@ -1,4 +1,5 @@
 import { requireAuth } from '@/lib/auth/auth';
+import { requireAcademyContext } from '@/lib/academies/academyContext';
 import { getDictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import { findUserById } from '@/lib/db/repositories/userRepository';
@@ -13,6 +14,7 @@ export default async function KidProfilePage({
   const { locale, id } = await params as { locale: Locale; id: string };
   const dictionary = await getDictionary(locale);
   const user = await requireAuth(locale);
+  const academyCtx = await requireAcademyContext(locale);
 
   // Fetch the kid
   const kid = await findUserById(id);
@@ -38,6 +40,7 @@ export default async function KidProfilePage({
         locale={locale}
         kid={kid}
         currentUser={user}
+        academyId={academyCtx.academyId}
       />
     </div>
   );

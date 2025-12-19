@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
-import { User } from '@/lib/db/repositories/userRepository';
+import type { User } from '@/lib/db/repositories/userRepository';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,7 +37,7 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
     }
 
     setIsDeleting(userId);
-    const result = await deleteUserAction(userId);
+    const result = await deleteUserAction(userId, { locale });
     setIsDeleting(null);
 
     if (result.success) {

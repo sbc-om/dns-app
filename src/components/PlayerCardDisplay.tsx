@@ -1,6 +1,6 @@
 'use client';
 
-import { PlayerCardData } from '@/lib/db/repositories/playerCardRepository';
+import type { PlayerCardData } from '@/lib/db/repositories/playerCardRepository';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, User } from 'lucide-react';

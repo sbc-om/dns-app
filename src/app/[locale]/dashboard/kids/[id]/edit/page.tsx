@@ -4,6 +4,8 @@ import { Locale } from '@/config/i18n';
 import { findUserById } from '@/lib/db/repositories/userRepository';
 import { notFound, redirect } from 'next/navigation';
 import { EditKidProfileClient } from '@/components/EditKidProfileClient';
+import { getAllAcademies } from '@/lib/db/repositories/academyRepository';
+import { getUserAcademyIds } from '@/lib/db/repositories/academyMembershipRepository';
 
 export default async function EditKidProfilePage({
   params,
@@ -26,12 +28,21 @@ export default async function EditKidProfilePage({
     notFound();
   }
 
+  // Fetch academies for selection
+  const allAcademies = await getAllAcademies();
+  const activeAcademies = allAcademies.filter(a => a.isActive);
+  
+  // Get user's current academies
+  const userAcademyIds = await getUserAcademyIds(id);
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-4xl">
       <EditKidProfileClient
         dictionary={dictionary}
         locale={locale}
         kid={kid}
+        academies={activeAcademies}
+        currentAcademyIds={userAcademyIds}
       />
     </div>
   );

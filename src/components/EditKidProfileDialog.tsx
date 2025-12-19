@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User } from '@/lib/db/repositories/userRepository';
+import type { User } from '@/lib/db/repositories/userRepository';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { updateUserAction } from '@/lib/actions/userActions';
 import { Upload } from 'lucide-react';

@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ImageUpload } from '@/components/ImageUpload';
 import { updateCourseAction } from '@/lib/actions/courseActions';
 import { getCoachesAction } from '@/lib/actions/userActions';
-import { Course } from '@/lib/db/repositories/courseRepository';
+import type { Course } from '@/lib/db/repositories/courseRepository';
 
 interface EditCourseClientProps {
   locale: string;

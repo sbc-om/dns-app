@@ -1,6 +1,21 @@
-import { open, RootDatabase } from 'lmdb';
+import type { RootDatabase } from 'lmdb';
 import path from 'path';
 import { getMemoryBudget, isLowResourceMode } from '@/lib/utils/systemResources';
+
+type LmdbModule = typeof import('lmdb');
+
+let lmdbModule: LmdbModule | null = null;
+
+function getLmdbModule(): LmdbModule {
+  if (typeof window !== 'undefined') {
+    throw new Error('LMDB can only be used on the server. Do not import this module from Client Components.');
+  }
+  if (!lmdbModule) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    lmdbModule = require('lmdb') as LmdbModule;
+  }
+  return lmdbModule;
+}
 
 let db: RootDatabase | null = null;
 
@@ -25,6 +40,7 @@ export function getDatabase(): LMDBDatabase {
     const profileLabel = isLowResourceMode() ? 'low-resource' : memoryBudget.profile;
     
     try {
+      const { open } = getLmdbModule();
       db = open({
         path: dbPath,
         compression: true,

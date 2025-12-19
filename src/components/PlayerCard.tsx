@@ -1,7 +1,7 @@
 'use client';
 
-import { User } from '@/lib/db/repositories/userRepository';
-import { PhysicalTest } from '@/lib/db/repositories/physicalTestRepository';
+import type { User } from '@/lib/db/repositories/userRepository';
+import type { PhysicalTest } from '@/lib/db/repositories/physicalTestRepository';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';

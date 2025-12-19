@@ -1,29 +1,63 @@
 'use client';
 
-import { User } from '@/lib/db/repositories/userRepository';
-import { AuthUser } from '@/lib/auth/auth';
-import { Dictionary } from '@/lib/i18n/getDictionary';
-import { Locale } from '@/config/i18n';
+import type { User } from '@/lib/db/repositories/userRepository';
+import type { AuthUser } from '@/lib/auth/auth';
+import type { Dictionary } from '@/lib/i18n/getDictionary';
+import type { Locale } from '@/config/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { UserCircle, Trophy, Activity, Star, Calendar, Edit, BookOpen, Save, Trash2, Pencil, DollarSign, CheckCircle2, Award, Plus, X, Check } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+  Activity,
+  Award,
+  BookOpen,
+  Calendar,
+  CheckCircle2,
+  Edit,
+  Flag,
+  Plus,
+  Save,
+  Star,
+  Trash2,
+  Trophy,
+  UserCircle,
+} from 'lucide-react';
 import { ImageUpload } from '@/components/ImageUpload';
 import { StudentMedalsDisplay } from '@/components/StudentMedalsDisplay';
 import { updateUserProfilePictureAction } from '@/lib/actions/userActions';
 import { getEnrollmentsByStudentIdAction, updateEnrollmentCourseAction, createEnrollmentAction, deleteEnrollmentAction } from '@/lib/actions/enrollmentActions';
 import { getActiveCoursesAction } from '@/lib/actions/courseActions';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Enrollment } from '@/lib/db/repositories/enrollmentRepository';
 import type { Course } from '@/lib/db/repositories/courseRepository';
+import type { PlayerProfile } from '@/lib/db/repositories/playerProfileRepository';
+import {
+  ensurePlayerProfileAction,
+  evaluatePlayerStageAction,
+  approveStageUpgradeAction,
+  grantPlayerBadgeAction,
+  syncPlayerProfileAfterAssessmentAction,
+} from '@/lib/actions/playerProfileActions';
+import {
+  createDnaAssessmentAction,
+  deleteDnaAssessmentAction,
+  getDnaAssessmentsForPlayerAction,
+  type DnaAssessmentSession,
+} from '@/lib/actions/dnaAssessmentActions';
+import { BADGES } from '@/lib/player/badges';
+import { calculateCategoryScores } from '@/lib/player/dnaScoring';
 
 interface KidProfileClientProps {
   dictionary: Dictionary;
   locale: Locale;
-  kid: User | any;
-  currentUser: AuthUser | any;
+  kid: User;
+  currentUser: AuthUser;
+  academyId: string;
 }
 
 export function KidProfileClient({
@@ -31,9 +65,16 @@ export function KidProfileClient({
   locale,
   kid,
   currentUser,
+  academyId,
 }: KidProfileClientProps) {
+  type StageEvaluationActionResult = Awaited<ReturnType<typeof evaluatePlayerStageAction>>;
+  type StageEvaluationSuccess = Extract<StageEvaluationActionResult, { success: true }>;
+  type EnrichedEnrollment = Enrollment & { course?: Course | null };
+  type AssessmentFieldKey = 'speed' | 'agility' | 'balance' | 'power' | 'reaction' | 'coordination' | 'flexibility';
+  type AssessmentFormState = { sessionDate: string; notes: string } & Record<AssessmentFieldKey, string>;
+
   const [currentKid, setCurrentKid] = useState<User>(kid);
-  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [enrollments, setEnrollments] = useState<EnrichedEnrollment[]>([]);
   const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
   const [selectedCourseId, setSelectedCourseId] = useState<string>('');
   const [savingCourse, setSavingCourse] = useState(false);
@@ -41,17 +82,45 @@ export function KidProfileClient({
   const [editingEnrollmentId, setEditingEnrollmentId] = useState<string | null>(null);
   const [deletingEnrollmentId, setDeletingEnrollmentId] = useState<string | null>(null);
 
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [profile, setProfile] = useState<PlayerProfile | null>(null);
+  const [stageEvaluation, setStageEvaluation] = useState<StageEvaluationSuccess | null>(null);
+  const [assessments, setAssessments] = useState<DnaAssessmentSession[]>([]);
+
+  const [assessmentDialogOpen, setAssessmentDialogOpen] = useState(false);
+  const [assessmentSubmitting, setAssessmentSubmitting] = useState(false);
+  const [assessmentForm, setAssessmentForm] = useState<AssessmentFormState>({
+    sessionDate: new Date().toISOString().split('T')[0],
+    speed: '',
+    agility: '',
+    balance: '',
+    power: '',
+    reaction: '',
+    coordination: '',
+    flexibility: '',
+    notes: '',
+  });
+
+  const [badgeDialogOpen, setBadgeDialogOpen] = useState(false);
+  const [selectedBadgeId, setSelectedBadgeId] = useState<string>('');
+  const [badgeNotes, setBadgeNotes] = useState('');
+  const [badgeSubmitting, setBadgeSubmitting] = useState(false);
+
+  const canManage = currentUser?.role === 'admin' || currentUser?.role === 'coach';
+  const canAdmin = currentUser?.role === 'admin';
+
   const handleImageUpload = async (file: File, croppedImageUrl: string) => {
     try {
       const result = await updateUserProfilePictureAction(currentKid.id, croppedImageUrl);
       if (result.success && result.user) {
         setCurrentKid(result.user);
       } else {
-        alert(result.error || 'Failed to update profile picture');
+        alert(result.error || dictionary.common.error);
       }
     } catch (error) {
       console.error('Profile picture upload error:', error);
-      alert('Failed to upload profile picture');
+      alert(dictionary.common.error);
     }
   };
 
@@ -59,21 +128,75 @@ export function KidProfileClient({
     loadEnrollmentAndCourses();
   }, [kid.id]);
 
-  const loadEnrollmentAndCourses = async () => {
+  useEffect(() => {
+    void loadPlayerProfile();
+  }, [kid.id, academyId]);
+
+  async function loadEnrollmentAndCourses() {
     // Load kid's enrollments (can have multiple)
     const enrollmentResult = await getEnrollmentsByStudentIdAction(kid.id);
     if (enrollmentResult.success && enrollmentResult.enrollments) {
-      setEnrollments(enrollmentResult.enrollments as any);
+      setEnrollments(enrollmentResult.enrollments as EnrichedEnrollment[]);
     }
 
     // Load available courses (for admin to add new course)
-    if (currentUser.role === 'admin') {
+    if (canAdmin) {
       const coursesResult = await getActiveCoursesAction();
       if (coursesResult.success && coursesResult.courses) {
         setAvailableCourses(coursesResult.courses);
       }
     }
-  };
+  }
+
+  async function loadPlayerProfile() {
+    setLoadingProfile(true);
+    setProfileError(null);
+    try {
+      const ensured = await ensurePlayerProfileAction({
+        locale,
+        academyId,
+        userId: kid.id,
+      });
+
+      if (!ensured.success) {
+        setProfileError(ensured.error || dictionary.common.error);
+        setProfile(null);
+      } else {
+        setProfile(ensured.profile);
+      }
+
+      const evalRes = await evaluatePlayerStageAction({
+        locale,
+        academyId,
+        userId: kid.id,
+      });
+
+      if (evalRes.success) {
+        setStageEvaluation(evalRes as StageEvaluationSuccess);
+      } else {
+        setStageEvaluation(null);
+      }
+
+      const assRes = await getDnaAssessmentsForPlayerAction({
+        locale,
+        academyId,
+        playerId: kid.id,
+      });
+      if (assRes.success && assRes.sessions) {
+        setAssessments(assRes.sessions);
+      } else {
+        setAssessments([]);
+      }
+    } catch (error) {
+      console.error('Load player profile error:', error);
+      setProfileError(dictionary.common.error);
+      setProfile(null);
+      setStageEvaluation(null);
+      setAssessments([]);
+    } finally {
+      setLoadingProfile(false);
+    }
+  }
 
   const handleSaveCourse = async () => {
     if (!selectedCourseId) return;
@@ -90,7 +213,7 @@ export function KidProfileClient({
           setEditingEnrollmentId(null);
           setSelectedCourseId('');
         } else {
-          alert(result.error || 'Failed to update course');
+          alert(result.error || dictionary.common.error);
         }
       } else {
         // Create new enrollment
@@ -104,25 +227,25 @@ export function KidProfileClient({
           setEditingCourse(false);
           setSelectedCourseId('');
         } else {
-          alert(result.error || 'Failed to add course');
+          alert(result.error || dictionary.common.error);
         }
       }
     } catch (error) {
       console.error('Error saving course:', error);
-      alert('Failed to save course');
+      alert(dictionary.common.error);
     }
     
     setSavingCourse(false);
   };
 
-  const handleEditEnrollment = (enrollment: any) => {
+  const handleEditEnrollment = (enrollment: EnrichedEnrollment) => {
     setEditingEnrollmentId(enrollment.id);
     setSelectedCourseId(enrollment.courseId);
     setEditingCourse(true);
   };
 
   const handleDeleteEnrollment = async (enrollmentId: string) => {
-    if (!confirm(locale === 'ar' ? 'هل أنت متأكد من حذف هذه الدورة؟' : 'Are you sure you want to delete this course?')) {
+    if (!confirm(dictionary.common.confirmDelete)) {
       return;
     }
 
@@ -132,7 +255,7 @@ export function KidProfileClient({
     if (result.success) {
       await loadEnrollmentAndCourses();
     } else {
-      alert(result.error || 'Failed to delete enrollment');
+      alert(result.error || dictionary.common.error);
     }
     setDeletingEnrollmentId(null);
   };
@@ -143,290 +266,840 @@ export function KidProfileClient({
     setSelectedCourseId('');
   };
 
+  const latestAssessment = useMemo(() => (assessments.length > 0 ? assessments[0] : null), [assessments]);
+
+  const insights = useMemo(() => {
+    if (!latestAssessment) return null;
+    const scores: Record<string, number> = calculateCategoryScores(latestAssessment.tests);
+    const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+    const strengths = sorted.slice(0, 3).map(([k]) => k);
+    const development = sorted.slice(-2).map(([k]) => k);
+    return { scores, strengths, development };
+  }, [latestAssessment]);
+
+  const grantedBadgeIds = useMemo(() => {
+    const list = profile?.badges || [];
+    return new Set(list.map((b) => b.badgeId));
+  }, [profile]);
+
+  const openGrantBadgeDialog = () => {
+    setSelectedBadgeId('');
+    setBadgeNotes('');
+    setBadgeDialogOpen(true);
+  };
+
+  const t = (path: string): string => {
+    const parts = path.split('.');
+    let cur: unknown = dictionary;
+    for (const p of parts) {
+      if (!cur || typeof cur !== 'object') return path;
+      cur = (cur as Record<string, unknown>)[p];
+    }
+    return typeof cur === 'string' ? cur : path;
+  };
+
+  const handleGrantBadge = async () => {
+    if (!selectedBadgeId) return;
+    setBadgeSubmitting(true);
+    try {
+      const res = await grantPlayerBadgeAction({
+        locale,
+        academyId,
+        userId: kid.id,
+        badgeId: selectedBadgeId,
+        notes: badgeNotes || undefined,
+      });
+      if (!res.success) {
+        alert(res.error || dictionary.common.error);
+      } else {
+        setBadgeDialogOpen(false);
+        await loadPlayerProfile();
+      }
+    } catch (error) {
+      console.error('Grant badge error:', error);
+      alert(dictionary.common.error);
+    } finally {
+      setBadgeSubmitting(false);
+    }
+  };
+
+  const handleCreateAssessment = async () => {
+    setAssessmentSubmitting(true);
+    try {
+      const tests = {
+        speed: Number(assessmentForm.speed),
+        agility: Number(assessmentForm.agility),
+        balance: Number(assessmentForm.balance),
+        power: Number(assessmentForm.power),
+        reaction: Number(assessmentForm.reaction),
+        coordination: Number(assessmentForm.coordination),
+        flexibility: Number(assessmentForm.flexibility),
+      };
+
+      const invalid = Object.values(tests).some((v) => !Number.isFinite(v));
+      if (invalid) {
+        alert(dictionary.common.error);
+        return;
+      }
+
+      const created = await createDnaAssessmentAction({
+        locale,
+        academyId,
+        playerId: kid.id,
+        sessionDate: assessmentForm.sessionDate,
+        enteredBy: currentUser.id,
+        tests,
+        notes: assessmentForm.notes || undefined,
+      });
+
+      if (!created.success) {
+        alert(created.error || dictionary.common.error);
+        return;
+      }
+
+      // Sync profile XP/status
+      await ensurePlayerProfileAction({ locale, academyId, userId: kid.id });
+      await syncPlayerProfileAfterAssessmentAction({
+        locale,
+        academyId,
+        userId: kid.id,
+      });
+
+      setAssessmentDialogOpen(false);
+      setAssessmentForm({
+        sessionDate: new Date().toISOString().split('T')[0],
+        speed: '',
+        agility: '',
+        balance: '',
+        power: '',
+        reaction: '',
+        coordination: '',
+        flexibility: '',
+        notes: '',
+      });
+
+      await loadPlayerProfile();
+    } catch (error) {
+      console.error('Create assessment error:', error);
+      alert(dictionary.common.error);
+    } finally {
+      setAssessmentSubmitting(false);
+    }
+  };
+
+  const handleApproveStageUpgrade = async () => {
+    if (!canManage) return;
+    const confirmed = confirm(dictionary.common.confirmContinue);
+    if (!confirmed) return;
+
+    const res = await approveStageUpgradeAction({
+      locale,
+      academyId,
+      userId: kid.id,
+    });
+    if (!res.success) {
+      alert(res.error || dictionary.common.error);
+      return;
+    }
+    await loadPlayerProfile();
+  };
+
+  const handleDeleteAssessment = async (assessmentId: string) => {
+    if (!canAdmin) return;
+    const confirmed = confirm(dictionary.common.confirmDelete);
+    if (!confirmed) return;
+    const res = await deleteDnaAssessmentAction({
+      locale,
+      academyId,
+      playerId: kid.id,
+      assessmentId,
+    });
+    if (!res.success) {
+      alert(res.error || dictionary.common.error);
+      return;
+    }
+    await loadPlayerProfile();
+  };
+
+  const formatPct = (value: number | undefined) => {
+    if (value === undefined || !Number.isFinite(value)) return '0%';
+    return `${Math.round(value * 100)}%`;
+  };
+
+  const stageLabel = (stageKey?: string) => {
+    switch (stageKey) {
+      case 'explorer':
+        return dictionary.playerProfile?.stages?.explorer ?? 'Explorer';
+      case 'foundation':
+        return dictionary.playerProfile?.stages?.foundation ?? 'Foundation';
+      case 'active_player':
+        return dictionary.playerProfile?.stages?.activePlayer ?? 'Active Player';
+      case 'competitor':
+        return dictionary.playerProfile?.stages?.competitor ?? 'Competitor';
+      case 'champion':
+        return dictionary.playerProfile?.stages?.champion ?? 'Champion';
+      default:
+        return dictionary.playerProfile?.stages?.explorer ?? 'Explorer';
+    }
+  };
+
+  const categoryLabel = (key: string) => {
+    const labels: Record<string, string> = {
+      speed: dictionary.playerProfile?.categories?.speed ?? 'Speed',
+      agility: dictionary.playerProfile?.categories?.agility ?? 'Agility',
+      balance: dictionary.playerProfile?.categories?.balance ?? 'Balance',
+      power: dictionary.playerProfile?.categories?.power ?? 'Power',
+      reaction: dictionary.playerProfile?.categories?.reaction ?? 'Reaction',
+      coordination: dictionary.playerProfile?.categories?.coordination ?? 'Coordination',
+      flexibility: dictionary.playerProfile?.categories?.flexibility ?? 'Flexibility',
+    };
+    return labels[key] || key;
+  };
+
+  const assessmentStatusLabel = (status?: string) => {
+    const labels = dictionary.playerProfile?.assessmentStatuses;
+    switch (status) {
+      case 'new':
+        return labels?.new ?? 'New';
+      case 'first_assessment_completed':
+        return labels?.firstAssessmentCompleted ?? 'First assessment completed';
+      case 'reassessment':
+        return labels?.reassessment ?? 'Reassessment';
+      case 'stage_evaluation':
+        return labels?.stageEvaluation ?? 'Stage evaluation';
+      case 'due_for_reassessment':
+        return labels?.dueForReassessment ?? 'Due for reassessment';
+      default:
+        return status || (labels?.new ?? 'New');
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header Profile Card */}
-      <Card className="shadow-lg">
+      {/* Header */}
+      <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
         <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row items-start gap-6">
-            {currentUser.role === 'admin' && (
-              <div className="flex flex-col items-center gap-3">
-                <ImageUpload
-                  onUpload={handleImageUpload}
-                  currentImage={currentKid.profilePicture}
-                  aspectRatio={1}
-                  maxSizeMB={2}
-                />
-              </div>
-            )}
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{currentKid.fullName || currentKid.username}</h1>
-                {currentUser.role === 'admin' && (
-                  <Button
-                    onClick={() => window.location.href = `/${locale}/dashboard/kids/${currentKid.id}/edit`}
-                    variant="outline"
-                    size="sm"
-                    className="border-[#30B2D2] text-[#30B2D2] hover:bg-[#30B2D2] hover:text-white"
-                  >
-                    <Edit className="h-4 w-4 me-2" />
-                    {dictionary.users.editUser}
-                  </Button>
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex items-start gap-4">
+              <div className="shrink-0">
+                {canAdmin ? (
+                  <ImageUpload
+                    onUpload={handleImageUpload}
+                    currentImage={currentKid.profilePicture}
+                    aspectRatio={1}
+                    maxSizeMB={2}
+                  />
+                ) : currentKid.profilePicture ? (
+                  <img
+                    src={currentKid.profilePicture}
+                    alt={currentKid.fullName || currentKid.username}
+                    className="w-20 h-20 rounded-full object-cover border-2 border-[#DDDDDD] dark:border-[#000000]"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] flex items-center justify-center">
+                    <UserCircle className="w-10 h-10 text-gray-600 dark:text-gray-300" />
+                  </div>
                 )}
               </div>
-              <div className="flex flex-wrap justify-center md:justify-start gap-2">
-                <Badge variant="outline" className="text-sm">
-                  {dictionary.users.role}: {dictionary.users.roles.kid}
-                </Badge>
-                {currentKid.nationalId && (
-                  <Badge variant="secondary" className="text-sm">
-                    {dictionary.users.nationalId}: {currentKid.nationalId}
+
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-[#262626] dark:text-white truncate">
+                  {currentKid.fullName || currentKid.username}
+                </h1>
+
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Badge variant="outline" className="border-2 border-[#DDDDDD] dark:border-[#000000]">
+                    {dictionary.users.roles.kid}
                   </Badge>
-                )}
-                {currentKid.birthDate && (
-                  <Badge variant="secondary" className="text-sm">
-                    Birth: {new Date(currentKid.birthDate).toLocaleDateString(locale)}
+                  <Badge variant="secondary" className="bg-gray-100 dark:bg-[#1a1a1a] text-[#262626] dark:text-white">
+                    {dictionary.playerProfile?.labels?.stage ?? 'Stage'}: {stageLabel(profile?.currentStage)}
                   </Badge>
-                )}
+                  {latestAssessment && (
+                    <Badge className="bg-[#262626] text-white border-0">
+                      {dictionary.playerProfile?.labels?.naScore ?? 'NA'}: {latestAssessment.naScore}
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="mt-3 text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  {currentKid.nationalId && (
+                    <div>
+                      <span className="font-semibold">{dictionary.users.nationalId}:</span> {currentKid.nationalId}
+                    </div>
+                  )}
+                  {currentKid.birthDate && (
+                    <div>
+                      <span className="font-semibold">{dictionary.playerProfile?.labels?.birthDate ?? 'Birth date'}:</span>{' '}
+                      {new Date(currentKid.birthDate).toLocaleDateString(locale)}
+                    </div>
+                  )}
+                  {currentKid.school && (
+                    <div>
+                      <span className="font-semibold">{dictionary.playerProfile?.labels?.school ?? 'School'}:</span> {currentKid.school}
+                      {currentKid.grade ? ` · ${currentKid.grade}` : ''}
+                    </div>
+                  )}
+                  {currentKid.position && (
+                    <div>
+                      <span className="font-semibold">{dictionary.playerProfile?.labels?.position ?? 'Position'}:</span> {currentKid.position}
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="text-gray-500 space-y-1">
-                {currentKid.school && <p>🏫 {currentKid.school} {currentKid.grade && `- Grade ${currentKid.grade}`}</p>}
-                {currentKid.position && <p>⚽ Position: {currentKid.position}</p>}
-                <p className="text-sm">
-                  {dictionary.users.createdAt}: {new Date(currentKid.createdAt).toLocaleDateString(locale)}
-                </p>
+            </div>
+
+            <div className="lg:ms-auto flex flex-wrap gap-2 items-start justify-start lg:justify-end">
+              {canAdmin && (
+                <Button
+                  onClick={() => (window.location.href = `/${locale}/dashboard/kids/${currentKid.id}/edit`)}
+                  variant="outline"
+                  className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]"
+                >
+                  <Edit className="h-4 w-4 me-2" />
+                  {dictionary.users.editUser}
+                </Button>
+              )}
+              {canManage && (
+                <Button
+                  onClick={() => setAssessmentDialogOpen(true)}
+                  className="bg-[#262626] hover:bg-black text-white"
+                >
+                  <Plus className="h-4 w-4 me-2" />
+                  {dictionary.playerProfile?.actions?.newAssessment ?? 'New Assessment'}
+                </Button>
+              )}
+              {canManage && (
+                <Button
+                  onClick={openGrantBadgeDialog}
+                  variant="outline"
+                  className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]"
+                >
+                  <Award className="h-4 w-4 me-2" />
+                  {dictionary.playerProfile?.actions?.grantBadge ?? 'Grant Badge'}
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Stage Progress */}
+          <div className="mt-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                <div className="font-bold text-[#262626] dark:text-white">
+                  {dictionary.playerProfile?.labels?.progress ?? 'Stage Progress'}
+                </div>
+              </div>
+              {canManage && stageEvaluation?.evaluation?.readyForStageUpgrade && (
+                <Button onClick={handleApproveStageUpgrade} className="bg-[#FF5F02] hover:bg-[#e55502] text-white">
+                  <Flag className="h-4 w-4 me-2" />
+                  {dictionary.playerProfile?.actions?.approveStageUpgrade ?? 'Approve Stage Upgrade'}
+                </Button>
+              )}
+            </div>
+
+            <div className="mt-3">
+              <progress
+                value={Math.round((stageEvaluation?.evaluation?.overallProgress || 0) * 100)}
+                max={100}
+                className="w-full h-4 rounded-md overflow-hidden border-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-100 dark:bg-[#1a1a1a]"
+              />
+              <div className="mt-2 text-sm text-gray-600 dark:text-gray-300 flex flex-wrap gap-x-6 gap-y-1">
+                <span>
+                  {dictionary.playerProfile?.labels?.daysInStage ?? 'Days in stage'}: {stageEvaluation?.evaluation?.timeInStageDays ?? 0}
+                </span>
+                <span>
+                  {dictionary.playerProfile?.labels?.attendance ?? 'Attendance'}: {formatPct(stageEvaluation?.attendance?.attendanceRate)}
+                </span>
+                <span>
+                  {dictionary.playerProfile?.labels?.naImprovement ?? 'NA improvement'}:{' '}
+                  {formatPct(stageEvaluation?.evaluation?.naImprovementPct)}
+                </span>
+                <span>
+                  {dictionary.playerProfile?.labels?.xp ?? 'XP'}: {profile?.xpTotal ?? 0}
+                </span>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Courses Information Card */}
-      <Card className="border-2 border-[#FF5F02]/20 bg-linear-to-br from-white to-orange-50/30 dark:from-[#262626] dark:to-[#1a1a1a] shadow-xl overflow-hidden">
-            <CardHeader className="bg-linear-to-r from-[#FF5F02] to-[#ff7b33] text-white pb-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
-                    <BookOpen className="h-6 w-6" />
+      <Tabs defaultValue="overview">
+        <TabsList>
+          <TabsTrigger value="overview">
+            <Activity className="w-4 h-4" />
+            {dictionary.playerProfile?.tabs?.overview ?? 'Overview'}
+          </TabsTrigger>
+          <TabsTrigger value="assessments">
+            <Calendar className="w-4 h-4" />
+            {dictionary.playerProfile?.tabs?.assessments ?? 'Assessments'}
+          </TabsTrigger>
+          <TabsTrigger value="badges">
+            <Star className="w-4 h-4" />
+            {dictionary.playerProfile?.tabs?.badges ?? 'Badges'}
+          </TabsTrigger>
+          <TabsTrigger value="courses">
+            <BookOpen className="w-4 h-4" />
+            {dictionary.playerProfile?.tabs?.courses ?? 'Courses'}
+          </TabsTrigger>
+          <TabsTrigger value="achievements">
+            <Award className="w-4 h-4" />
+            {dictionary.playerProfile?.tabs?.achievements ?? 'Achievements'}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] lg:col-span-2">
+              <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a]">
+                <CardTitle className="text-[#262626] dark:text-white">
+                  {dictionary.playerProfile?.sections?.insights ?? 'Insights'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-6">
+                {!latestAssessment ? (
+                  <div className="text-gray-600 dark:text-gray-300">
+                    {dictionary.playerProfile?.empty?.noAssessments ?? 'No assessments yet.'}
                   </div>
-                  <div>
-                    <CardTitle className="text-xl sm:text-2xl font-bold">
-                      {locale === 'ar' ? 'الدورات التدريبية' : 'Training Courses'}
-                    </CardTitle>
-                    <p className="text-sm text-white/90 mt-1">
-                      {locale === 'ar' ? 'مسار التعلم والتطور' : 'Learning & Development Path'}
-                    </p>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
+                        <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                          {dictionary.playerProfile?.labels?.strengths ?? 'Strengths'}
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {insights?.strengths?.map((k) => (
+                            <Badge key={String(k)} className="bg-green-600 text-white border-0">
+                              {categoryLabel(String(k))}
+                            </Badge>
+                          ))}
+                        </div>
+                        <div className="mt-3 text-xs text-gray-600 dark:text-gray-400">
+                          {dictionary.playerProfile?.hints?.strengthsHint ?? ''}
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
+                        <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                          {dictionary.playerProfile?.labels?.developmentAreas ?? 'Development areas'}
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {insights?.development?.map((k) => (
+                            <Badge key={String(k)} variant="secondary" className="bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200">
+                              {categoryLabel(String(k))}
+                            </Badge>
+                          ))}
+                        </div>
+                        <div className="mt-3 text-xs text-gray-600 dark:text-gray-400">
+                          {dictionary.playerProfile?.hints?.developmentHint ?? ''}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+                        {dictionary.playerProfile?.labels?.latestAssessment ?? 'Latest assessment'}: {latestAssessment.sessionDate}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {Object.entries(latestAssessment.tests).map(([k, v]) => (
+                          <div
+                            key={k}
+                            className="p-3 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]"
+                          >
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{categoryLabel(k)}</div>
+                            <div className="mt-1 flex items-end justify-between gap-3">
+                              <div className="text-lg font-bold text-[#262626] dark:text-white">{v}</div>
+                              <div className="text-xs font-semibold text-gray-600 dark:text-gray-300">
+                                {Math.round(insights?.scores?.[k] ?? 0)}/100
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+              <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a]">
+                <CardTitle className="text-[#262626] dark:text-white">
+                  {dictionary.playerProfile?.sections?.status ?? 'Status'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-4">
+                <div className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
+                  <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.assessmentStatus ?? 'Assessment status'}</div>
+                  <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
+                    {assessmentStatusLabel(profile?.assessmentStatus)}
                   </div>
                 </div>
-                {currentUser.role === 'admin' && availableCourses.length > 0 && (
+
+                <div className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
+                  <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.stageStart ?? 'Stage start'}</div>
+                  <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
+                    {profile?.stageStartDate ? new Date(profile.stageStartDate).toLocaleDateString(locale) : '-'}
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
+                  <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.lastAssessment ?? 'Last assessment'}</div>
+                  <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
+                    {latestAssessment ? latestAssessment.sessionDate : '-'}
+                  </div>
+                </div>
+
+                {loadingProfile && (
+                  <div className="text-sm text-gray-600 dark:text-gray-300">{dictionary.common.loading}</div>
+                )}
+                {profileError && (
+                  <div className="text-sm text-red-600">{profileError}</div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="assessments">
+          <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+            <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a]">
+              <CardTitle className="text-[#262626] dark:text-white">
+                {dictionary.playerProfile?.sections?.assessmentHistory ?? 'Assessment history'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {assessments.length === 0 ? (
+                <div className="text-gray-600 dark:text-gray-300">
+                  {dictionary.playerProfile?.empty?.noAssessments ?? 'No assessments yet.'}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {assessments.map((a) => (
+                    <div
+                      key={a.id}
+                      className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="font-bold text-[#262626] dark:text-white">
+                            {a.sessionDate}
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-300">
+                            {dictionary.playerProfile?.labels?.naScore ?? 'NA Score'}: <span className="font-semibold">{a.naScore}</span>
+                          </div>
+                        </div>
+                        {canAdmin && (
+                          <Button
+                            variant="outline"
+                            className="border-2 border-[#DDDDDD] dark:border-[#000000]"
+                            onClick={() => handleDeleteAssessment(a.id)}
+                          >
+                            <Trash2 className="h-4 w-4 me-2" />
+                            {dictionary.common.delete}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="badges">
+          <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+            <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a]">
+              <CardTitle className="text-[#262626] dark:text-white">
+                {dictionary.playerProfile?.sections?.badges ?? 'Badges'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {BADGES.map((b) => {
+                  const unlocked = grantedBadgeIds.has(b.id);
+                  return (
+                    <div
+                      key={b.id}
+                      className={`p-4 rounded-xl border-2 ${
+                        unlocked
+                          ? 'border-green-300 dark:border-green-900 bg-green-50 dark:bg-green-900/10'
+                          : 'border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="font-bold text-[#262626] dark:text-white truncate">
+                            {t(b.nameKey)}
+                          </div>
+                          <div className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                            {unlocked ? t(b.descriptionKey) : t(b.lockedHintKey)}
+                          </div>
+                        </div>
+                        <div>
+                          {unlocked ? (
+                            <Badge className="bg-green-600 text-white border-0">
+                              {dictionary.playerProfile?.labels?.unlocked ?? 'Unlocked'}
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary" className="bg-gray-100 dark:bg-[#0a0a0a]">
+                              {dictionary.playerProfile?.labels?.locked ?? 'Locked'}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="courses">
+          <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+            <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a]">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <CardTitle className="text-[#262626] dark:text-white">
+                  {dictionary.playerProfile?.sections?.courses ?? 'Courses'}
+                </CardTitle>
+                {canAdmin && availableCourses.length > 0 && (
                   <Button
                     size="sm"
-                    onClick={() => editingCourse ? handleCancelEdit() : setEditingCourse(true)}
-                    className="bg-white text-[#FF5F02] hover:bg-white/90 shadow-md active:scale-95 transition-all self-start sm:self-auto"
+                    onClick={() => (editingCourse ? handleCancelEdit() : setEditingCourse(true))}
+                    className="bg-[#262626] hover:bg-black text-white"
                   >
-                    {editingCourse ? (
-                      <>
-                        <X className="h-4 w-4 me-1" />
-                        {locale === 'ar' ? 'إلغاء' : 'Cancel'}
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="h-4 w-4 me-1" />
-                        {locale === 'ar' ? 'إضافة دورة' : 'Add Course'}
-                      </>
-                    )}
+                    <Plus className="h-4 w-4 me-2" />
+                    {dictionary.playerProfile?.actions?.addCourse ?? 'Add Course'}
                   </Button>
                 )}
               </div>
             </CardHeader>
-            <CardContent className="pt-6 pb-6 px-4 sm:px-6">
-              {editingCourse && currentUser.role === 'admin' ? (
-                <div className="space-y-4 bg-white dark:bg-[#262626] rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700">
+            <CardContent className="pt-6">
+              {editingCourse && canAdmin ? (
+                <div className="space-y-4 p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
                   <div>
-                    <Label className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'اختر الدورة' : 'Select Course'}</Label>
-                    <Select
-                      value={selectedCourseId}
-                      onValueChange={setSelectedCourseId}
-                    >
-                      <SelectTrigger className="mt-2 h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#0a0a0a]">
-                        <SelectValue placeholder={locale === 'ar' ? 'اختر دورة جديدة' : 'Select new course'} />
+                    <Label className="text-[#262626] dark:text-white font-semibold">
+                      {dictionary.playerProfile?.labels?.selectCourse ?? 'Select course'}
+                    </Label>
+                    <Select value={selectedCourseId} onValueChange={setSelectedCourseId}>
+                      <SelectTrigger className="mt-2 h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                        <SelectValue placeholder={dictionary.playerProfile?.placeholders?.selectCourse ?? 'Select a course'} />
                       </SelectTrigger>
                       <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
                         {availableCourses.map((course) => (
-                          <SelectItem key={course.id} value={course.id} className="text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20 cursor-pointer">
+                          <SelectItem key={course.id} value={course.id} className="cursor-pointer">
                             {locale === 'ar' ? course.nameAr : course.name} - {course.price} {course.currency}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button
-                    onClick={handleSaveCourse}
-                    disabled={savingCourse || !selectedCourseId}
-                    className="w-full bg-[#FF5F02] hover:bg-[#e55502] text-white shadow-md active:scale-95 transition-all h-12"
-                  >
-                    <Save className="h-4 w-4 me-2" />
-                    {savingCourse ? (locale === 'ar' ? 'جاري الإضافة...' : 'Adding...') : (locale === 'ar' ? 'إضافة الدورة' : 'Add Course')}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleSaveCourse}
+                      disabled={savingCourse || !selectedCourseId}
+                      className="bg-[#262626] hover:bg-black text-white"
+                    >
+                      <Save className="h-4 w-4 me-2" />
+                      {dictionary.common.save}
+                    </Button>
+                    <Button variant="outline" className="border-2" onClick={handleCancelEdit}>
+                      {dictionary.common.cancel}
+                    </Button>
+                  </div>
                 </div>
-              ) : enrollments.length > 0 ? (
-                <div className="grid gap-4 sm:gap-6">
-                  {enrollments.map((enrollment: any) => {
+              ) : enrollments.length === 0 ? (
+                <div className="text-gray-600 dark:text-gray-300">
+                  {dictionary.playerProfile?.empty?.noCourses ?? 'No courses.'}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {enrollments.map((enrollment) => {
                     const isDeleting = deletingEnrollmentId === enrollment.id;
-                    
+                    const status = enrollment.paymentStatus;
+                    const statusLabel =
+                      status === 'paid'
+                        ? dictionary.payments?.paid || 'Paid'
+                        : status === 'pending'
+                          ? dictionary.payments?.pending || 'Pending'
+                          : dictionary.payments?.rejected || 'Rejected';
                     return (
-                      <div 
-                        key={enrollment.id} 
-                        className="group relative bg-white dark:bg-[#262626] rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-[#FF5F02] hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                      <div
+                        key={enrollment.id}
+                        className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]"
                       >
-                        {/* Background gradient overlay */}
-                        <div className="absolute inset-0 bg-linear-to-br from-[#FF5F02]/5 to-orange-50/30 dark:from-[#FF5F02]/10 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        
-                        <div className="relative flex flex-col sm:flex-row gap-4 p-4 sm:p-6">
-                          {/* Course Image */}
-                          {enrollment.course?.courseImage && (
-                            <div className="relative h-48 sm:h-32 sm:w-32 lg:h-40 lg:w-40 shrink-0 rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow">
-                              <img
-                                src={enrollment.course.courseImage}
-                                alt={locale === 'ar' ? enrollment.course.nameAr : enrollment.course.name}
-                                className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
-                              />
-                              <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0">
+                            <div className="font-bold text-[#262626] dark:text-white truncate">
+                              {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
                             </div>
-                          )}
-                          
-                          {/* Course Content */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-3 mb-3">
-                              <div 
-                                className={`flex-1 min-w-0 ${enrollment.paymentStatus === 'paid' ? 'cursor-pointer' : ''}`}
-                                onClick={() => {
-                                  if (enrollment.paymentStatus === 'paid') {
-                                    window.location.href = `/${locale}/dashboard/kids/${currentKid.id}/courses/${enrollment.course?.id}`;
-                                  }
-                                }}
+                            <div className="mt-1 flex flex-wrap items-center gap-2">
+                              <Badge
+                                className={`border-0 ${
+                                  status === 'paid'
+                                    ? 'bg-green-600 text-white'
+                                    : status === 'pending'
+                                      ? 'bg-amber-600 text-white'
+                                      : 'bg-red-600 text-white'
+                                }`}
                               >
-                                <h3 className="font-bold text-lg lg:text-xl text-gray-900 dark:text-white mb-2 group-hover:text-[#FF5F02] transition-colors">
-                                  {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
-                                </h3>
-                                
-                                <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                  {enrollment.paymentStatus === 'paid' ? (
-                                    enrollment.course?.startDate && enrollment.course?.endDate && (
-                                      <span className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full">
-                                        <Calendar className="h-4 w-4 text-[#FF5F02]" />
-                                        <span className="font-medium">
-                                          {new Date(enrollment.course.startDate).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
-                                        </span>
-                                        <span>-</span>
-                                        <span className="font-medium">
-                                          {new Date(enrollment.course.endDate).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })}
-                                        </span>
-                                      </span>
-                                    )
-                                  ) : (
-                                    <span className="flex items-center gap-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1.5 rounded-full font-bold text-base">
-                                      <DollarSign className="h-4 w-4" />
-                                      {enrollment.course?.price} {enrollment.course?.currency}
-                                    </span>
-                                  )}
-                                </div>
-
-                                {/* Status Badge */}
-                                <div className="flex flex-wrap items-center gap-2 mb-3">
-                                  <Badge 
-                                    className={`px-3 py-1.5 text-xs font-semibold shadow-md ${
-                                      enrollment.paymentStatus === 'paid' ? 'bg-linear-to-r from-green-500 to-green-600 text-white border-0' :
-                                      enrollment.paymentStatus === 'pending' ? 'bg-linear-to-r from-yellow-500 to-yellow-600 text-white border-0' :
-                                      'bg-linear-to-r from-red-500 to-red-600 text-white border-0'
-                                    }`}
-                                  >
-                                    {enrollment.paymentStatus === 'paid' && <CheckCircle2 className="h-3.5 w-3.5 me-1 inline" />}
-                                    {enrollment.paymentStatus === 'paid' ? (locale === 'ar' ? 'نشطة' : 'Active') :
-                                     enrollment.paymentStatus === 'pending' ? (locale === 'ar' ? 'قيد المراجعة' : 'Pending') :
-                                     (locale === 'ar' ? 'غير مدفوع' : 'Unpaid')}
-                                  </Badge>
-                                </div>
-
-                                {/* Description if exists */}
-                                {enrollment.course?.description && enrollment.paymentStatus === 'paid' && (
-                                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                                    {locale === 'ar' ? enrollment.course.descriptionAr : enrollment.course.description}
-                                  </p>
-                                )}
-                              </div>
-                              
-                              {/* Admin Actions */}
-                              {currentUser.role === 'admin' && (
-                                <div className="flex gap-2 shrink-0">
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => handleEditEnrollment(enrollment)}
-                                    disabled={isDeleting}
-                                    className="h-9 w-9 p-0 hover:bg-blue-100 dark:hover:bg-blue-900 active:scale-95 transition-all"
-                                    title={locale === 'ar' ? 'تعديل الدورة' : 'Edit Course'}
-                                  >
-                                    <Pencil className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => handleDeleteEnrollment(enrollment.id)}
-                                    disabled={isDeleting}
-                                    className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900 active:scale-95 transition-all"
-                                    title={locale === 'ar' ? 'حذف الدورة' : 'Delete Course'}
-                                  >
-                                    <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
-                                  </Button>
-                                </div>
+                                {status === 'paid' && <CheckCircle2 className="h-3.5 w-3.5 me-1" />}
+                                {statusLabel}
+                              </Badge>
+                              {enrollment.course?.startDate && enrollment.course?.endDate && (
+                                <Badge variant="secondary" className="bg-gray-100 dark:bg-[#0a0a0a]">
+                                  <Calendar className="h-3.5 w-3.5 me-1" />
+                                  {new Date(enrollment.course.startDate).toLocaleDateString(locale)} -{' '}
+                                  {new Date(enrollment.course.endDate).toLocaleDateString(locale)}
+                                </Badge>
                               )}
                             </div>
                           </div>
+
+                          {canAdmin && (
+                            <div className="flex gap-2 shrink-0">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="border-2"
+                                onClick={() => handleEditEnrollment(enrollment)}
+                                disabled={isDeleting}
+                              >
+                                {dictionary.common.edit}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="border-2"
+                                onClick={() => handleDeleteEnrollment(enrollment.id)}
+                                disabled={isDeleting}
+                              >
+                                <Trash2 className="h-4 w-4 me-1" />
+                                {dictionary.common.delete}
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
                   })}
-                  {currentUser.role === 'parent' && enrollments.some((e: any) => e.paymentStatus !== 'paid') && (
-                    <Button
-                      className="w-full bg-linear-to-r from-[#30B2D2] to-[#1E3A8A] hover:from-[#1E3A8A] hover:to-[#30B2D2] text-white shadow-lg active:scale-95 transition-all h-12 text-base font-semibold"
-                      onClick={() => window.location.href = `/${locale}/dashboard/payments`}
-                    >
-                      <DollarSign className="h-5 w-5 me-2" />
-                      {locale === 'ar' ? 'الذهاب إلى صفحة الدفع' : 'Go to Payment Page'}
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-12 px-4">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
-                    <BookOpen className="h-10 w-10 text-gray-400" />
-                  </div>
-                  <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">
-                    {locale === 'ar' ? 'لم يتم تسجيل الطفل في أي دورة' : 'Not enrolled in any course'}
-                  </p>
-                  {currentUser.role === 'admin' && availableCourses.length > 0 && (
-                    <Button
-                      size="sm"
-                      onClick={() => setEditingCourse(true)}
-                      className="bg-[#FF5F02] hover:bg-[#e55502] text-white shadow-md active:scale-95 transition-all"
-                    >
-                      <Plus className="h-4 w-4 me-1" />
-                      {locale === 'ar' ? 'تسجيل في دورة' : 'Enroll in Course'}
-                    </Button>
-                  )}
                 </div>
               )}
             </CardContent>
           </Card>
+        </TabsContent>
 
-      {/* Achievements (Medals) Section */}
-      <StudentMedalsDisplay
-        studentId={currentKid.id}
-        title={locale === 'ar' ? 'الإنجازات' : 'Achievements'}
-        description={locale === 'ar' ? 'الميداليات التي حصل عليها الطالب' : 'Medals earned by the student'}
-        locale={locale}
-      />
+        <TabsContent value="achievements">
+          <StudentMedalsDisplay
+            studentId={currentKid.id}
+            title={dictionary.playerProfile?.sections?.medals ?? 'Medals'}
+            description={dictionary.playerProfile?.hints?.medalsHint ?? undefined}
+            locale={locale}
+          />
+        </TabsContent>
+      </Tabs>
+
+      {/* Assessment dialog */}
+      <Dialog open={assessmentDialogOpen} onOpenChange={setAssessmentDialogOpen}>
+        <DialogContent className="sm:max-w-[720px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{dictionary.playerProfile?.actions?.newAssessment ?? 'New Assessment'}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="sessionDate">{dictionary.playerProfile?.labels?.assessmentDate ?? 'Assessment date'}</Label>
+              <Input
+                id="sessionDate"
+                type="date"
+                value={assessmentForm.sessionDate}
+                onChange={(e) => setAssessmentForm((p) => ({ ...p, sessionDate: e.target.value }))}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {(
+                [
+                  { key: 'speed', step: '0.01' },
+                  { key: 'agility', step: '0.01' },
+                  { key: 'balance', step: '0.1' },
+                  { key: 'power', step: '0.1' },
+                  { key: 'reaction', step: '1' },
+                  { key: 'coordination', step: '1' },
+                  { key: 'flexibility', step: '0.1' },
+                ] as const
+              ).map((f) => (
+                <div key={f.key} className="grid gap-2">
+                  <Label htmlFor={f.key}>{categoryLabel(f.key)}</Label>
+                  <Input
+                    id={f.key}
+                    type="number"
+                    step={f.step}
+                    value={assessmentForm[f.key]}
+                    onChange={(e) => setAssessmentForm((p) => ({ ...p, [f.key]: e.target.value }))}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="notes">{dictionary.common.optional}</Label>
+              <Input
+                id="notes"
+                value={assessmentForm.notes}
+                onChange={(e) => setAssessmentForm((p) => ({ ...p, notes: e.target.value }))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" className="border-2" onClick={() => setAssessmentDialogOpen(false)}>
+              {dictionary.common.cancel}
+            </Button>
+            <Button className="bg-[#262626] hover:bg-black text-white" disabled={assessmentSubmitting} onClick={handleCreateAssessment}>
+              {assessmentSubmitting ? dictionary.common.loading : dictionary.common.save}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Badge dialog */}
+      <Dialog open={badgeDialogOpen} onOpenChange={setBadgeDialogOpen}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle>{dictionary.playerProfile?.actions?.grantBadge ?? 'Grant Badge'}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label>{dictionary.playerProfile?.labels?.selectBadge ?? 'Select badge'}</Label>
+              <Select value={selectedBadgeId} onValueChange={setSelectedBadgeId}>
+                <SelectTrigger className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                  <SelectValue placeholder={dictionary.playerProfile?.placeholders?.selectBadge ?? 'Choose a badge'} />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                  {BADGES.filter((b) => !grantedBadgeIds.has(b.id)).map((b) => (
+                    <SelectItem key={b.id} value={b.id} className="cursor-pointer">
+                      {t(b.nameKey)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label>{dictionary.common.optional}</Label>
+              <Input value={badgeNotes} onChange={(e) => setBadgeNotes(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" className="border-2" onClick={() => setBadgeDialogOpen(false)}>
+              {dictionary.common.cancel}
+            </Button>
+            <Button className="bg-[#262626] hover:bg-black text-white" disabled={badgeSubmitting || !selectedBadgeId} onClick={handleGrantBadge}>
+              {badgeSubmitting ? dictionary.common.loading : dictionary.common.save}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
 
 

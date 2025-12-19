@@ -21,6 +21,7 @@ import {
 } from '@/lib/db/repositories/academyRepository';
 import {
   addUserToAcademy,
+  getAcademyMembership,
   getUserAcademyIds,
   listAcademyMembers,
   type AcademyMembership,
@@ -251,5 +252,57 @@ export async function setCurrentAcademyAction(locale: string, academyId: string)
   } catch (error) {
     console.error('Set current academy error:', error);
     return { success: false as const, error: 'Failed to set current academy' };
+  }
+}
+
+export async function getAcademyUiContextAction(locale: string = 'en') {
+  noStore();
+  try {
+    const ctx = await requireAcademyContext(locale);
+
+    if (ctx.user.role === ROLES.ADMIN) {
+      const academies = await getAllAcademies();
+      return {
+        success: true as const,
+        userRole: ctx.user.role,
+        academies,
+        currentAcademyId: ctx.academyId,
+      };
+    }
+
+    const academyIds = await getUserAcademyIds(ctx.user.id);
+    const all = await getAllAcademies();
+    const academies = all.filter((a) => academyIds.includes(a.id));
+
+    return {
+      success: true as const,
+      userRole: ctx.user.role,
+      academies,
+      currentAcademyId: ctx.academyId,
+    };
+  } catch (error) {
+    console.error('Get academy ui context error:', error);
+    return { success: false as const, error: 'Failed to load academy context' };
+  }
+}
+
+export async function getUserPrimaryAcademyIdAction(params: { locale: string; userId: string }) {
+  noStore();
+  try {
+    const ctx = await requireAcademyContext(params.locale);
+
+    if (ctx.user.role !== ROLES.ADMIN) {
+      const membership = await getAcademyMembership(ctx.academyId, params.userId);
+      if (!membership) {
+        return { success: false as const, error: 'Not authorized' };
+      }
+      return { success: true as const, academyId: ctx.academyId };
+    }
+
+    const academyIds = await getUserAcademyIds(params.userId);
+    return { success: true as const, academyId: academyIds[0] || ctx.academyId };
+  } catch (error) {
+    console.error('Get user primary academy error:', error);
+    return { success: false as const, error: 'Failed to load user academy' };
   }
 }

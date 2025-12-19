@@ -26,7 +26,9 @@
     "next": "التالي",
     "continue": "متابعة",
     "clear": "مسح",
-    "optional": "اختياري"
+    "optional": "اختياري",
+    "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
+    "confirmContinue": "هل أنت متأكد أنك تريد المتابعة؟"
   },
   "nav": {
     "home": "الرئيسية",
@@ -307,6 +309,8 @@
     "active": "نشط",
     "inactive": "غير نشط",
     "role": "الدور",
+    "academy": "الأكاديمية",
+    "selectAcademy": "اختر الأكاديمية",
     "createdAt": "تاريخ الإنشاء",
     "confirmDelete": "هل أنت متأكد من حذف هذا المستخدم؟",
     "userCreated": "تم إنشاء المستخدم بنجاح",
@@ -810,6 +814,165 @@
     "saveSettings": "حفظ الإعدادات",
     "settingsSaved": "تم حفظ الإعدادات بنجاح",
     "settingsFailed": "فشل حفظ الإعدادات"
+  },
+  "playerProfile": {
+    "tabs": {
+      "overview": "نظرة عامة",
+      "assessments": "التقييمات",
+      "badges": "الشارات",
+      "courses": "الدورات",
+      "achievements": "الإنجازات"
+    },
+    "sections": {
+      "insights": "ملخص",
+      "status": "الحالة",
+      "assessmentHistory": "سجل التقييمات",
+      "badges": "الشارات",
+      "courses": "الدورات",
+      "medals": "الميداليات"
+    },
+    "labels": {
+      "stage": "المرحلة",
+      "naScore": "مؤشر القدرات (NA)",
+      "birthDate": "تاريخ الميلاد",
+      "school": "المدرسة",
+      "position": "المركز",
+      "progress": "تقدم المرحلة",
+      "daysInStage": "أيام في المرحلة",
+      "attendance": "الحضور",
+      "naImprovement": "تحسن NA",
+      "xp": "النقاط",
+      "strengths": "نقاط القوة",
+      "developmentAreas": "فرص التطوير",
+      "latestAssessment": "آخر تقييم",
+      "assessmentStatus": "حالة التقييم",
+      "stageStart": "بداية المرحلة",
+      "lastAssessment": "آخر تقييم",
+      "unlocked": "مفتوحة",
+      "locked": "مقفلة",
+      "assessmentDate": "تاريخ التقييم",
+      "selectBadge": "اختر شارة",
+      "selectCourse": "اختر دورة"
+    },
+    "actions": {
+      "newAssessment": "تقييم جديد",
+      "grantBadge": "منح شارة",
+      "approveStageUpgrade": "اعتماد ترقية المرحلة",
+      "addCourse": "إضافة دورة"
+    },
+    "placeholders": {
+      "selectCourse": "اختر دورة",
+      "selectBadge": "اختر شارة"
+    },
+    "empty": {
+      "noAssessments": "لا توجد تقييمات بعد.",
+      "noCourses": "لا توجد دورات."
+    },
+    "hints": {
+      "strengthsHint": "أفضل القدرات بناءً على آخر تقييم.",
+      "developmentHint": "مناطق تركيز إيجابية للتحسن التالي.",
+      "medalsHint": "ميداليات تم فتحها مع التقدم."
+    },
+    "stages": {
+      "explorer": "مستكشف",
+      "foundation": "الأساس",
+      "activePlayer": "لاعب نشط",
+      "competitor": "منافس",
+      "champion": "بطل"
+    },
+    "categories": {
+      "speed": "السرعة",
+      "agility": "الرشاقة",
+      "balance": "التوازن",
+      "power": "القوة",
+      "reaction": "رد الفعل",
+      "coordination": "التناسق",
+      "flexibility": "المرونة"
+    },
+    "assessmentStatuses": {
+      "new": "جديد",
+      "firstAssessmentCompleted": "تم إكمال التقييم الأول",
+      "reassessment": "إعادة تقييم",
+      "stageEvaluation": "تقييم المرحلة",
+      "dueForReassessment": "حان وقت إعادة التقييم"
+    },
+    "badges": {
+      "consistencyStar": {
+        "name": "نجمة الالتزام",
+        "description": "يحضر بانتظام ويستمر في التحسن.",
+        "lockedHint": "تُكتسب بالالتزام والحضور."
+      },
+      "focusChampion": {
+        "name": "بطل التركيز",
+        "description": "يحافظ على التركيز ويتبع التعليمات.",
+        "lockedHint": "تُكتسب بالتركيز أثناء الحصص."
+      },
+      "attendanceHero": {
+        "name": "بطل الحضور",
+        "description": "حضور ممتاز والتزام قوي.",
+        "lockedHint": "تُكتسب بحضور مميز."
+      },
+      "effortBadge": {
+        "name": "شارة الجهد",
+        "description": "يبذل جهداً كبيراً في كل مرة.",
+        "lockedHint": "تُكتسب بالاجتهاد المستمر."
+      },
+      "teamSpirit": {
+        "name": "روح الفريق",
+        "description": "يدعم زملاءه ويظهر روح رياضية.",
+        "lockedHint": "تُكتسب بسلوك الفريق الإيجابي."
+      },
+      "fairPlay": {
+        "name": "اللعب النظيف",
+        "description": "يلعب بعدل ويحترم الآخرين.",
+        "lockedHint": "تُكتسب بالاحترام والإنصاف."
+      },
+      "quickLearner": {
+        "name": "متعلم سريع",
+        "description": "يتعلم بسرعة ويطبق الملاحظات.",
+        "lockedHint": "تُكتسب بالتعلم وتطبيق التعليمات."
+      },
+      "resilience": {
+        "name": "المرونة",
+        "description": "يتجاوز الإخفاقات ويعود بقوة.",
+        "lockedHint": "تُكتسب بالعودة الإيجابية بعد الأخطاء."
+      },
+      "coachListens": {
+        "name": "ينصت للمدرب",
+        "description": "ينصت جيداً ويتبع التعليمات.",
+        "lockedHint": "تُكتسب بالإنصات والتركيز."
+      },
+      "positiveEnergy": {
+        "name": "طاقة إيجابية",
+        "description": "يجلب طاقة إيجابية وحماساً.",
+        "lockedHint": "تُكتسب بالموقف الإيجابي."
+      },
+      "goalSetter": {
+        "name": "صانع الأهداف",
+        "description": "يضع أهدافاً ويعمل لتحقيقها.",
+        "lockedHint": "تُكتسب بوضع أهداف ومتابعتها."
+      },
+      "supportiveTeammate": {
+        "name": "زميل داعم",
+        "description": "يساعد الآخرين ويدعم زملاءه.",
+        "lockedHint": "تُكتسب بمساعدة الزملاء."
+      },
+      "discipline": {
+        "name": "الانضباط",
+        "description": "يحافظ على الانضباط والالتزام.",
+        "lockedHint": "تُكتسب بالانضباط والروتين."
+      },
+      "warmupMaster": {
+        "name": "خبير الإحماء",
+        "description": "يهتم بالإحماء ويؤديه جيداً.",
+        "lockedHint": "تُكتسب بعادات إحماء ممتازة."
+      },
+      "progressPride": {
+        "name": "فخر التقدم",
+        "description": "يفخر بتقدمه ويواصل التطور.",
+        "lockedHint": "تُكتسب بالاحتفال بالتقدم والاستمرار."
+      }
+    }
   },
   "playerCard": {
     "createCard": "إنشاء بطاقة اللاعب",

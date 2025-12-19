@@ -113,7 +113,7 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
       phoneNumber: appointment.mobileNumber,
       password: temporaryPassword,
       role: 'parent',
-    });
+    }, { locale });
 
     if (parentResult.success && parentResult.user) {
       await updateAppointmentAction(appointment.id, {

@@ -15,9 +15,9 @@ import { updateCourseAction } from '@/lib/actions/courseActions';
 import { getCoachesAction } from '@/lib/actions/userActions';
 import { getSessionPlansAction } from '@/lib/actions/sessionPlanActions';
 import { getAllCategoriesAction } from '@/lib/actions/categoryActions';
-import { Course } from '@/lib/db/repositories/courseRepository';
-import { SessionPlan } from '@/lib/db/repositories/sessionPlanRepository';
-import { Category } from '@/lib/db/repositories/categoryRepository';
+import type { Course } from '@/lib/db/repositories/courseRepository';
+import type { SessionPlan } from '@/lib/db/repositories/sessionPlanRepository';
+import type { Category } from '@/lib/db/repositories/categoryRepository';
 import { CourseCalendar } from './CourseCalendar';
 
 interface EditCourseClientProps {

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { User } from '@/lib/db/repositories/userRepository';
-import { PhysicalTest } from '@/lib/db/repositories/physicalTestRepository';
+import type { User } from '@/lib/db/repositories/userRepository';
+import type { PhysicalTest } from '@/lib/db/repositories/physicalTestRepository';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import {
