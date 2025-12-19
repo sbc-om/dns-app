@@ -1,20 +1,18 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { MessageSquare, Users as UsersIcon, Send, Plus, Search, X, Check, Smile, Paperclip, MoreVertical, ArrowLeft, Phone, Video, CheckCheck, Clock } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { MessageSquare, Users as UsersIcon, Send, Plus, Search, X, Smile, Paperclip, MoreVertical, ArrowLeft, Phone, Video, CheckCheck, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import { AuthUser } from '@/lib/auth/auth';
 import { User } from '@/lib/db/repositories/userRepository';
-import EmojiPicker from 'emoji-picker-react';
+import EmojiPicker, { Theme, type EmojiClickData } from 'emoji-picker-react';
 import {
   sendMessageAction,
   getConversationAction,
@@ -23,12 +21,12 @@ import {
   getUserGroupsAction,
   getAllGroupsAction,
   createGroupAction,
-  updateGroupAction,
   markMessageAsReadAction,
 } from '@/lib/actions/messageActions';
 import { Message, MessageGroup } from '@/lib/db/repositories/messageRepository';
 import { useConfirm } from '@/components/ConfirmDialog';
 import { RolePermission } from '@/lib/db/repositories/rolePermissionRepository';
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
 
 interface MessagesClientProps {
   dictionary: Dictionary;
@@ -38,8 +36,14 @@ interface MessagesClientProps {
   permissions: RolePermission['permissions'];
 }
 
+type ConversationListItem = {
+  userId: string;
+  lastMessage: Message;
+  user?: User | null;
+};
+
 export function MessagesClient({ dictionary, locale, currentUser, allUsers, permissions }: MessagesClientProps) {
-  const [conversations, setConversations] = useState<any[]>([]);
+  const [conversations, setConversations] = useState<ConversationListItem[]>([]);
   const [groups, setGroups] = useState<MessageGroup[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<{ type: 'user' | 'group'; id: string; name: string } | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -60,49 +64,12 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
 
   const isAdmin = currentUser.role === 'admin';
 
-  // Load conversations and groups
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  // Auto-scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Auto-refresh messages every 5 seconds
-  useEffect(() => {
-    if (selectedConversation) {
-      const interval = setInterval(() => {
-        loadMessages(selectedConversation);
-      }, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [selectedConversation]);
-
-  // Close emoji picker when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
-        setShowEmojiPicker(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Show notification helper
-  const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 3000);
-  };
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       // Load conversations
       const convResult = await getUserConversationsAction();
       if (convResult.success) {
-        setConversations(convResult.conversations || []);
+        setConversations((convResult.conversations || []) as ConversationListItem[]);
       }
 
       // Load groups
@@ -113,9 +80,9 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
     } catch (error) {
       console.error('Load data error:', error);
     }
-  };
+  }, [isAdmin]);
 
-  const loadMessages = async (conversation: { type: 'user' | 'group'; id: string; name: string }) => {
+  const loadMessages = useCallback(async (conversation: { type: 'user' | 'group'; id: string; name: string }) => {
     try {
       if (conversation.type === 'user') {
         const result = await getConversationAction(conversation.id);
@@ -137,6 +104,43 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
     } catch (error) {
       console.error('Load messages error:', error);
     }
+  }, [currentUser.id]);
+
+  // Load conversations and groups
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Auto-refresh messages every 5 seconds
+  useEffect(() => {
+    if (selectedConversation) {
+      const interval = setInterval(() => {
+        loadMessages(selectedConversation);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [selectedConversation, loadMessages]);
+
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Show notification helper
+  const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
   };
 
   const handleSelectConversation = (conversation: { type: 'user' | 'group'; id: string; name: string }) => {
@@ -173,8 +177,8 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
     }
   };
 
-  const handleEmojiClick = (emojiData: any) => {
-    setMessageText(prev => prev + emojiData.emoji);
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    setMessageText((prev) => prev + emojiData.emoji);
   };
 
   const handleCreateGroup = async () => {
@@ -268,7 +272,7 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
         </div>
       )}
 
-      <div className="h-[calc(100vh-4rem)] lg:h-full flex flex-col bg-gray-50 dark:bg-[#1a1a1a] pb-0 lg:pb-0">
+  <div className="h-full min-h-0 flex flex-col bg-gray-50 dark:bg-[#1a1a1a] overflow-hidden">
         {/* Header - Hidden on mobile when chat is open */}
         <div className={`${!showMobileSidebar && selectedConversation ? 'hidden lg:block' : 'block'} p-4 sm:p-6 border-b bg-white dark:bg-[#262626] shadow-sm`}>
           <div className="flex items-center justify-between gap-3">
@@ -307,11 +311,11 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 min-h-0 flex overflow-hidden">
           {/* Sidebar - Conversations List */}
           <div className={`${
             showMobileSidebar ? 'flex' : 'hidden lg:flex'
-          } w-full lg:w-80 lg:max-w-[320px] border-r bg-white dark:bg-[#000000] overflow-y-auto overflow-x-hidden flex-col`}>
+          } w-full lg:w-80 lg:max-w-[320px] border-r bg-white dark:bg-[#000000] overflow-hidden flex-col min-h-0`}>
             <Tabs defaultValue="conversations" className="w-full flex flex-col flex-1 overflow-hidden">
               <div className="px-3 pt-3 pb-2">
                 <TabsList className="w-full grid grid-cols-2 bg-gray-100 dark:bg-[#262626] rounded-xl h-11 p-1">
@@ -324,107 +328,141 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                 </TabsList>
               </div>
               
-              <TabsContent value="conversations" className="space-y-2 px-3 pb-3 flex-1 overflow-y-auto overflow-x-hidden">
-                {conversations.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>{dictionary.messages?.noConversations || 'No conversations yet'}</p>
-                  </div>
-                ) : (
-                  conversations.map((conv) => (
-                    <button
-                      key={conv.userId}
-                      onClick={() => handleSelectConversationMobile({ type: 'user', id: conv.userId, name: conv.user?.fullName || conv.user?.email || '' })}
-                      className={`w-full p-3 sm:p-4 rounded-xl text-left transition-all active:scale-95 overflow-hidden ${
-                        selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
-                          ? 'bg-linear-to-r from-[#FF5F02] to-[#ff7b33] text-white shadow-lg'
-                          : 'hover:bg-gray-50 dark:hover:bg-[#262626] hover:shadow-md'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="relative shrink-0">
-                          {conv.user?.profilePicture ? (
-                            <img
-                              src={conv.user.profilePicture}
-                              alt={conv.user.fullName || conv.user.email}
-                              className={`h-12 w-12 rounded-full object-cover shadow-md ${
-                                selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
-                                  ? 'border-2 border-white'
-                                  : 'border-2 border-orange-500'
-                              }`}
-                            />
-                          ) : (
-                            <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md ${
-                              selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
-                                ? 'bg-white/20'
-                                : 'bg-orange-500'
-                            }`}>
-                              {conv.user?.fullName?.[0]?.toUpperCase() || 'U'}
-                            </div>
-                          )}
-                          {/* Online indicator */}
-                          <div className="absolute bottom-0 right-0 h-3.5 w-3.5 bg-green-500 border-2 border-white dark:border-[#000000] rounded-full"></div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="font-semibold truncate">{conv.user?.fullName || conv.user?.email}</p>
-                            {conv.lastMessage && (
-                              <span className="text-xs opacity-75 shrink-0 ms-2">
-                                {new Date(conv.lastMessage.createdAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-sm opacity-75 truncate">{conv.lastMessage?.content || (locale === 'ar' ? 'ابدأ محادثة' : 'Start conversation')}</p>
-                        </div>
+              <TabsContent value="conversations" className="flex-1 min-h-0 p-0 m-0">
+                <OverlayScrollbarsComponent
+                  element="div"
+                  className="h-full px-3 pb-3"
+                  options={{
+                    scrollbars: {
+                      autoHide: 'move',
+                      autoHideDelay: 800,
+                      theme: 'os-theme-dark',
+                      visibility: 'auto',
+                    },
+                    overflow: { x: 'hidden', y: 'scroll' },
+                  }}
+                  defer
+                >
+                  <div className="space-y-2">
+                    {conversations.length === 0 ? (
+                      <div className="text-center py-12 text-muted-foreground">
+                        <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                        <p>{dictionary.messages?.noConversations || 'No conversations yet'}</p>
                       </div>
-                    </button>
-                  ))
-                )}
-              </TabsContent>
-
-              <TabsContent value="groups" className="space-y-2 px-3 pb-3 flex-1 overflow-y-auto overflow-x-hidden">
-                {groups.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <UsersIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>{locale === 'ar' ? 'لا توجد مجموعات' : 'No groups yet'}</p>
-                    {permissions.canCreateGroup && (
-                      <Button
-                        onClick={() => setShowNewGroupDialog(true)}
-                        size="sm"
-                        className="mt-4 bg-[#FF5F02] hover:bg-[#e55502]"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        {dictionary.messages?.newGroup || 'New Group'}
-                      </Button>
+                    ) : (
+                      conversations.map((conv) => (
+                        <button
+                          key={conv.userId}
+                          onClick={() => handleSelectConversationMobile({ type: 'user', id: conv.userId, name: conv.user?.fullName || conv.user?.email || '' })}
+                          className={`w-full p-3 sm:p-4 rounded-xl text-left transition-all active:scale-95 overflow-hidden ${
+                            selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
+                              ? 'bg-linear-to-r from-[#FF5F02] to-[#ff7b33] text-white shadow-lg'
+                              : 'hover:bg-gray-50 dark:hover:bg-[#262626] hover:shadow-md'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="relative shrink-0">
+                              {conv.user?.profilePicture ? (
+                                <img
+                                  src={conv.user.profilePicture}
+                                  alt={conv.user.fullName || conv.user.email}
+                                  className={`h-12 w-12 rounded-full object-cover shadow-md ${
+                                    selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
+                                      ? 'border-2 border-white'
+                                      : 'border-2 border-orange-500'
+                                  }`}
+                                />
+                              ) : (
+                                <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md ${
+                                  selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
+                                    ? 'bg-white/20'
+                                    : 'bg-orange-500'
+                                }`}>
+                                  {conv.user?.fullName?.[0]?.toUpperCase() || 'U'}
+                                </div>
+                              )}
+                              {/* Online indicator */}
+                              <div className="absolute bottom-0 right-0 h-3.5 w-3.5 bg-green-500 border-2 border-white dark:border-[#000000] rounded-full"></div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-1">
+                                <p className="font-semibold truncate">{conv.user?.fullName || conv.user?.email}</p>
+                                {conv.lastMessage && (
+                                  <span className="text-xs opacity-75 shrink-0 ms-2">
+                                    {new Date(conv.lastMessage.createdAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm opacity-75 truncate">{conv.lastMessage?.content || (locale === 'ar' ? 'ابدأ محادثة' : 'Start conversation')}</p>
+                            </div>
+                          </div>
+                        </button>
+                      ))
                     )}
                   </div>
-                ) : (
-                  groups.map((group) => (
-                    <button
-                      key={group.id}
-                      onClick={() => handleSelectConversationMobile({ type: 'group', id: group.id, name: group.name })}
-                      className={`w-full p-3 sm:p-4 rounded-xl text-left transition-all active:scale-95 overflow-hidden ${
-                        selectedConversation?.id === group.id && selectedConversation?.type === 'group'
-                          ? 'bg-linear-to-r from-[#FF5F02] to-[#ff7b33] text-white shadow-lg'
-                          : 'hover:bg-gray-50 dark:hover:bg-[#262626] hover:shadow-md'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`h-12 w-12 rounded-full flex items-center justify-center shadow-md ${
-                          selectedConversation?.id === group.id && selectedConversation?.type === 'group'
-                            ? 'bg-white/20 text-white'
-                            : 'bg-linear-to-br from-blue-500 to-blue-600 text-white'
-                        }`}>
-                          <UsersIcon className="h-6 w-6" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold truncate">{group.name}</p>
-                          <p className="text-sm opacity-75">{group.members.length} {locale === 'ar' ? 'أعضاء' : 'members'}</p>
-                        </div>
+                </OverlayScrollbarsComponent>
+              </TabsContent>
+
+              <TabsContent value="groups" className="flex-1 min-h-0 p-0 m-0">
+                <OverlayScrollbarsComponent
+                  element="div"
+                  className="h-full px-3 pb-3"
+                  options={{
+                    scrollbars: {
+                      autoHide: 'move',
+                      autoHideDelay: 800,
+                      theme: 'os-theme-dark',
+                      visibility: 'auto',
+                    },
+                    overflow: { x: 'hidden', y: 'scroll' },
+                  }}
+                  defer
+                >
+                  <div className="space-y-2">
+                    {groups.length === 0 ? (
+                      <div className="text-center py-12 text-muted-foreground">
+                        <UsersIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                        <p>{locale === 'ar' ? 'لا توجد مجموعات' : 'No groups yet'}</p>
+                        {permissions.canCreateGroup && (
+                          <Button
+                            onClick={() => setShowNewGroupDialog(true)}
+                            size="sm"
+                            className="mt-4 bg-[#FF5F02] hover:bg-[#e55502]"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            {dictionary.messages?.newGroup || 'New Group'}
+                          </Button>
+                        )}
                       </div>
-                    </button>
-                  ))
-                )}
+                    ) : (
+                      groups.map((group) => (
+                        <button
+                          key={group.id}
+                          onClick={() => handleSelectConversationMobile({ type: 'group', id: group.id, name: group.name })}
+                          className={`w-full p-3 sm:p-4 rounded-xl text-left transition-all active:scale-95 overflow-hidden ${
+                            selectedConversation?.id === group.id && selectedConversation?.type === 'group'
+                              ? 'bg-linear-to-r from-[#FF5F02] to-[#ff7b33] text-white shadow-lg'
+                              : 'hover:bg-gray-50 dark:hover:bg-[#262626] hover:shadow-md'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`h-12 w-12 rounded-full flex items-center justify-center shadow-md ${
+                              selectedConversation?.id === group.id && selectedConversation?.type === 'group'
+                                ? 'bg-white/20 text-white'
+                                : 'bg-linear-to-br from-blue-500 to-blue-600 text-white'
+                            }`}>
+                              <UsersIcon className="h-6 w-6" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold truncate">{group.name}</p>
+                              <p className="text-sm opacity-75">{group.members.length} {locale === 'ar' ? 'أعضاء' : 'members'}</p>
+                            </div>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </OverlayScrollbarsComponent>
               </TabsContent>
             </Tabs>
           </div>
@@ -497,95 +535,110 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
-                  {messages.length === 0 ? (
-                    <div className="flex items-center justify-center h-full text-muted-foreground">
-                      <div className="text-center">
-                        <MessageSquare className="h-16 w-16 mx-auto mb-4 opacity-30" />
-                        <p className="text-sm">{locale === 'ar' ? 'لا توجد رسائل بعد' : 'No messages yet'}</p>
-                        <p className="text-xs mt-2">{locale === 'ar' ? 'ابدأ المحادثة الآن' : 'Start the conversation now'}</p>
+                <OverlayScrollbarsComponent
+                  element="section"
+                  className="flex-1 min-h-0"
+                  options={{
+                    scrollbars: {
+                      autoHide: 'move',
+                      autoHideDelay: 800,
+                      theme: 'os-theme-dark',
+                      visibility: 'auto',
+                    },
+                    overflow: { x: 'hidden', y: 'scroll' },
+                  }}
+                  defer
+                >
+                  <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 min-h-full">
+                    {messages.length === 0 ? (
+                      <div className="flex items-center justify-center h-full text-muted-foreground">
+                        <div className="text-center">
+                          <MessageSquare className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                          <p className="text-sm">{locale === 'ar' ? 'لا توجد رسائل بعد' : 'No messages yet'}</p>
+                          <p className="text-xs mt-2">{locale === 'ar' ? 'ابدأ المحادثة الآن' : 'Start the conversation now'}</p>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    messages.map((message, index) => {
-                      const isOwn = message.senderId === currentUser.id;
-                      const showDate = index === 0 || 
-                        new Date(messages[index - 1].createdAt).toDateString() !== new Date(message.createdAt).toDateString();
-                      
-                      return (
-                        <div key={message.id}>
-                          {/* Date separator */}
-                          {showDate && (
-                            <div className="flex items-center justify-center my-4">
-                              <div className="bg-gray-200 dark:bg-[#262626] px-3 py-1 rounded-full text-xs text-gray-600 dark:text-gray-400">
-                                {new Date(message.createdAt).toLocaleDateString(locale, { 
-                                  weekday: 'short', 
-                                  month: 'short', 
-                                  day: 'numeric' 
-                                })}
+                    ) : (
+                      messages.map((message, index) => {
+                        const isOwn = message.senderId === currentUser.id;
+                        const showDate = index === 0 ||
+                          new Date(messages[index - 1].createdAt).toDateString() !== new Date(message.createdAt).toDateString();
+
+                        return (
+                          <div key={message.id}>
+                            {/* Date separator */}
+                            {showDate && (
+                              <div className="flex items-center justify-center my-4">
+                                <div className="bg-gray-200 dark:bg-[#262626] px-3 py-1 rounded-full text-xs text-gray-600 dark:text-gray-400">
+                                  {new Date(message.createdAt).toLocaleDateString(locale, {
+                                    weekday: 'short',
+                                    month: 'short',
+                                    day: 'numeric'
+                                  })}
+                                </div>
                               </div>
-                            </div>
-                          )}
-                          
-                          <div className={`flex items-end gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                            {!isOwn && selectedConversation.type === 'user' && (
-                              <>
-                                {(() => {
-                                  const sender = allUsers.find(u => u.id === message.senderId);
-                                  return sender?.profilePicture ? (
+                            )}
+
+                            <div className={`flex items-end gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                              {!isOwn && selectedConversation.type === 'user' && (
+                                <>
+                                  {(() => {
+                                    const sender = allUsers.find(u => u.id === message.senderId);
+                                    return sender?.profilePicture ? (
+                                      <img
+                                        src={sender.profilePicture}
+                                        alt={sender.fullName || sender.username}
+                                        className="h-8 w-8 rounded-full object-cover border-2 border-gray-300 shrink-0"
+                                      />
+                                    ) : (
+                                      <div className="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                        {selectedConversation.name[0]?.toUpperCase()}
+                                      </div>
+                                    );
+                                  })()}
+                                </>
+                              )}
+                              {!isOwn && selectedConversation.type === 'group' && (
+                                <div className="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                  {selectedConversation.name[0]?.toUpperCase()}
+                                </div>
+                              )}
+
+                              <div className={`group max-w-[85%] sm:max-w-[70%] ${isOwn ? 'bg-linear-to-br from-[#FF5F02] to-[#ff7b33] text-white' : 'bg-white dark:bg-[#262626] dark:text-white'} rounded-2xl ${isOwn ? 'rounded-br-md' : 'rounded-bl-md'} p-3 sm:p-4 shadow-md hover:shadow-lg transition-shadow`}>
+                                <p className="wrap-break-word text-sm sm:text-base whitespace-pre-wrap">{message.content}</p>
+                                <div className={`flex items-center gap-1.5 mt-1.5 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                                  <p className={`text-xs ${isOwn ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>
+                                    {new Date(message.createdAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
+                                  </p>
+                                  {isOwn && (
+                                    <CheckCheck className={`h-3.5 w-3.5 ${message.readBy.length > 1 ? 'text-blue-200' : 'text-white/60'}`} />
+                                  )}
+                                </div>
+                              </div>
+
+                              {isOwn && (
+                                <>
+                                  {currentUser.profilePicture ? (
                                     <img
-                                      src={sender.profilePicture}
-                                      alt={sender.fullName || sender.username}
-                                      className="h-8 w-8 rounded-full object-cover border-2 border-gray-300 shrink-0"
+                                      src={currentUser.profilePicture}
+                                      alt={currentUser.fullName || currentUser.username}
+                                      className="h-8 w-8 rounded-full object-cover border-2 border-orange-500 shrink-0"
                                     />
                                   ) : (
-                                    <div className="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                      {selectedConversation.name[0]?.toUpperCase()}
+                                    <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                      {currentUser.fullName?.[0]?.toUpperCase() || 'U'}
                                     </div>
-                                  );
-                                })()}
-                              </>
-                            )}
-                            {!isOwn && selectedConversation.type === 'group' && (
-                              <div className="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                {selectedConversation.name[0]?.toUpperCase()}
-                              </div>
-                            )}
-                            
-                            <div className={`group max-w-[85%] sm:max-w-[70%] ${isOwn ? 'bg-linear-to-br from-[#FF5F02] to-[#ff7b33] text-white' : 'bg-white dark:bg-[#262626] dark:text-white'} rounded-2xl ${isOwn ? 'rounded-br-md' : 'rounded-bl-md'} p-3 sm:p-4 shadow-md hover:shadow-lg transition-shadow`}>
-                              <p className="wrap-break-word text-sm sm:text-base whitespace-pre-wrap">{message.content}</p>
-                              <div className={`flex items-center gap-1.5 mt-1.5 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                                <p className={`text-xs ${isOwn ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>
-                                  {new Date(message.createdAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
-                                </p>
-                                {isOwn && (
-                                  <CheckCheck className={`h-3.5 w-3.5 ${message.readBy.length > 1 ? 'text-blue-200' : 'text-white/60'}`} />
-                                )}
-                              </div>
+                                  )}
+                                </>
+                              )}
                             </div>
-                            
-                            {isOwn && (
-                              <>
-                                {currentUser.profilePicture ? (
-                                  <img
-                                    src={currentUser.profilePicture}
-                                    alt={currentUser.fullName || currentUser.username}
-                                    className="h-8 w-8 rounded-full object-cover border-2 border-orange-500 shrink-0"
-                                  />
-                                ) : (
-                                  <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                    {currentUser.fullName?.[0]?.toUpperCase() || 'U'}
-                                  </div>
-                                )}
-                              </>
-                            )}
                           </div>
-                        </div>
-                      );
-                    })
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
+                        );
+                      })
+                    )}
+                    <div ref={messagesEndRef} />
+                  </div>
+                </OverlayScrollbarsComponent>
 
                 {/* Message Input */}
                 <div className="p-3 sm:p-4 border-t bg-white dark:bg-[#262626] pb-[88px] lg:pb-3 sm:lg:pb-4 relative">
@@ -597,7 +650,7 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                     >
                       <EmojiPicker 
                         onEmojiClick={handleEmojiClick}
-                        theme={'light' as any}
+                        theme={Theme.LIGHT}
                         searchPlaceholder={locale === 'ar' ? 'بحث عن إيموجي...' : 'Search emoji...'}
                         height={350}
                         width="100%"

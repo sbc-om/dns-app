@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Send, Users, MessageSquare, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Loader2, Send, Users, MessageSquare, CheckCircle, XCircle, AlertCircle, Save, Trash2, Pencil } from 'lucide-react';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 
 interface User {
@@ -23,6 +24,14 @@ interface WhatsAppMessagingClientProps {
   dictionary: Dictionary;
   locale: string;
 }
+
+type WhatsAppRecipientProfile = {
+  id: string;
+  name: string;
+  userIds: string[];
+  createdAt: string;
+  updatedAt: string;
+};
 
 export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsAppMessagingClientProps) {
   const [users, setUsers] = useState<User[]>([]);
@@ -40,9 +49,19 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
 
+  const [profiles, setProfiles] = useState<WhatsAppRecipientProfile[]>([]);
+  const [selectedProfileId, setSelectedProfileId] = useState<string>('');
+  const [isFetchingProfiles, setIsFetchingProfiles] = useState(true);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isDeletingProfile, setIsDeletingProfile] = useState(false);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [profileDialogMode, setProfileDialogMode] = useState<'create' | 'edit'>('create');
+  const [profileName, setProfileName] = useState('');
+
   // Fetch users on component mount
   useEffect(() => {
     fetchUsers();
+    fetchProfiles();
   }, []);
 
   // Filter users based on role and search query
@@ -87,6 +106,116 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
       setErrorMessage('Failed to fetch users');
     } finally {
       setIsFetchingUsers(false);
+    }
+  };
+
+  const fetchProfiles = async () => {
+    try {
+      setIsFetchingProfiles(true);
+      const response = await fetch('/api/whatsapp/profiles');
+      const data = await response.json();
+      if (response.ok && data?.success) {
+        setProfiles(data.profiles || []);
+      } else {
+        // Keep silent; page should still work without profiles.
+      }
+    } catch (error) {
+      console.error('Error fetching WhatsApp profiles:', error);
+    } finally {
+      setIsFetchingProfiles(false);
+    }
+  };
+
+  const selectedProfile = useMemo(
+    () => profiles.find((p) => p.id === selectedProfileId) || null,
+    [profiles, selectedProfileId]
+  );
+
+  const applyProfileSelection = (profileId: string) => {
+    setSelectedProfileId(profileId);
+    const profile = profiles.find((p) => p.id === profileId);
+    if (!profile) return;
+    setSelectedUsers(new Set(profile.userIds));
+  };
+
+  const openCreateProfile = () => {
+    setProfileDialogMode('create');
+    setProfileName('');
+    setProfileDialogOpen(true);
+  };
+
+  const openEditProfile = () => {
+    if (!selectedProfile) return;
+    setProfileDialogMode('edit');
+    setProfileName(selectedProfile.name);
+    setProfileDialogOpen(true);
+  };
+
+  const handleSaveProfile = async () => {
+    const name = profileName.trim();
+    if (!name) {
+      setErrorMessage('Profile name is required');
+      return;
+    }
+    if (selectedUsers.size === 0) {
+      setErrorMessage('Please select at least one user');
+      return;
+    }
+
+    setIsSavingProfile(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    try {
+      const userIds = Array.from(selectedUsers);
+      const isEdit = profileDialogMode === 'edit' && selectedProfile;
+      const url = isEdit ? `/api/whatsapp/profiles/${selectedProfile!.id}` : '/api/whatsapp/profiles';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, userIds }),
+      });
+      const data = await response.json();
+
+      if (response.ok && data?.success) {
+        await fetchProfiles();
+        const newId = data.profile?.id || selectedProfile?.id;
+        if (newId) setSelectedProfileId(newId);
+        setProfileDialogOpen(false);
+        setSuccessMessage(isEdit ? 'Profile updated' : 'Profile created');
+      } else {
+        setErrorMessage(data?.message || 'Failed to save profile');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      setErrorMessage('Failed to save profile');
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handleDeleteProfile = async () => {
+    if (!selectedProfile) return;
+    setIsDeletingProfile(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+    try {
+      const response = await fetch(`/api/whatsapp/profiles/${selectedProfile.id}`, { method: 'DELETE' });
+      const data = await response.json();
+      if (response.ok && data?.success) {
+        setSelectedProfileId('');
+        await fetchProfiles();
+        setSuccessMessage('Profile deleted');
+      } else {
+        setErrorMessage(data?.message || 'Failed to delete profile');
+      }
+    } catch (error) {
+      console.error('Error deleting profile:', error);
+      setErrorMessage('Failed to delete profile');
+    } finally {
+      setIsDeletingProfile(false);
     }
   };
 
@@ -215,30 +344,219 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-4">
-              <div className="flex-1">
-                <Input
-                  placeholder={locale === 'ar' ? 'البحث...' : 'Search...'}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                />
+            {/* Profiles */}
+            <div className="mb-4 p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-50 dark:bg-[#1a1a1a]">
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
+                <div className="flex-1">
+                  <Label className="text-[#262626] dark:text-white font-semibold">
+                    {locale === 'ar' ? 'ملفات المستلمين' : 'Recipient Profiles'}
+                  </Label>
+                  <div className="mt-2">
+                    <Select
+                      value={selectedProfileId || 'none'}
+                      onValueChange={(v) => {
+                        if (v === 'none') {
+                          setSelectedProfileId('');
+                          return;
+                        }
+                        applyProfileSelection(v);
+                      }}
+                    >
+                      <SelectTrigger className="w-full h-12 bg-white dark:bg-[#0a0a0a] border-2 border-[#DDDDDD] dark:border-[#000000] text-[#262626] dark:text-white">
+                        <SelectValue placeholder={isFetchingProfiles ? 'Loading profiles...' : 'Select a profile'} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                        <SelectItem value="none" className="text-[#262626] dark:text-white cursor-pointer">
+                          {locale === 'ar' ? 'بدون' : 'None'}
+                        </SelectItem>
+                        {profiles.map((p) => (
+                          <SelectItem key={p.id} value={p.id} className="text-[#262626] dark:text-white cursor-pointer">
+                            {p.name} ({p.userIds.length})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {selectedProfile && (
+                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      {selectedProfile.userIds.length} {locale === 'ar' ? 'مستلمين' : 'recipients'}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={openCreateProfile}
+                    className="h-12 border-2"
+                    disabled={isSavingProfile}
+                  >
+                    <Save className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {locale === 'ar' ? 'حفظ كملف' : 'Save Profile'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={openEditProfile}
+                    className="h-12 border-2"
+                    disabled={!selectedProfile || isSavingProfile}
+                  >
+                    <Pencil className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    {locale === 'ar' ? 'تعديل' : 'Edit'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleDeleteProfile}
+                    className="h-12 border-2"
+                    disabled={!selectedProfile || isDeletingProfile}
+                  >
+                    {isDeletingProfile ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">Delete</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setSelectedUsers(new Set());
+                      setSelectedProfileId('');
+                    }}
+                    className="h-12"
+                  >
+                    {locale === 'ar' ? 'مسح التحديد' : 'Clear'}
+                  </Button>
+                </div>
               </div>
-              <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className="w-full sm:w-[200px] h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#0a0a0a]">
-                  <SelectValue placeholder={locale === 'ar' ? 'فلترة حسب الدور' : 'Filter by role'} />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
-                  <SelectItem value="all" className="text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20 cursor-pointer">{locale === 'ar' ? 'الكل' : 'All'}</SelectItem>
-                  {uniqueRoles.map(role => (
-                    <SelectItem key={role} value={role} className="text-[#262626] dark:text-white hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20 cursor-pointer">
-                      {role.charAt(0).toUpperCase() + role.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
+              <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+                <DialogContent className="sm:max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {profileDialogMode === 'edit'
+                        ? (locale === 'ar' ? 'تعديل الملف' : 'Edit Profile')
+                        : (locale === 'ar' ? 'إنشاء ملف' : 'Create Profile')}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {locale === 'ar'
+                        ? 'احفظ مجموعة من المستلمين لإرسال الرسائل لهم بسرعة'
+                        : 'Save a set of recipients to send messages in one click.'}
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-[#262626] dark:text-white font-semibold">
+                        {locale === 'ar' ? 'اسم الملف' : 'Profile Name'}
+                      </Label>
+                      <Input
+                        value={profileName}
+                        onChange={(e) => setProfileName(e.target.value)}
+                        placeholder={locale === 'ar' ? 'مثال: أولياء الأمور' : 'e.g. Parents'}
+                        className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] text-[#262626] dark:text-white"
+                      />
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      {selectedUsers.size} {locale === 'ar' ? 'مستخدمين محددين' : 'selected users'}
+                    </div>
+                  </div>
+
+                  <DialogFooter className="gap-2">
+                    <Button variant="outline" onClick={() => setProfileDialogOpen(false)} className="border-2">
+                      {locale === 'ar' ? 'إلغاء' : 'Cancel'}
+                    </Button>
+                    <Button onClick={handleSaveProfile} disabled={isSavingProfile} className="bg-[#262626] hover:bg-[#1f1f1f] text-white">
+                      {isSavingProfile ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2 rtl:mr-0 rtl:ml-2" />
+                          {locale === 'ar' ? 'جارٍ الحفظ...' : 'Saving...'}
+                        </>
+                      ) : (
+                        <>
+                          <Save className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                          {profileDialogMode === 'edit' ? (locale === 'ar' ? 'حفظ التغييرات' : 'Save Changes') : (locale === 'ar' ? 'إنشاء' : 'Create')}
+                        </>
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
+
+            {/* Filters */}
+<div className="flex flex-col sm:flex-row gap-4 mb-4">
+  {/* Search Input */}
+  <div className="flex-1">
+    <Input
+      placeholder={locale === 'ar' ? 'البحث...' : 'Search...'}
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="
+        h-12 flex items-center py-2 text-sm
+        bg-white dark:bg-[#1a1a1a]
+        border-2 border-[#DDDDDD] dark:border-[#000000]
+        focus:border-[#FF5F02] dark:focus:border-[#FF5F02]
+        text-[#262626] dark:text-white
+        placeholder:text-gray-400 dark:placeholder:text-gray-500
+      "
+    />
+  </div>
+
+  {/* Role Filter */}
+  <Select value={roleFilter} onValueChange={setRoleFilter}>
+    <SelectTrigger
+      className="
+        w-full sm:w-[200px] h-12 flex items-center py-2
+        bg-white dark:bg-[#1a1a1a]
+        border-2 border-[#DDDDDD] dark:border-[#000000]
+        focus:border-[#FF5F02] dark:focus:border-[#FF5F02]
+        text-[#262626] dark:text-white
+        hover:bg-gray-50 dark:hover:bg-[#0a0a0a]
+      "
+    >
+      <SelectValue
+        placeholder={locale === 'ar' ? 'فلترة حسب الدور' : 'Filter by role'}
+      />
+    </SelectTrigger>
+
+    <SelectContent
+      className="
+        bg-white dark:bg-[#262626]
+        border-2 border-[#DDDDDD] dark:border-[#000000]
+      "
+    >
+      <SelectItem
+        value="all"
+        className="
+          text-[#262626] dark:text-white
+          hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20
+          cursor-pointer
+        "
+      >
+        {locale === 'ar' ? 'الكل' : 'All'}
+      </SelectItem>
+
+      {uniqueRoles.map((role) => (
+        <SelectItem
+          key={role}
+          value={role}
+          className="
+            text-[#262626] dark:text-white
+            hover:bg-[#FF5F02]/10 dark:hover:bg-[#FF5F02]/20
+            cursor-pointer
+          "
+        >
+          {role.charAt(0).toUpperCase() + role.slice(1)}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
+
 
             {/* Select All */}
             {filteredUsers.length > 0 && (

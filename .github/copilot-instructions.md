@@ -387,4 +387,354 @@ These are examples of how you (Copilot) will be asked to generate code:
 * “Implement a language switcher component that toggles between English and Arabic and updates the layout direction.”
 * “Create a helper function `canUserPerformAction` that loads user roles and permissions from LMDB and checks if the user can perform a specific action on a given resource key.”
 
- 
+ # Discover Natural Ability (DNA)
+## Talent Intelligence Platform for Youth Sports
+
+---
+
+## 1. Product Definition
+
+**Discover Natural Ability (DNA)** is a Talent Intelligence Platform designed to:
+- Measure children's natural physical abilities
+- Transform raw assessments into structured development stages
+- Provide clear data, motivation, and long-term engagement
+- Operate **above** academies and schools (not replacing training)
+
+> DNA does NOT provide training programs, drills, or curricula.  
+> It provides **assessment, stages, insights, and motivation**.
+
+---
+
+## 2. Core Philosophy
+
+- Every child is on a **journey**, not a competition
+- Data must be **objective**, but communication must be **positive**
+- The child sees **progress and motivation**
+- The coach sees **analysis and decision support**
+- Parents see **clarity and reassurance**
+- Stages are earned through **time + attendance + improvement**
+
+---
+
+## 3. User Roles
+
+### 3.1 Discover Admin
+- Create academies / schools
+- Set organization type (Academy / School)
+- Set training intensity (High / Low)
+- Assign technicians
+- Monitor data quality
+- Audit badges and stage upgrades
+
+### 3.2 Discover Technician
+- Login with technician account
+- Select assigned academy/school
+- Select players
+- Run assessment sessions
+- Enter numeric test results only
+- Close and lock assessment sessions
+
+### 3.3 Academy / School Admin
+- Create player profiles
+- Manage age groups / training groups
+- View reports
+- Supervise coaches
+
+### 3.4 Coach
+- Record attendance (Present / Absent)
+- View player dashboards
+- Grant badges manually
+- Approve stage upgrades
+
+### 3.5 Player / Parent
+- View Player Profile
+- Track stage, progress, badges, medals
+- Receive positive updates
+
+---
+
+## 4. Player Profile (Core of the System)
+
+### 4.1 Player Profile Purpose
+The Player Profile is the **digital identity** of the athlete inside DNA.
+
+It must:
+- Be understandable to a child
+- Be trustworthy to a parent
+- Be actionable for a coach
+- Be consistent across years
+
+---
+
+## 5. Player Profile Structure
+
+### 5.1 Basic Information
+- Player ID (UUID)
+- Full Name
+- Profile Photo
+- Date of Birth
+- Age (calculated)
+- Gender (optional)
+- Academy / School
+- Training Group (e.g. U10, U12+U14)
+- Sport Preference (icon-based: ⚽ 🏀 🏊‍♂️ etc.)
+
+---
+
+### 5.2 Player Status
+- Current Stage
+- Stage Start Date
+- Days in Current Stage
+- Assessment Status:
+  - New
+  - First Assessment Completed
+  - Reassessment
+  - Stage Evaluation
+  - Due for Reassessment
+
+---
+
+### 5.3 Natural Ability Score (NA Score)
+- Single composite score
+- Derived from 7 physical tests
+- Used ONLY for:
+  - Tracking personal progress
+  - Stage eligibility
+- NOT used for ranking players publicly
+
+---
+
+### 5.4 Physical Assessment Results (7 Tests)
+
+Each test is numeric input only:
+
+1. Speed (seconds)
+2. Agility (seconds)
+3. Balance (seconds)
+4. Power (cm)
+5. Reaction (ms or score)
+6. Coordination (reps / time)
+7. Flexibility (cm)
+
+> No explanations, videos, or instructions in the app  
+> Test protocols are internal to Discover
+
+---
+
+### 5.5 Strengths & Development Areas
+
+#### Strengths
+- Top 2–3 abilities
+- Positive language only
+- Example:
+  - "Excellent balance and body control"
+
+#### Development Areas
+- Positive framing
+- No word "weakness"
+- Example:
+  - "Great opportunity to improve flexibility"
+
+---
+
+### 5.6 Player Identity
+- Assigned manually by Discover (not automatic)
+- Examples:
+  - Agile Player
+  - Power Player
+  - Balanced Athlete
+- Displayed with icon and short description
+
+---
+
+### 5.7 Stage Progress
+- Progress Bar (%)
+- Based on:
+  - Time in stage
+  - Attendance
+  - NA improvement
+- Child never sees failure reasons
+
+---
+
+### 5.8 XP (Experience Points)
+- Motivation only
+- Example logic:
+  - First assessment: +50 XP
+  - Reassessment: +20 XP
+  - Badge granted: +10 XP
+  - Monthly cap: 100 XP
+
+---
+
+### 5.9 Badges (15 in MVP)
+
+- Educational / behavioral / effort-based
+- Examples:
+  - Consistency Star
+  - Focus Champion
+  - Attendance Hero
+- Granted manually by Coach
+- Two states:
+  - Unlocked (colored)
+  - Locked (grey + 🔒 + general description)
+
+---
+
+### 5.10 Medals
+- Tied to stages and organization type
+
+**Academies (High Intensity):**
+- Medal every 3 months
+- Physical medal + certificate + photo
+
+**Schools (Low Intensity):**
+- Annual medal
+- Progress reports during the year
+
+Medals UI:
+- PlayStation-style row
+- Unlocked = colored
+- Upcoming = grey locked
+
+---
+
+## 6. Stages System
+
+### 6.1 Stage List
+1. Explorer – Discovery stage
+2. Foundation – Building base
+3. Active Player – Consistent & engaged
+4. Competitor – Performance-driven
+5. Champion – High consistency & growth
+
+---
+
+### 6.2 Entry Rule
+- Every player enters **Explorer** after first assessment
+
+---
+
+### 6.3 Stage Upgrade Conditions
+
+To move from one stage to the next, ALL conditions must be met:
+
+#### 1. Time in Stage
+- Academy: ≥ 90 days
+- School: ≥ 365 days
+
+#### 2. Attendance Rate
+- Explorer → Foundation: ≥ 50%
+- Foundation → Active: ≥ 60%
+- Active → Competitor: ≥ 70%
+- Competitor → Champion: ≥ 75%
+
+#### 3. NA Score Improvement
+- ≥ 10% improvement compared to NA at stage entry
+
+---
+
+### 6.4 Upgrade Flow
+- System evaluates conditions
+- If met → status becomes "Ready for Stage Upgrade"
+- Coach reviews and approves
+- Stage History is updated
+- Medal eligibility is triggered
+
+> System suggests, Coach decides
+
+---
+
+## 7. Assessment Session Workflow
+
+1. Player profile exists
+2. Technician logs in
+3. Select academy/school
+4. Select player
+5. Warm-up (12–15 min) – offline
+6. Run 7 physical tests
+7. Enter numeric results
+8. System calculates NA, progress, stage status
+9. Results sent to:
+   - Player Profile
+   - Coach Dashboard
+10. Session is locked (no edits)
+
+Session duration:
+- ~30 minutes per player
+
+---
+
+## 8. Coach Dashboard (Private View)
+
+Coach sees:
+- Current & previous NA Score
+- Age group benchmark
+- Performance trend (↑ ↓ →)
+- Explicit weak points
+- Attendance %
+- Assessment timeline
+- Badge history
+- Stage upgrade proposals
+
+Coach does NOT see:
+- Parent contact details
+- Player app UI styling
+
+---
+
+## 9. Privacy & Psychology Rules
+
+- Child never sees:
+  - Negative labels
+  - Weakness terminology
+  - Comparisons with other players
+  - Attendance failure reasons
+
+- All critical actions are audited:
+  - Who assessed
+  - Who granted badge
+  - Who upgraded stage
+
+---
+
+## 10. Language & Accessibility
+
+- Full bilingual support:
+  - Arabic (RTL)
+  - English (LTR)
+- Same logic, different UI direction
+- Localization-ready for future languages
+
+---
+
+## 11. MVP Boundaries
+
+Included:
+- Manual input only
+- No sensors or cameras
+- No training content
+- No AI recommendations
+
+Future extensions:
+- Device integrations
+- PDF reports
+- Advanced analytics
+- National benchmarks
+
+---
+
+## 12. Summary for Developers
+
+- DNA is not a training app
+- Everything revolves around:
+  - Player Profile
+  - Assessments
+  - Stages
+  - Motivation
+- Simple input, strong logic
+- Positive UI, deep analytics behind the scenes
+
+---
+
+End of document.

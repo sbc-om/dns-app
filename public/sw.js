@@ -42,36 +42,82 @@ self.addEventListener('fetch', (event) => {
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Offline</title>
               <style>
+                :root {
+                  color-scheme: light dark;
+                  --bg: #f5f5f5;
+                  --card: #ffffff;
+                  --text: #171717;
+                  --muted: #525252;
+                  --border: #e5e5e5;
+                  --shadow: rgba(0, 0, 0, 0.06);
+                }
+                @media (prefers-color-scheme: dark) {
+                  :root {
+                    --bg: #000000;
+                    --card: #1a1a1a;
+                    --text: #ffffff;
+                    --muted: #a3a3a3;
+                    --border: #0a0a0a;
+                    --shadow: rgba(0, 0, 0, 0.35);
+                  }
+                }
+                * { box-sizing: border-box; }
                 body {
-                  font-family: system-ui, -apple-system, sans-serif;
+                  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
                   display: flex;
                   align-items: center;
                   justify-content: center;
                   min-height: 100vh;
                   margin: 0;
-                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                  color: white;
+                  background: var(--bg);
+                  color: var(--text);
                   text-align: center;
-                  padding: 20px;
+                  padding: 24px;
                 }
                 .container {
-                  max-width: 400px;
+                  width: 100%;
+                  max-width: 420px;
+                }
+                .card {
+                  background: var(--card);
+                  border: 2px solid var(--border);
+                  border-radius: 16px;
+                  padding: 24px;
+                  box-shadow: 0 20px 40px var(--shadow);
+                }
+                .icon {
+                  width: 56px;
+                  height: 56px;
+                  border-radius: 14px;
+                  display: grid;
+                  place-items: center;
+                  margin: 0 auto 12px;
+                  border: 2px solid var(--border);
+                  background: rgba(0, 0, 0, 0.04);
+                }
+                @media (prefers-color-scheme: dark) {
+                  .icon { background: rgba(255, 255, 255, 0.06); }
                 }
                 h1 {
-                  font-size: 3rem;
-                  margin: 0 0 1rem;
+                  font-size: 1.5rem;
+                  margin: 0 0 8px;
+                  letter-spacing: -0.02em;
                 }
                 p {
-                  font-size: 1.25rem;
-                  opacity: 0.9;
+                  margin: 0;
+                  font-size: 1rem;
+                  color: var(--muted);
+                  line-height: 1.5;
                 }
               </style>
             </head>
             <body>
               <div class="container">
-                <h1>📡</h1>
-                <h1>You're Offline</h1>
-                <p>Please check your internet connection and try again.</p>
+                <div class="card">
+                  <div class="icon" aria-hidden="true">📡</div>
+                  <h1>You're Offline</h1>
+                  <p>Please check your internet connection and try again.</p>
+                </div>
               </div>
             </body>
             </html>

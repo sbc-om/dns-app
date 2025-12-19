@@ -338,7 +338,9 @@
     "updateProfile": "Update Profile",
     "confirmUpdate": "Are you sure you want to update your profile?",
     "profileUpdated": "Profile updated successfully!",
-    "profilePictureUpdated": "Profile picture updated successfully!"
+    "profilePictureUpdated": "Profile picture updated successfully!",
+    "contactInfo": "Contact info",
+    "contactInfoHint": "Keep your phone number up to date so you can receive important notifications."
   },
   "roles": {
     "title": "Roles",

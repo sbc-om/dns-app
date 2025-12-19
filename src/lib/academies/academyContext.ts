@@ -91,7 +91,6 @@ export async function requireAcademyContext(locale: string = 'en'): Promise<Acad
 
   if (!selected) {
     const picked = await pickDefaultAcademyIdForUser(user);
-    await setSelectedAcademyIdCookie(picked.academyId);
     return { user, academyId: picked.academyId, academyRole: picked.role };
   }
 
@@ -99,7 +98,6 @@ export async function requireAcademyContext(locale: string = 'en'): Promise<Acad
   const academy = await findAcademyById(selected);
   if (!academy || !academy.isActive) {
     const picked = await pickDefaultAcademyIdForUser(user);
-    await setSelectedAcademyIdCookie(picked.academyId);
     return { user, academyId: picked.academyId, academyRole: picked.role };
   }
 
@@ -124,18 +122,30 @@ export async function getAcademyContextIfAuthenticated(): Promise<AcademyContext
 
   await ensureDefaultAcademyExists('system');
   const selected = await getSelectedAcademyIdFromCookie();
-  const academyId = selected || DEFAULT_ACADEMY_ID;
 
-  if (user.role === 'admin') {
-    return { user, academyId, academyRole: 'global_admin' };
+  if (!selected) {
+    const picked = await pickDefaultAcademyIdForUser(user);
+    return { user, academyId: picked.academyId, academyRole: picked.role };
   }
 
-  const role = await getUserRoleInAcademy(user.id, academyId);
+  const academy = await findAcademyById(selected);
+  if (!academy || !academy.isActive) {
+    const picked = await pickDefaultAcademyIdForUser(user);
+    return { user, academyId: picked.academyId, academyRole: picked.role };
+  }
+
+  if (user.role === 'admin') {
+    return { user, academyId: selected, academyRole: 'global_admin' };
+  }
+
+  await ensureLegacyUserMembership(user, selected);
+
+  const role = await getUserRoleInAcademy(user.id, selected);
   if (!role) {
     return null;
   }
 
-  return { user, academyId, academyRole: role };
+  return { user, academyId: selected, academyRole: role };
 }
 
 export function isAcademyAdmin(ctx: AcademyContext): boolean {

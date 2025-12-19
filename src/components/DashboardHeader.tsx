@@ -64,9 +64,9 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
       try {
         const result = await getMyAcademiesAction(locale);
         if (result.success) {
-          const list = (result.academies || []) as Array<{ id: string; name: string }>;
+          const list = (result.academies || []).map((a) => ({ id: a.id, name: a.name }));
           setAcademies(list);
-          setCurrentAcademyId((result as any).currentAcademyId || null);
+          setCurrentAcademyId(result.currentAcademyId || null);
         }
       } catch (e) {
         console.error('Failed to load academies:', e);
@@ -146,157 +146,170 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
-      <div className="flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4 lg:px-6 gap-2">
-        <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+      <div className="flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4 lg:px-6 gap-2 sm:gap-3">
+        {/* Left Section: Menu + Title */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           {/* Mobile Menu Button */}
           <Button
             variant="ghost"
             size="icon"
             onClick={handleMobileMenuToggle}
-            className="lg:hidden h-10 w-10 min-w-10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-colors border-2 border-transparent hover:border-black/10 dark:hover:border-white/10 touch-manipulation"
+            className="lg:hidden h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-all border-2 border-transparent hover:border-black/10 dark:hover:border-white/10"
+            aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
               <X className="h-5 w-5 text-gray-800 dark:text-gray-100" />
             ) : (
               <Menu className="h-5 w-5 text-gray-800 dark:text-gray-100" />
             )}
-            <span className="sr-only">Toggle menu</span>
           </Button>
 
-          {/* Logo & Title */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-
-            <h1 className="hidden sm:block text-base md:text-lg lg:text-xl font-bold text-[#262626] dark:text-white truncate">
-              Discover Natural Ability
-            </h1>
-          </div>
+          {/* Title - Responsive visibility */}
+          <h1 className="hidden sm:block text-base md:text-lg font-bold text-[#262626] dark:text-white truncate">
+            DNA
+          </h1>
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-          {/* Home Button */}
-          <Link href={`/${locale}`}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 sm:h-10 sm:w-10 min-w-9 sm:min-w-10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-colors border-2 border-transparent hover:border-black/10 dark:hover:border-white/10 touch-manipulation"
-              title={dictionary.nav?.home || 'Home'}
-            >
-              <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700 dark:text-gray-200" />
-              <span className="sr-only">{dictionary.nav?.home || 'Home'}</span>
-            </Button>
-          </Link>
+        {/* Right Section: Actions - Grouped by priority */}
+        <div className="flex items-center gap-1 shrink-0">
+          {/* Primary Actions Group - Always visible */}
+          <div className="flex items-center gap-1">
+            {/* Academy Switcher - Hide icon on mobile, show on desktop */}
+            {academies.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="h-9 sm:h-10 px-2 sm:px-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-all border-2 border-transparent hover:border-black/10 dark:hover:border-white/10 flex items-center gap-1.5"
+                    aria-label="Switch academy"
+                  >
+                    <Building2 className="h-4 w-4 text-gray-700 dark:text-gray-200 shrink-0" />
+                    <span className="hidden lg:inline max-w-[120px] xl:max-w-40 truncate text-sm font-semibold text-[#262626] dark:text-white">{currentAcademyName}</span>
+                    <ChevronDown className="hidden lg:inline h-3.5 w-3.5 text-gray-500 dark:text-gray-400 shrink-0" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                  <DropdownMenuLabel className="bg-gray-50 dark:bg-[#1a1a1a]">
+                    <span className="text-sm font-bold text-[#262626] dark:text-white">Academies</span>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
+                  {academies.map((a) => (
+                    <DropdownMenuItem
+                      key={a.id}
+                      onClick={() => handleSwitchAcademy(a.id)}
+                      className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5"
+                    >
+                      <div className="flex items-center justify-between w-full gap-2">
+                        <span className="font-medium text-[#262626] dark:text-white truncate">{a.name}</span>
+                        {a.id === currentAcademyId && (
+                          <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 shrink-0">✓</span>
+                        )}
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
-          {/* Academy Switcher */}
-          {academies.length > 0 && (
+            {/* Notifications - Always visible with badge */}
+            <Link href={`/${locale}/dashboard/notifications`}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-all border-2 border-transparent hover:border-black/10 dark:hover:border-white/10 relative"
+                aria-label={dictionary.nav.notifications}
+              >
+                <Bell className="h-4 w-4 text-gray-700 dark:text-gray-200" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-600 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white dark:border-[#1a1a1a]">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+
+            {/* User Menu - Avatar */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="h-9 sm:h-10 px-3 sm:px-4 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-colors border-2 border-transparent hover:border-black/10 dark:hover:border-white/10 touch-manipulation flex items-center gap-2"
-                  title="Switch academy"
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-9 w-9 sm:h-10 sm:w-10 rounded-full active:scale-95 transition-all border-2 border-transparent hover:border-black/10 dark:hover:border-white/10"
+                  aria-label="User menu"
                 >
-                  <Building2 className="h-4 w-4 text-gray-700 dark:text-gray-200" />
-                  <span className="hidden md:inline max-w-[180px] truncate font-semibold text-[#262626] dark:text-white">{currentAcademyName}</span>
-                  <ChevronDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  {user.profilePicture ? (
+                    <img
+                      key={user.profilePicture}
+                      src={user.profilePicture}
+                      alt={user.fullName || 'User'}
+                      className="h-full w-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full rounded-full bg-[#262626] dark:bg-[#444] flex items-center justify-center text-white text-xs font-bold">
+                      {user.fullName?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+              <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
                 <DropdownMenuLabel className="bg-gray-50 dark:bg-[#1a1a1a]">
-                  <span className="text-sm font-bold text-[#262626] dark:text-white">Academies</span>
+                  <div className="flex flex-col space-y-1">
+                    <span className="text-sm font-bold text-[#262626] dark:text-white truncate">
+                      {user.fullName || dictionary.common.welcome}
+                    </span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{user.email}</span>
+                  </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
-                {academies.map((a) => (
-                  <DropdownMenuItem
-                    key={a.id}
-                    onClick={() => handleSwitchAcademy(a.id)}
-                    className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5"
-                  >
-                    <div className="flex items-center justify-between w-full gap-3">
-                      <span className="font-medium text-[#262626] dark:text-white truncate">{a.name}</span>
-                      {a.id === currentAcademyId && (
-                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">Current</span>
-                      )}
-                    </div>
+                
+                {/* Home */}
+                <Link href={`/${locale}`}>
+                  <DropdownMenuItem className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5">
+                    <Globe className="mr-2 h-4 w-4 text-gray-700 dark:text-gray-200" />
+                    <span className="font-medium text-[#262626] dark:text-white">{dictionary.nav?.home || 'Home'}</span>
                   </DropdownMenuItem>
-                ))}
+                </Link>
+
+                {/* Profile */}
+                <Link href={`/${locale}/dashboard/profile`}>
+                  <DropdownMenuItem className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5">
+                    <User className="mr-2 h-4 w-4 text-gray-700 dark:text-gray-200" />
+                    <span className="font-medium text-[#262626] dark:text-white">{dictionary.users?.profile || 'Profile'}</span>
+                  </DropdownMenuItem>
+                </Link>
+
+                <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
+                
+                {/* Theme & Language inline */}
+                <div className="px-2 py-2 flex items-center justify-between gap-2">
+                  <ThemeToggle />
+                  <LanguageSwitcher />
+                </div>
+
+                {/* Install App */}
+                {installPrompt && (
+                  <>
+                    <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
+                    <DropdownMenuItem onClick={handleInstall} className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5">
+                      <Download className="mr-2 h-4 w-4 text-green-600 dark:text-green-500" />
+                      <span className="font-medium text-[#262626] dark:text-white">Install App</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
+
+                <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
+                
+                {/* Logout */}
+                <DropdownMenuItem 
+                  onClick={handleLogout} 
+                  className="cursor-pointer text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 focus:bg-red-50 dark:focus:bg-red-950/20 font-medium"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>{dictionary.common.logout}</span>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
-
-          <ThemeToggle />
-          <LanguageSwitcher />
-
-          {/* Install App Button */}
-          {installPrompt && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleInstall}
-              className="h-9 w-9 sm:h-10 sm:w-10 min-w-9 sm:min-w-10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-colors border-2 border-transparent hover:border-black/10 dark:hover:border-white/10 touch-manipulation"
-              title="Install App"
-            >
-              <Download className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-500" />
-              <span className="sr-only">Install App</span>
-            </Button>
-          )}
-
-          {/* Notifications Button */}
-          <Link href={`/${locale}/dashboard/notifications`}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 sm:h-10 sm:w-10 min-w-9 sm:min-w-10 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 transition-colors border-2 border-transparent hover:border-black/10 dark:hover:border-white/10 touch-manipulation relative"
-              title={dictionary.nav.notifications}
-            >
-              <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700 dark:text-gray-200" />
-              {unreadCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-600 border-2 border-white dark:border-[#1a1a1a]" />
-              )}
-              <span className="sr-only">{dictionary.nav.notifications}</span>
-            </Button>
-          </Link>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 min-w-9 sm:min-w-10 rounded-full active:scale-95 transition-colors touch-manipulation border-2 border-transparent hover:border-black/10 dark:hover:border-white/10">
-                {user.profilePicture ? (
-                  <img
-                    key={user.profilePicture}
-                    src={user.profilePicture}
-                    alt={user.fullName || 'User'}
-                    className="h-7 w-7 sm:h-8 sm:w-8 rounded-full object-cover border-2 border-[#DDDDDD] dark:border-[#000000]"
-                  />
-                ) : (
-                  <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-[#262626] dark:bg-[#262626] flex items-center justify-center text-white text-xs sm:text-sm font-bold border-2 border-[#DDDDDD] dark:border-[#000000]">
-                    {user.fullName?.[0]?.toUpperCase() || 'U'}
-                  </div>
-                )}
-                <span className="sr-only">User menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
-              <DropdownMenuLabel className="bg-gray-50 dark:bg-[#1a1a1a]">
-                <div className="flex flex-col space-y-1">
-                  <span className="text-sm font-bold text-[#262626] dark:text-white">
-                    {user.fullName || dictionary.common.welcome}
-                  </span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400">{user.email}</span>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
-              <Link href={`/${locale}/dashboard/profile`}>
-                <DropdownMenuItem className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5">
-                  <User className="mr-2 h-4 w-4 text-gray-700 dark:text-gray-200" />
-                  <span className="font-medium">{dictionary.users?.profile || 'My Profile'}</span>
-                </DropdownMenuItem>
-              </Link>
-              <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
-              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 focus:bg-red-50 dark:focus:bg-red-950/20 font-medium">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>{dictionary.common.logout}</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          </div>
         </div>
       </div>
     </header>

@@ -338,7 +338,9 @@
     "updateProfile": "تحديث الملف الشخصي",
     "confirmUpdate": "هل أنت متأكد من تحديث ملفك الشخصي؟",
     "profileUpdated": "تم تحديث الملف الشخصي بنجاح!",
-    "profilePictureUpdated": "تم تحديث صورة الملف الشخصي بنجاح!"
+    "profilePictureUpdated": "تم تحديث صورة الملف الشخصي بنجاح!",
+    "contactInfo": "معلومات الاتصال",
+    "contactInfoHint": "حافظ على تحديث رقم هاتفك حتى تتمكن من تلقي إشعارات مهمة."
   },
   "roles": {
     "title": "الأدوار",
