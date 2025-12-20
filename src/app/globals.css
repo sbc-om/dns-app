@@ -46,41 +46,42 @@
 :root {
   --radius: 0.625rem;
   /* Core palette: White #FFFFFF, Light Gray #DDDDDD, Dark Charcoal #262626, Black #000000 */
-  --background: #FFFFFF;
-  --foreground: #000000;
-  --card: #FFFFFF;
-  --card-foreground: #000000;
-  --popover: #FFFFFF;
-  --popover-foreground: #000000;
-  --primary: #1E3A8A;
-  --primary-foreground: #FFFFFF;
-  --secondary: #DDDDDD;
-  --secondary-foreground: #000000;
-  --muted: #DDDDDD;
-  --muted-foreground: #262626;
-  --accent: #30B2D2;
-  --accent-foreground: #000000;
-  --destructive: #dc2626;
-  --border: #DDDDDD;
-  --input: #DDDDDD;
-  --ring: #1E3A8A;
-  --chart-1: #1E3A8A;
-  --chart-2: #30B2D2;
-  --chart-3: #DDDDDD;
-  --chart-4: #000000;
-  --chart-5: #FFFFFF;
-  --sidebar: #262626;
+  /* Dark-only palette */
+  --background: #000000;
+  --foreground: #FFFFFF;
+  --card: #262626;
+  --card-foreground: #FFFFFF;
+  --popover: #262626;
+  --popover-foreground: #FFFFFF;
+  --primary: #30B2D2;
+  --primary-foreground: #000000;
+  --secondary: #262626;
+  --secondary-foreground: #FFFFFF;
+  --muted: #262626;
+  --muted-foreground: #DDDDDD;
+  --accent: #1E3A8A;
+  --accent-foreground: #FFFFFF;
+  --destructive: #ef4444;
+  --border: #262626;
+  --input: #262626;
+  --ring: #30B2D2;
+  --chart-1: #30B2D2;
+  --chart-2: #DDDDDD;
+  --chart-3: #262626;
+  --chart-4: #FFFFFF;
+  --chart-5: #000000;
+  --sidebar: #000000;
   --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #1E3A8A;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #30B2D2;
-  --sidebar-accent-foreground: #000000;
-  --sidebar-border: #000000;
+  --sidebar-primary: #30B2D2;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #1E3A8A;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #262626;
   --sidebar-ring: #30B2D2;
   
   /* Chart colors */
-  --grid-color: #e5e7eb;
-  --text-secondary: #6b7280;
+  --grid-color: #374151;
+  --text-secondary: #9ca3af;
 }
 
 .dark {
@@ -128,7 +129,8 @@
   }
   body {
     @apply bg-background text-foreground;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    /* Avoid theme-transition flashes. */
+    transition: none;
   }
 }
 

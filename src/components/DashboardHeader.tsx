@@ -1,9 +1,8 @@
 'use client';
 
-import { LogOut, User, Menu, X, Download, Bell, Globe, Building2, ChevronDown, ArrowLeft, Sparkles } from 'lucide-react';
+import { LogOut, User, Menu, X, Download, Bell, Globe, Building2, ChevronDown, ArrowLeft, Sparkles, Shield } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { ThemeToggle } from './ThemeToggle';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -137,7 +136,9 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
     setInstallPrompt(null);
   };
 
-  const currentAcademyName = academies.find((a) => a.id === currentAcademyId)?.name || (academies[0]?.name ?? 'Academy');
+  const currentAcademyName =
+    academies.find((a) => a.id === currentAcademyId)?.name ||
+    (academies[0]?.name ?? dictionary.common.academy);
 
   const handleSwitchAcademy = async (academyId: string) => {
     try {
@@ -254,21 +255,42 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                     <ChevronDown className="hidden lg:inline h-3.5 w-3.5 text-gray-500 dark:text-gray-400 shrink-0" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
-                  <DropdownMenuLabel className="bg-gray-50 dark:bg-[#1a1a1a]">
-                    <span className="text-sm font-bold text-[#262626] dark:text-white">Academies</span>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-72 bg-white/90 dark:bg-gray-950/85 backdrop-blur-2xl border-2 border-black/10 dark:border-white/10 shadow-2xl shadow-purple-900/20 overflow-hidden"
+                >
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.12),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.12),transparent_60%)]" />
+                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-size-[24px_24px] opacity-[0.10] dark:opacity-[0.07]" />
+
+                  <DropdownMenuLabel className="relative bg-gray-50/70 dark:bg-white/5 border-b border-black/10 dark:border-white/10">
+                    <div className="flex items-center gap-2">
+                      <motion.div
+                        animate={{ rotate: [0, -6, 6, -6, 0] }}
+                        transition={{ duration: 0.8 }}
+                      >
+                        <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      </motion.div>
+                      <span className="text-sm font-black text-[#262626] dark:text-white">{dictionary.nav.academies}</span>
+                    </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
+                  <DropdownMenuSeparator className="bg-black/10 dark:bg-white/10" />
                   {academies.map((a) => (
                     <DropdownMenuItem
                       key={a.id}
                       onClick={() => handleSwitchAcademy(a.id)}
-                      className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5"
+                      className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5 relative"
                     >
                       <div className="flex items-center justify-between w-full gap-2">
                         <span className="font-medium text-[#262626] dark:text-white truncate">{a.name}</span>
                         {a.id === currentAcademyId && (
-                          <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 shrink-0">✓</span>
+                          <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="text-xs font-black text-blue-700 dark:text-blue-300 shrink-0 inline-flex items-center gap-1"
+                          >
+                            <Sparkles className="h-3.5 w-3.5" />
+                            ✓
+                          </motion.span>
                         )}
                       </div>
                     </DropdownMenuItem>
@@ -331,8 +353,14 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                   </Button>
                 </motion.div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
-                <DropdownMenuLabel className="bg-gray-50 dark:bg-[#1a1a1a]">
+              <DropdownMenuContent
+                align="end"
+                className="w-80 bg-white/92 dark:bg-gray-950/85 backdrop-blur-2xl border-2 border-black/10 dark:border-white/10 shadow-2xl shadow-purple-900/25 overflow-hidden"
+              >
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.12),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.12),transparent_60%)]" />
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-size-[24px_24px] opacity-[0.10] dark:opacity-[0.07]" />
+
+                <DropdownMenuLabel className="relative bg-gray-50/70 dark:bg-white/5 border-b border-black/10 dark:border-white/10">
                   <div className="flex flex-col space-y-1">
                     <span className="text-sm font-bold text-[#262626] dark:text-white truncate">
                       {user.fullName || dictionary.common.welcome}
@@ -340,13 +368,13 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                     <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{user.email}</span>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
+                <DropdownMenuSeparator className="bg-black/10 dark:bg-white/10" />
                 
                 {/* Home */}
                 <Link href={`/${locale}`}>
                   <DropdownMenuItem className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5">
                     <Globe className="mr-2 h-4 w-4 text-gray-700 dark:text-gray-200" />
-                    <span className="font-medium text-[#262626] dark:text-white">{dictionary.nav?.home || 'Home'}</span>
+                    <span className="font-medium text-[#262626] dark:text-white">{dictionary.nav.home}</span>
                   </DropdownMenuItem>
                 </Link>
 
@@ -354,30 +382,39 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                 <Link href={`/${locale}/dashboard/profile`}>
                   <DropdownMenuItem className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5">
                     <User className="mr-2 h-4 w-4 text-gray-700 dark:text-gray-200" />
-                    <span className="font-medium text-[#262626] dark:text-white">{dictionary.users?.profile || 'Profile'}</span>
+                    <span className="font-medium text-[#262626] dark:text-white">{dictionary.users.profile}</span>
                   </DropdownMenuItem>
                 </Link>
 
-                <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
+                <DropdownMenuSeparator className="bg-black/10 dark:bg-white/10" />
                 
-                {/* Theme & Language inline */}
-                <div className="px-2 py-2 flex items-center justify-between gap-2">
-                  <ThemeToggle />
+                {/* Language */}
+                <div className="px-2 py-2 flex items-center justify-end">
                   <LanguageSwitcher />
                 </div>
 
                 {/* Install App */}
                 {installPrompt && (
                   <>
-                    <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
+                    <DropdownMenuSeparator className="bg-black/10 dark:bg-white/10" />
                     <DropdownMenuItem onClick={handleInstall} className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5">
                       <Download className="mr-2 h-4 w-4 text-green-600 dark:text-green-500" />
-                      <span className="font-medium text-[#262626] dark:text-white">Install App</span>
+                      <span className="font-medium text-[#262626] dark:text-white">{dictionary.common.installApp}</span>
                     </DropdownMenuItem>
                   </>
                 )}
 
-                <DropdownMenuSeparator className="bg-[#DDDDDD] dark:bg-[#000000]" />
+                <DropdownMenuSeparator className="bg-black/10 dark:bg-white/10" />
+
+                {/* Quick Access */}
+                <Link href={`/${locale}/dashboard`}>
+                  <DropdownMenuItem className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:bg-black/5 dark:focus:bg-white/5">
+                    <Shield className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <span className="font-medium text-[#262626] dark:text-white">{dictionary.nav.dashboard}</span>
+                  </DropdownMenuItem>
+                </Link>
+
+                <DropdownMenuSeparator className="bg-black/10 dark:bg-white/10" />
                 
                 {/* Logout */}
                 <DropdownMenuItem 

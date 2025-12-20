@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -19,42 +19,28 @@ export function ThemeProvider({
   children: React.ReactNode;
   forcedTheme?: Theme;
 }) {
-  const [theme, setThemeState] = useState<Theme>(forcedTheme ?? 'light');
-  const [mounted, setMounted] = useState(false);
+  const effectiveTheme = useMemo<Theme>(() => forcedTheme ?? 'dark', [forcedTheme]);
+  const [theme, setThemeState] = useState<Theme>(effectiveTheme);
 
   useEffect(() => {
-    setMounted(true);
+    setThemeState(effectiveTheme);
 
-    const savedTheme = localStorage.getItem('theme') as Theme;
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const initialTheme = forcedTheme ?? savedTheme ?? systemTheme;
-    
-    setThemeState(initialTheme);
-    
-    // Remove both classes first
-    document.documentElement.classList.remove('light', 'dark');
-    // Add the correct class
-    document.documentElement.classList.add(initialTheme);
-  }, [forcedTheme]);
+    // Dark-only: never remove `dark` (avoids a brief light-mode paint).
+    document.documentElement.classList.remove('light');
+    document.documentElement.classList.add('dark');
+  }, [effectiveTheme]);
 
   const setTheme = (newTheme: Theme) => {
-    const nextTheme = forcedTheme ?? newTheme;
-    setThemeState(nextTheme);
-
-    if (!forcedTheme) {
-      localStorage.setItem('theme', nextTheme);
-    }
-    
-    // Remove both classes first
-    document.documentElement.classList.remove('light', 'dark');
-    // Add the correct class
-    document.documentElement.classList.add(nextTheme);
+    // Dark-only.
+    if (newTheme !== 'dark') return;
+    setThemeState('dark');
+    document.documentElement.classList.remove('light');
+    document.documentElement.classList.add('dark');
   };
 
   const toggleTheme = () => {
-    if (forcedTheme) return;
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
+    // Dark-only.
+    return;
   };
 
   return (

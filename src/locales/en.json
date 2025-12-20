@@ -4,6 +4,7 @@
     "welcome": "Welcome",
     "login": "Login",
     "logout": "Logout",
+    "installApp": "Install App",
     "signup": "Sign Up",
     "email": "Email",
     "password": "Password",
@@ -29,7 +30,8 @@
     "clear": "Clear",
     "optional": "Optional",
     "confirmDelete": "Are you sure you want to delete this item?",
-    "confirmContinue": "Are you sure you want to continue?"
+    "confirmContinue": "Are you sure you want to continue?",
+    "academy": "Academy"
   },
   "nav": {
     "home": "Home",
@@ -50,6 +52,22 @@
     "payments": "Payments",
     "settings": "Settings",
     "academies": "Academies"
+  },
+  "footer": {
+    "description": "Be a Champion!",
+    "tagline": "Let’s build champions together.",
+    "quickLinks": "Quick Links",
+    "contact": "Contact",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "followUs": "Follow Us",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "linkedin": "LinkedIn",
+    "rights": "All rights reserved.",
+    "madeForAthletes": "Built for athletes, coaches, and families.",
+    "copyright": "© {year} DNA. All rights reserved."
   },
   "auth": {
     "login": "Login",
@@ -570,7 +588,7 @@
         "subtitle": "OUR COMMUNITY"
       },
       "faq": {
-        "title": "Have Questions? Check Out Our FAQ for All the Answers You Need.",
+        "title": "Frequently Asked Questions",
         "q1": "What sports programs does the academy offer?",
         "a1": "We offer comprehensive training programs in football, basketball, and various other sports disciplines.",
         "q2": "What age groups can join?",
@@ -1113,15 +1131,5 @@
       "warning": "Warning",
       "error": "Error"
     }
-  },
-  "footer": {
-    "description": "Be a Champion!",
-    "quickLinks": "Quick Links",
-    "contact": "Contact",
-    "legal": "Legal",
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
-    "rights": "All rights reserved.",
-    "copyright": "© {year} DNA. All rights reserved."
   }
 }

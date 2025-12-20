@@ -45,7 +45,7 @@ export function LanguageSwitcher() {
         variant="ghost" 
         size="sm"
         onClick={switchLocale}
-        className="h-10 gap-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all backdrop-blur-xl"
+        className="h-11 gap-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all backdrop-blur-xl"
       >
         <Languages className="h-5 w-5 text-blue-400" />
         <span className="text-sm font-semibold text-white">

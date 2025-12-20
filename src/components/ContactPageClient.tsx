@@ -23,205 +23,147 @@ interface ContactFormData {
 
 // Since we can't use async in client components, we'll need to pass dictionary as props
 // For now, we'll create a client component that receives the dictionary
-export default function ContactPage({ dictionary, locale, user }: { dictionary: any; locale: Locale; user?: { fullName?: string; email: string } | null }) {
-  const [formData, setFormData] = useState<ContactFormData>({
-    name: '',
     email: '',
     message: '',
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { Dictionary } from '@/lib/i18n/getDictionary';
+import type { Locale } from '@/config/i18n';
   const handleSubmit = async (e: React.FormEvent) => {
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { ContactForm } from '@/components/ContactForm';
     e.preventDefault();
-    setIsSubmitting(true);
+type SessionUser = { fullName?: string; email: string; role?: string };
 
-    try {
-      // Here you would typically send the form data to your API
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      
-      setSubmitStatus('success');
-      setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
-      setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  return (
-    <div className="min-h-screen flex flex-col bg-[#DDDDDD] dark:bg-gray-900">
-      <Header dictionary={dictionary} locale={locale} user={user} />
-      
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="py-20 px-4 text-center">
-          <div className="container max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-[#262626] dark:text-white">
-              {dictionary.pages.contact.title}
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
-              {dictionary.pages.contact.subtitle}
-            </p>
-          </div>
-        </section>
-
-        {/* Contact Form & Info Section */}
-        <section className="py-20 px-4">
-          <div className="container max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {/* Contact Form */}
+export default function ContactPageClient({
+  dictionary,
+  locale,
+  user,
+}: {
+  dictionary: Dictionary;
+  locale: Locale;
+  user?: SessionUser | null;
+}) {
+  const email = 'info@discovernaturalability.com';
+  const phone = '+968 7772 2112';
+  const address = 'Oman - Muscat';
               <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-lg dark:bg-gray-900/80">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-bold text-[#262626] dark:text-white">
+    <div className="min-h-screen flex flex-col bg-[#0a0a0a]" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
                     {dictionary.pages.contact.form.submit}
                   </CardTitle>
                   <CardDescription className="text-gray-600 dark:text-gray-400">
-                    Fill out the form below and we'll get back to you as soon as possible.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                      <Label htmlFor="name">{dictionary.pages.contact.form.name}</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        type="text"
-                        placeholder={dictionary.pages.contact.form.namePlaceholder}
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
+        {/* Hero */}
+        <section className="relative px-4 pt-18 pb-10 overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute inset-0 bg-black" />
+            <motion.div
+              className="absolute -top-48 -left-48 h-120 w-120 rounded-full bg-blue-500/12 blur-3xl"
+              animate={{ scale: [1, 1.12, 1], opacity: [0.28, 0.6, 0.28] }}
+              transition={{ duration: 6.2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.div
+              className="absolute -bottom-56 -right-56 h-136 w-136 rounded-full bg-purple-500/12 blur-3xl"
+              animate={{ scale: [1, 1.14, 1], opacity: [0.25, 0.58, 0.25] }}
+              transition={{ duration: 7.1, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-size-[28px_28px] opacity-[0.06]" />
+          </div>
 
-                    <div>
-                      <Label htmlFor="email">{dictionary.pages.contact.form.email}</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder={dictionary.pages.contact.form.emailPlaceholder}
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="message">{dictionary.pages.contact.form.message}</Label>
-                      <textarea
-                        id="message"
-                        name="message"
-                        rows={5}
-                        placeholder={dictionary.pages.contact.form.messagePlaceholder}
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full min-h-0 rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                      />
-                    </div>
-
-                    {submitStatus === 'success' && (
-                      <div className="p-4 bg-green-50 border border-green-200 rounded-md">
-                        <p className="text-green-800">{dictionary.pages.contact.form.success}</p>
-                      </div>
-                    )}
-
-                    {submitStatus === 'error' && (
-                      <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-                        <p className="text-red-800">{dictionary.pages.contact.form.error}</p>
-                      </div>
-                    )}
-
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-[#FF5F02] hover:bg-[#262626] text-white shadow-lg" 
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? dictionary.common.loading : dictionary.pages.contact.form.submit}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-
-              {/* Contact Information */}
-              <div className="space-y-8">
-                <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-lg dark:bg-gray-900/80">
-                  <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-[#262626] dark:text-white">
-                      {dictionary.pages.contact.info.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                      <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900/30">
-                        <Mail className="h-6 w-6 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900 dark:text-gray-100">Email</p>
-                        <p className="text-gray-600 dark:text-gray-400">contact@dnawebapp.com</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                      <div className="p-3 rounded-full bg-pink-100 dark:bg-pink-900/30">
-                        <Phone className="h-6 w-6 text-pink-600" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900 dark:text-gray-100">Phone</p>
-                        <p className="text-gray-600 dark:text-gray-400">+1 (555) 123-4567</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                      <div className="p-3 rounded-full bg-orange-100 dark:bg-orange-900/30">
-                        <MapPin className="h-6 w-6 text-orange-600" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900 dark:text-gray-100">Address</p>
-                        <p className="text-gray-600 dark:text-gray-400">
-                          123 Tech Street<br />
-                          Innovation City, IC 12345
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-lg dark:bg-gray-900/80">
-                  <CardHeader>
-                    <CardTitle className="font-bold text-gray-900 dark:text-gray-100">Office Hours</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex justify-between p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20">
-                        <span className="font-medium">Monday - Friday:</span>
-                        <span className="text-purple-600 dark:text-purple-400 font-semibold">9:00 AM - 6:00 PM</span>
-                      </div>
-                      <div className="flex justify-between p-3 rounded-lg bg-pink-50 dark:bg-pink-900/20">
-                        <span className="font-medium">Saturday:</span>
-                        <span className="text-pink-600 dark:text-pink-400 font-semibold">10:00 AM - 4:00 PM</span>
-                      </div>
-                      <div className="flex justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
-                        <span className="font-medium">Sunday:</span>
-                        <span className="text-gray-600 dark:text-gray-400 font-semibold">Closed</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+          <div className="mx-auto max-w-5xl text-center">
+            <motion.h1
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, type: 'spring', stiffness: 260, damping: 24 }}
+              className="text-4xl md:text-6xl font-black text-white"
+            >
+              {dictionary.pages.contact.title}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.05 }}
+              className="mt-4 text-lg md:text-xl text-gray-300"
+            >
+              {dictionary.pages.contact.subtitle}
+            </motion.p>
           </div>
         </section>
-      </main>
 
-      <Footer dictionary={dictionary} locale={locale} />
-    </div>
-  );
-}
+        {/* Content */}
+        <section className="px-4 pb-16">
+          <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Info */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-5 space-y-6"
+            >
+              <Card className="relative overflow-hidden border border-white/10 bg-white/5">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(59,130,246,0.14),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.12),transparent_60%)]" />
+                <CardHeader className="relative">
+                  <CardTitle className="text-2xl font-black text-white">{dictionary.pages.contact.info.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="relative space-y-4">
+                  <Link
+                    href={`mailto:${email}`}
+                    className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-4 hover:bg-black/30 transition-colors"
+                  >
+                    <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                      <Mail className="h-6 w-6 text-blue-300" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-white/80">{dictionary.pages.contact.info.emailLabel}</div>
+                      <div className="text-base font-bold text-white truncate">{email}</div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href={`tel:${phone.replace(/\s+/g, '')}`}
+                    className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-4 hover:bg-black/30 transition-colors"
+                  >
+                    <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                      <Phone className="h-6 w-6 text-purple-300" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-white/80">{dictionary.pages.contact.info.phoneLabel}</div>
+                      <div className="text-base font-bold text-white truncate">{phone}</div>
+                    </div>
+                  </Link>
+
+                  <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-4">
+                    <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                      <MapPin className="h-6 w-6 text-pink-300" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-white/80">{dictionary.pages.contact.info.addressLabel}</div>
+                      <div className="text-base font-bold text-white truncate">{address}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Form */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.05 }}
+              className="lg:col-span-7"
+            >
+              <Card className="relative overflow-hidden border border-white/10 bg-white/5">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(236,72,153,0.10),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(59,130,246,0.12),transparent_60%)]" />
+                <CardHeader className="relative">
+                  <CardTitle className="text-2xl font-black text-white">{dictionary.pages.contact.form.submit}</CardTitle>
+                </CardHeader>
+                <CardContent className="relative">
+                  <ContactForm dictionary={dictionary} locale={locale} />
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </section>

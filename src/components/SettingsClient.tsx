@@ -422,25 +422,6 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
                   </div>
                 </div>
 
-                {/* Theme Settings */}
-                <div className="p-5 bg-white dark:bg-[#1a1a1a] rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1 flex-1">
-                      <h3 className="font-bold text-[#262626] dark:text-white">
-                        {dictionary.settings?.theme || 'Theme'}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {dictionary.settings?.themeDesc || 'Choose your preferred theme mode'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-[#262626] dark:text-white px-3 py-1.5 bg-black/5 dark:bg-white/5 rounded-lg">
-                        {dictionary.settings?.system || 'System'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Time Zone */}
                 <div className="p-5 bg-white dark:bg-[#1a1a1a] rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
                   <div className="flex items-center justify-between">

@@ -202,101 +202,69 @@ export default function HomePage({ params }: PageProps) {
             className="pointer-events-none absolute -bottom-48 -right-48 w-[620px] h-[620px] rounded-full bg-[radial-gradient(circle_at_70%_70%,rgba(168,85,247,0.28),transparent_60%)] blur-3xl"
             style={{ y: heroGlowY, rotate: heroGlowRotate, opacity: heroGlowOpacity }}
           />
-          <div className="max-w-7xl mx-auto">
+          <div className="w-full">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={containerVariants}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
+              className="w-full"
             >
-              <motion.div variants={itemVariants} className="lg:col-span-7">
-                <div className="relative group h-full">
-                  <div className="absolute -inset-px rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.25),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.18),transparent_55%)] blur-2xl" />
-                  <div className="relative h-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 mb-6">
-                      <Sparkles className="w-4 h-4 text-blue-300" />
-                      <span className="text-sm font-semibold text-white/90">Discover Your Natural Ability</span>
-                    </div>
+              <motion.div variants={itemVariants} className="w-full">
+                <div className="mx-auto max-w-4xl text-center">
+                  <motion.h1
+                    style={{ y: heroTitleY }}
+                    className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.05] text-white"
+                  >
+                    {dictionary.pages.home.hero.title}
+                  </motion.h1>
+                  <p className="mt-5 text-gray-300 font-medium leading-relaxed text-base sm:text-lg mx-auto max-w-2xl">
+                    {dictionary.pages.home.hero.subtitle}
+                  </p>
 
-                    <motion.h1
-                      style={{ y: heroTitleY }}
-                      className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.05] text-white"
-                    >
-                      {dictionary.pages.home.hero.title}
-                    </motion.h1>
-                    <p className="mt-5 text-gray-300 font-medium leading-relaxed text-base sm:text-lg max-w-2xl">
-                      {dictionary.pages.home.hero.subtitle}
-                    </p>
+                  <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                    <Link href={`/${locale}/book-appointment`} className="w-full sm:w-auto">
+                      <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+                        <Button
+                          size="lg"
+                          className="w-full sm:w-auto h-14 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 border border-blue-400/30"
+                        >
+                          <span className="flex items-center justify-center">
+                            {dictionary.pages.home.hero.cta}
+                            <ArrowRight className="ml-2 w-5 h-5" />
+                          </span>
+                        </Button>
+                      </motion.div>
+                    </Link>
 
-                    <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                      <Link href={`/${locale}/book-appointment`} className="w-full sm:w-auto">
+                    {user ? (
+                      <Link href={`/${locale}/dashboard`} className="w-full sm:w-auto">
                         <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
                           <Button
                             size="lg"
-                            className="w-full sm:w-auto h-14 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 border border-blue-400/30"
+                            variant="outline"
+                            className="w-full sm:w-auto h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/20 text-white hover:bg-white/10"
                           >
-                            <span className="flex items-center">
-                              {dictionary.pages.home.hero.cta}
-                              <ArrowRight className="ml-2 w-5 h-5" />
-                            </span>
+                            {dictionary.nav.dashboard}
+                            <ChevronRight className="ml-2 w-5 h-5" />
                           </Button>
                         </motion.div>
                       </Link>
-
-                      {user ? (
-                        <Link href={`/${locale}/dashboard`} className="w-full sm:w-auto">
-                          <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
-                            <Button
-                              size="lg"
-                              variant="outline"
-                              className="w-full sm:w-auto h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/20 text-white hover:bg-white/10"
-                            >
-                              {dictionary.nav.dashboard}
-                              <ChevronRight className="ml-2 w-5 h-5" />
-                            </Button>
-                          </motion.div>
-                        </Link>
-                      ) : (
-                        <Link href={`/${locale}/auth/login`} className="w-full sm:w-auto">
-                          <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
-                            <Button
-                              size="lg"
-                              variant="outline"
-                              className="w-full sm:w-auto h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/20 text-white hover:bg-white/10"
-                            >
-                              {dictionary.pages.home.hero.loginCta}
-                              <ChevronRight className="ml-2 w-5 h-5" />
-                            </Button>
-                          </motion.div>
-                        </Link>
-                      )}
-                    </div>
+                    ) : (
+                      <Link href={`/${locale}/auth/login`} className="w-full sm:w-auto">
+                        <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+                          <Button
+                            size="lg"
+                            variant="outline"
+                            className="w-full sm:w-auto h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/20 text-white hover:bg-white/10"
+                          >
+                            {dictionary.pages.home.hero.loginCta}
+                            <ChevronRight className="ml-2 w-5 h-5" />
+                          </Button>
+                        </motion.div>
+                      </Link>
+                    )}
                   </div>
-                </div>
-              </motion.div>
-
-              <motion.div variants={itemVariants} className="lg:col-span-5">
-                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4 h-full">
-                  {[
-                    { icon: Users, label: '500+', sublabel: 'Athletes' },
-                    { icon: Trophy, label: '50+', sublabel: 'Champions' },
-                    { icon: Star, label: '4.9', sublabel: 'Rating' },
-                  ].map((stat, i) => (
-                    <motion.div
-                      key={i}
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="relative group"
-                    >
-                      <div className="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_30%_20%,rgba(236,72,153,0.20),transparent_55%),radial-gradient(circle_at_70%_80%,rgba(96,165,250,0.18),transparent_55%)] blur-2xl" />
-                      <div className="relative rounded-2xl p-5 border border-white/10 bg-white/5 backdrop-blur-xl">
-                        <stat.icon className="w-6 h-6 text-blue-300 mb-3" />
-                        <div className="text-3xl font-black text-white">{stat.label}</div>
-                        <div className="text-sm text-gray-400">{stat.sublabel}</div>
-                      </div>
-                    </motion.div>
-                  ))}
                 </div>
               </motion.div>
             </motion.div>
@@ -550,108 +518,6 @@ export default function HomePage({ params }: PageProps) {
                 </motion.div>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* Stats & Achievements Section */}
-        <section className="relative py-24 px-4 bg-linear-to-br from-blue-600 via-purple-600 to-pink-600 overflow-hidden">
-          {/* Animated background pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-              className="absolute top-1/4 left-1/4 w-96 h-96 border-2 border-white/20 rounded-full"
-            />
-            <motion.div
-              animate={{ rotate: -360 }}
-              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-              className="absolute bottom-1/4 right-1/4 w-64 h-64 border-2 border-white/20 rounded-full"
-            />
-          </div>
-
-          <div className="max-w-7xl mx-auto relative">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-16"
-            >
-              <motion.div
-                initial={{ scale: 0.9 }}
-                whileInView={{ scale: 1 }}
-                className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-xl text-white px-5 py-2.5 rounded-full mb-6 border border-white/30"
-              >
-                <Trophy className="w-5 h-5" />
-                <span className="text-sm font-bold">OUR ACHIEVEMENTS</span>
-              </motion.div>
-              <h2 className="text-4xl md:text-6xl font-black text-white mb-4">
-                Building Champions
-              </h2>
-              <p className="text-xl text-white/90 max-w-2xl mx-auto">
-                Join thousands of athletes who have discovered their potential
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-              {[
-                { number: '5000+', label: 'Athletes Trained', icon: Users },
-                { number: '150+', label: 'Champions Created', icon: Trophy },
-                { number: '98%', label: 'Success Rate', icon: TrendingUp },
-                { number: '25+', label: 'Years Experience', icon: Award },
-              ].map((stat, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  className="relative group"
-                >
-                  <div className="absolute inset-0 bg-white/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-white/20 hover:border-white/40 transition-all">
-                    <stat.icon className="w-10 h-10 md:w-12 md:h-12 text-white mb-4 mx-auto group-hover:scale-110 transition-transform" />
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      whileInView={{ scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1 + 0.3, duration: 0.5, type: 'spring' }}
-                      className="text-3xl md:text-5xl font-black text-white mb-2"
-                    >
-                      {stat.number}
-                    </motion.div>
-                    <p className="text-sm md:text-base text-white/80 font-medium">
-                      {stat.label}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* CTA */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-              className="text-center mt-16"
-            >
-              <Link href={`/${locale}/book-appointment`}>
-                <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    size="lg"
-                    className="h-16 rounded-2xl bg-white text-purple-600 font-bold px-12 hover:bg-white/90 shadow-2xl shadow-black/30 text-lg relative overflow-hidden group"
-                  >
-                    <span className="relative z-10 flex items-center">
-                      Become a Champion
-                      <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                    </span>
-                  </Button>
-                </motion.div>
-              </Link>
-            </motion.div>
           </div>
         </section>
       </main>
