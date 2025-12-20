@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar,
   CalendarDays,
@@ -208,12 +209,19 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
 
   const AppointmentCards = ({ items }: { items: Appointment[] }) => (
     <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
-      {items.map((appointment) => (
-        <Card
+      {items.map((appointment, index) => (
+        <motion.div
           key={appointment.id}
-          className="rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] cursor-pointer"
-          onClick={() => openDetails(appointment)}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1, duration: 0.4 }}
+          whileHover={{ y: -5, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
+          <Card
+            className="rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] cursor-pointer"
+            onClick={() => openDetails(appointment)}
+          >
           <CardHeader className="px-4 pt-4 pb-2 border-b-2 border-[#DDDDDD] dark:border-[#000000]">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -250,6 +258,7 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
             </div>
           </CardContent>
         </Card>
+        </motion.div>
       ))}
     </div>
   );
@@ -269,9 +278,12 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
             </TableRow>
           </TableHeader>
           <TableBody>
-            {items.map((appointment) => (
-              <TableRow
+            {items.map((appointment, index) => (
+              <motion.tr
                 key={appointment.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05, duration: 0.3 }}
                 className="cursor-pointer border-b border-[#DDDDDD] dark:border-[#000000] hover:bg-gray-50 dark:hover:bg-[#262626]"
                 onClick={() => openDetails(appointment)}
               >
@@ -286,16 +298,18 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
                 <TableCell className="px-4 text-gray-700 dark:text-gray-300">{appointment.mobileNumber}</TableCell>
                 <TableCell className="px-4">{statusBadge(appointment.status)}</TableCell>
                 <TableCell className="px-4 text-right" onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
-                    onClick={() => openDetails(appointment)}
-                  >
-                    {dictionary.appointment?.viewDetails || 'View details'}
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
+                      onClick={() => openDetails(appointment)}
+                    >
+                      {dictionary.appointment?.viewDetails || 'View details'}
+                    </Button>
+                  </motion.div>
                 </TableCell>
-              </TableRow>
+              </motion.tr>
             ))}
           </TableBody>
         </Table>
@@ -304,43 +318,67 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
   );
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+      >
         <div className="min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#262626] dark:text-white truncate">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent truncate">
             {dictionary.nav.appointments}
           </h1>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
             {dictionary.appointment?.viewAppointments || 'View appointments'}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] hover:bg-gray-50 dark:hover:bg-[#262626]"
-            onClick={loadAppointments}
-            disabled={loading}
-          >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            {dictionary.appointment?.refresh || 'Refresh'}
-          </Button>
-          <Link href={`/${locale}/dashboard/schedules`}>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex flex-wrap items-center gap-2"
+        >
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               type="button"
               variant="outline"
               className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] hover:bg-gray-50 dark:hover:bg-[#262626]"
+              onClick={loadAppointments}
+              disabled={loading}
             >
-              <CalendarDays className="h-4 w-4 mr-2" />
-              {dictionary.nav.schedules}
+              <RefreshCw className="h-4 w-4 mr-2" />
+              {dictionary.appointment?.refresh || 'Refresh'}
             </Button>
+          </motion.div>
+          <Link href={`/${locale}/dashboard/schedules`}>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                type="button"
+                variant="outline"
+                className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] hover:bg-gray-50 dark:hover:bg-[#262626]"
+              >
+                <CalendarDays className="h-4 w-4 mr-2" />
+                {dictionary.nav.schedules}
+              </Button>
+            </motion.div>
           </Link>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      <Card className="rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
-        <CardHeader className="pb-4 border-b-2 border-[#DDDDDD] dark:border-[#000000]">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      >
+        <Card className="rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
+          <CardHeader className="pb-4 border-b-2 border-[#DDDDDD] dark:border-[#000000]">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <CardTitle className="text-lg font-bold text-[#262626] dark:text-white">
               {dictionary.appointment?.manageAppointments || dictionary.nav.appointments}
@@ -420,7 +458,8 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
             )}
           </Tabs>
         </CardContent>
-      </Card>
+        </Card>
+      </motion.div>
 
       {/* Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
@@ -524,6 +563,6 @@ export function AppointmentsClient({ dictionary, locale }: AppointmentsClientPro
       </Dialog>
 
       <ConfirmDialog />
-    </div>
+    </motion.div>
   );
 }
