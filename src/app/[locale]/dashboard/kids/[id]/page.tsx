@@ -34,7 +34,7 @@ export default async function KidProfilePage({
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+    <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-28 max-w-7xl space-y-6 overflow-x-hidden">
       <KidProfileClient
         dictionary={dictionary}
         locale={locale}

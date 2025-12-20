@@ -225,10 +225,10 @@ export default function CoachAttendanceClient({ text, courseId, roster, dictiona
                         <img
                           src={student.profilePicture}
                           alt={student.name}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-orange-500 shadow-md"
+                          className="w-12 h-12 rounded-xl object-cover border-2 border-orange-500 shadow-md"
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-base border-2 border-orange-400 shadow-md">
+                        <div className="w-12 h-12 rounded-xl bg-orange-500 flex items-center justify-center text-white font-bold text-base border-2 border-orange-400 shadow-md">
                           {student.name.charAt(0).toUpperCase()}
                         </div>
                       )}
@@ -270,9 +270,6 @@ export default function CoachAttendanceClient({ text, courseId, roster, dictiona
                           value={state.score ?? 5}
                           onChange={(event) => updateScore(student.id, event.target.value)}
                           className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                          style={{
-                            background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((state.score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) ${((state.score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) 100%)`
-                          }}
                         />
                         <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
@@ -308,10 +305,10 @@ export default function CoachAttendanceClient({ text, courseId, roster, dictiona
                         <img
                           src={student.profilePicture}
                           alt={student.name}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-orange-500 shadow-md shrink-0"
+                          className="w-12 h-12 rounded-xl object-cover border-2 border-orange-500 shadow-md shrink-0"
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-base border-2 border-orange-400 shadow-md shrink-0">
+                        <div className="w-12 h-12 rounded-xl bg-orange-500 flex items-center justify-center text-white font-bold text-base border-2 border-orange-400 shadow-md shrink-0">
                           {student.name.charAt(0).toUpperCase()}
                         </div>
                       )}
@@ -353,9 +350,6 @@ export default function CoachAttendanceClient({ text, courseId, roster, dictiona
                           value={state.score ?? 5}
                           onChange={(event) => updateScore(student.id, event.target.value)}
                           className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                          style={{
-                            background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((state.score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) ${((state.score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) 100%)`
-                          }}
                         />
                         <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (

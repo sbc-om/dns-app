@@ -61,10 +61,10 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
               <img
                 src={user.profilePicture}
                 alt={fullName}
-                className="w-12 h-12 rounded-full object-cover border-2 border-[#DDDDDD] dark:border-[#000000]"
+                className="w-12 h-12 rounded-xl object-cover border-2 border-[#DDDDDD] dark:border-[#000000]"
               />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-[#262626] dark:bg-white flex items-center justify-center text-white dark:text-[#262626] font-bold text-base border-2 border-[#DDDDDD] dark:border-[#000000]">
+              <div className="w-12 h-12 rounded-xl bg-[#262626] dark:bg-white flex items-center justify-center text-white dark:text-[#262626] font-bold text-base border-2 border-[#DDDDDD] dark:border-[#000000]">
                 {fullName.charAt(0).toUpperCase()}
               </div>
             )}

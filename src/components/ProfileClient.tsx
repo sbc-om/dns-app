@@ -336,6 +336,8 @@ export function ProfileClient({ dictionary, locale, user }: ProfileClientProps) 
                       aspectRatio={1}
                       maxSizeMB={5}
                       onError={handleImageError}
+                      shape="square"
+                      size="md"
                     />
                   </CardContent>
                 </Card>

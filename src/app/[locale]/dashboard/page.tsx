@@ -11,7 +11,6 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ChildMedalsPreview } from '@/components/ChildMedalsPreview';
 import { AnimatedDashboardClient } from '@/components/AnimatedDashboardClient';
-import { DashboardScrollWrapper } from '@/components/DashboardScrollWrapper';
 
 export default async function DashboardPage({
   params,
@@ -80,8 +79,7 @@ export default async function DashboardPage({
   }
 
   return (
-    <DashboardScrollWrapper>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl space-y-6 overflow-x-hidden">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl space-y-6 overflow-x-hidden">
       
       {/* Statistics Cards for Admin */}
       {user.role === 'admin' && stats && (
@@ -119,10 +117,10 @@ export default async function DashboardPage({
                       <img
                         src={children[0].profilePicture}
                         alt={children[0].fullName || children[0].username}
-                        className="w-32 h-32 rounded-full object-cover border-4 border-[#DDDDDD] dark:border-[#000000]"
+                        className="w-32 h-32 rounded-2xl object-cover border-4 border-[#DDDDDD] dark:border-[#000000]"
                       />
                     ) : (
-                      <div className="w-32 h-32 rounded-full bg-[#262626] dark:bg-black flex items-center justify-center text-white text-5xl font-bold border-4 border-[#DDDDDD] dark:border-[#000000]">
+                      <div className="w-32 h-32 rounded-2xl bg-[#262626] dark:bg-black flex items-center justify-center text-white text-5xl font-bold border-4 border-[#DDDDDD] dark:border-[#000000]">
                         {(children[0].fullName || children[0].username).charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -187,10 +185,10 @@ export default async function DashboardPage({
                             <img
                               src={child.profilePicture}
                               alt={child.fullName || child.username}
-                              className="w-16 h-16 rounded-full object-cover border-4 border-[#DDDDDD] dark:border-[#000000]"
+                              className="w-16 h-16 rounded-xl object-cover border-4 border-[#DDDDDD] dark:border-[#000000]"
                             />
                           ) : (
-                            <div className="w-16 h-16 rounded-full bg-[#262626] dark:bg-black flex items-center justify-center text-white text-2xl font-bold border-4 border-[#DDDDDD] dark:border-[#000000]">
+                            <div className="w-16 h-16 rounded-xl bg-[#262626] dark:bg-black flex items-center justify-center text-white text-2xl font-bold border-4 border-[#DDDDDD] dark:border-[#000000]">
                               {(child.fullName || child.username).charAt(0).toUpperCase()}
                             </div>
                           )}
@@ -300,7 +298,6 @@ export default async function DashboardPage({
         </div>
       )}
 
-      </div>
-    </DashboardScrollWrapper>
+    </div>
   );
 }

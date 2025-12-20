@@ -173,12 +173,12 @@ export function ParentProfileClient({
               <CardHeader className="bg-linear-to-r from-[#FF5F02] to-[#FF5F02]/80 text-white pb-6">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-3xl font-bold flex items-center gap-3">
-                    <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
                       {children[0].profilePicture ? (
                         <img
                           src={children[0].profilePicture}
                           alt={children[0].fullName || children[0].username}
-                          className="h-14 w-14 rounded-full object-cover"
+                          className="h-14 w-14 rounded-2xl object-cover"
                         />
                       ) : (
                         <User className="h-8 w-8" />

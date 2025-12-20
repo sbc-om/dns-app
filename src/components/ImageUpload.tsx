@@ -21,6 +21,7 @@ interface ImageUploadProps {
   maxSizeMB?: number;
   onError?: (message: string) => void;
   shape?: 'circle' | 'square';
+  size?: 'sm' | 'md' | 'lg';
   icon?: React.ReactNode;
 }
 
@@ -31,6 +32,7 @@ export function ImageUpload({
   maxSizeMB = 5,
   onError,
   shape = 'circle',
+  size,
   icon,
 }: ImageUploadProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -136,8 +138,17 @@ export function ImageUpload({
   };
 
   const isSquare = shape === 'square';
-  const containerClass = isSquare ? 'w-64 h-64' : 'w-48 h-48';
-  const borderClass = isSquare ? 'rounded-lg' : 'rounded-full';
+  const resolvedSize: NonNullable<ImageUploadProps['size']> = size ?? (isSquare ? 'lg' : 'md');
+
+  const containerClass =
+    resolvedSize === 'sm'
+      ? 'w-20 h-20'
+      : resolvedSize === 'md'
+        ? 'w-48 h-48'
+        : 'w-64 h-64';
+
+  const borderClass = isSquare ? 'rounded-2xl' : 'rounded-full';
+  const defaultIconClass = resolvedSize === 'sm' ? 'w-10 h-10' : resolvedSize === 'md' ? 'w-20 h-20' : 'w-24 h-24';
   
   return (
     <div className="space-y-4">
@@ -162,7 +173,7 @@ export function ImageUpload({
             />
           ) : (
             <div className="w-full h-full bg-linear-to-br from-[#30B2D2]/20 to-[#1E3A8A]/20 flex items-center justify-center">
-              {icon || <UserCircle className="w-24 h-24 text-gray-400" />}
+              {icon || <UserCircle className={`${defaultIconClass} text-gray-400`} />}
             </div>
           )}
           

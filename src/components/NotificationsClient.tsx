@@ -67,20 +67,11 @@ export function NotificationsClient({ dictionary, locale }: NotificationsClientP
 
   const t = dictionary.notificationsPage;
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-
   const loadNotifications = async () => {
     try {
       const result = await getNotificationsAction();
       if (result.success && result.notifications) {
-        // Convert timestamp strings to Date objects if needed
-        const parsedNotifications = result.notifications.map(n => ({
-          ...n,
-          timestamp: new Date(n.timestamp)
-        }));
-        setNotifications(parsedNotifications as any);
+        setNotifications(result.notifications);
       }
     } catch (error) {
       console.error('Failed to load notifications:', error);
@@ -88,6 +79,10 @@ export function NotificationsClient({ dictionary, locale }: NotificationsClientP
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadNotifications();
+  }, []);
 
   const getNotificationIcon = (type: NotificationType, category: NotificationCategory) => {
     if (category === 'appointments') return Calendar;

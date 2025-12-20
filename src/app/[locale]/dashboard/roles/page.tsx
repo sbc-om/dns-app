@@ -21,7 +21,7 @@ export default async function RolesPage({
   const rolePermissions = await getAllRolePermissions();
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full min-h-0">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl space-y-6">
         <RolesPermissionsClient
           dictionary={dictionary}

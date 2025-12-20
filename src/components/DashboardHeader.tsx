@@ -312,7 +312,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-9 w-9 sm:h-10 sm:w-10 rounded-full active:scale-95 transition-all border-2 border-transparent hover:border-blue-500/30 dark:hover:border-blue-500/50 relative overflow-hidden"
+                    className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl active:scale-95 transition-all border-2 border-transparent hover:border-blue-500/30 dark:hover:border-blue-500/50 relative overflow-hidden"
                     aria-label="User menu"
                   >
                     <div className="absolute inset-0 bg-linear-to-br from-blue-500/20 to-purple-500/20 opacity-0 hover:opacity-100 transition-opacity" />
@@ -321,10 +321,10 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                         key={user.profilePicture}
                         src={user.profilePicture}
                         alt={user.fullName || 'User'}
-                        className="h-full w-full rounded-full object-cover relative z-10"
+                        className="h-full w-full rounded-xl object-cover relative z-10"
                       />
                     ) : (
-                      <div className="h-full w-full rounded-full bg-linear-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-xs font-bold relative z-10">
+                      <div className="h-full w-full rounded-xl bg-linear-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-xs font-bold relative z-10">
                         {user.fullName?.[0]?.toUpperCase() || 'U'}
                       </div>
                     )}

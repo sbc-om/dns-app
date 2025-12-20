@@ -366,14 +366,14 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                                 <img
                                   src={conv.user.profilePicture}
                                   alt={conv.user.fullName || conv.user.email}
-                                  className={`h-12 w-12 rounded-full object-cover shadow-md ${
+                                  className={`h-12 w-12 rounded-xl object-cover shadow-md ${
                                     selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
                                       ? 'border-2 border-white'
                                       : 'border-2 border-orange-500'
                                   }`}
                                 />
                               ) : (
-                                <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md ${
+                                <div className={`h-12 w-12 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md ${
                                   selectedConversation?.id === conv.userId && selectedConversation?.type === 'user'
                                     ? 'bg-white/20'
                                     : 'bg-orange-500'
@@ -497,10 +497,10 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                             <img
                               src={chatUser.profilePicture}
                               alt={selectedConversation.name}
-                              className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover border-2 border-orange-500 shadow-md"
+                              className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl object-cover border-2 border-orange-500 shadow-md"
                             />
                           ) : (
-                            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold shadow-md">
+                            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-orange-500 flex items-center justify-center text-white font-bold shadow-md">
                               {selectedConversation.name[0]?.toUpperCase()}
                             </div>
                           );
@@ -588,10 +588,10 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                                       <img
                                         src={sender.profilePicture}
                                         alt={sender.fullName || sender.username}
-                                        className="h-8 w-8 rounded-full object-cover border-2 border-gray-300 shrink-0"
+                                        className="h-8 w-8 rounded-lg object-cover border-2 border-gray-300 shrink-0"
                                       />
                                     ) : (
-                                      <div className="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                      <div className="h-8 w-8 rounded-lg bg-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
                                         {selectedConversation.name[0]?.toUpperCase()}
                                       </div>
                                     );
@@ -622,10 +622,10 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                                     <img
                                       src={currentUser.profilePicture}
                                       alt={currentUser.fullName || currentUser.username}
-                                      className="h-8 w-8 rounded-full object-cover border-2 border-orange-500 shrink-0"
+                                      className="h-8 w-8 rounded-lg object-cover border-2 border-orange-500 shrink-0"
                                     />
                                   ) : (
-                                    <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                    <div className="h-8 w-8 rounded-lg bg-orange-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
                                       {currentUser.fullName?.[0]?.toUpperCase() || 'U'}
                                     </div>
                                   )}

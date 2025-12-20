@@ -307,10 +307,10 @@ export function CoachCourseDetailClient({
                             <img
                               src={student.profilePicture}
                               alt={studentName}
-                              className="w-20 h-20 rounded-full object-cover border-2 border-[#DDDDDD] dark:border-[#000000]"
+                              className="w-20 h-20 rounded-2xl object-cover border-2 border-[#DDDDDD] dark:border-[#000000]"
                             />
                           ) : (
-                            <div className="w-20 h-20 rounded-full bg-[#262626] dark:bg-[#1a1a1a] flex items-center justify-center border-2 border-[#DDDDDD] dark:border-[#000000]">
+                            <div className="w-20 h-20 rounded-2xl bg-[#262626] dark:bg-[#1a1a1a] flex items-center justify-center border-2 border-[#DDDDDD] dark:border-[#000000]">
                               <UserCircle className="h-12 w-12 text-white" />
                             </div>
                           )}

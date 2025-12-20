@@ -1,3 +1,50 @@
+# Copilot Instructions (DNA App)
+
+## What this is
+- Next.js 16 (App Router) app under `src/` with bilingual routing via `src/app/[locale]/...`.
+- Locales: `en` + `ar` (`src/config/i18n.ts`), translations in `src/locales/{en,ar}.json`.
+- Database: LMDB (file-based) in `data/lmdb/` accessed only on the server via repositories in `src/lib/db/repositories/*`.
+
+## Run & common workflows
+- Dev server runs on **port 3016**: `npm run dev` (`package.json`).
+- Production start uses `${PORT:-3016}`; Docker runs the app on **4040** (`docker-compose.yml`).
+- Initialize LMDB / seed data: `npm run db:init`.
+- Create an admin user: `npm run create-admin`.
+
+## Routing, i18n, and direction
+- Root `/` redirects to `/${locale}` using the `locale` cookie (`src/app/page.tsx`).
+- Locale layout sets RTL/LTR with `dir` based on locale (`src/app/[locale]/layout.tsx`).
+- Prefer translation keys from the dictionary returned by `getDictionary(locale)` (`src/lib/i18n/getDictionary.ts`).
+- UI strings in components should come from dictionaries; do not add long user-facing text inline.
+
+## Auth & access patterns
+- Auth uses a JWT stored in the `auth-token` cookie (set in `src/app/api/auth/login/route.ts`, cleared in `.../logout/route.ts`).
+- Server-side guards:
+  - `requireAuth(locale)` / `requireAdmin(locale)` in `src/lib/auth/auth.ts`.
+  - Use `RequireAuth` / `RequireAdmin` wrappers for server components (`src/lib/auth/authGuards.tsx`).
+- Dashboard menu access is currently **role-permission booleans**, not per-resource ACL:
+  - Permissions are stored/seeded in LMDB by `getRolePermissions(role)` (`src/lib/db/repositories/rolePermissionRepository.ts`).
+  - `src/app/[locale]/dashboard/layout.tsx` maps those booleans into `accessibleResources` passed into `DashboardLayoutClient`.
+  - If you add a new sidebar item/module, also add a permission flag + mapping.
+
+## Multi-academy context
+- Many dashboard features are scoped to a selected academy.
+- Server-side, resolve it via `requireAcademyContext(locale)` (`src/lib/academies/academyContext.ts`).
+- The selected academy is persisted in the `academy-id` cookie.
+
+## LMDB and repository conventions
+- Never import `src/lib/db/lmdb.ts` from Client Components (it is `server-only` and throws in the browser).
+- Repositories use simple key prefixes and secondary indexes (e.g. `users:`, `users_by_email:` in `userRepository.ts`).
+- Prefer adding/using repository functions rather than reading LMDB directly from routes/components.
+
+## UI conventions (this repo)
+- Uses shadcn/ui components under `src/components/ui/*` and Tailwind.
+- Motion style is a deliberate “game-like” feel: use `framer-motion` for interactive elements (e.g. `src/components/LanguageSwitcher.tsx`).
+- Root layout forces dark theme (`ThemeProvider forcedTheme="dark"` in `src/app/layout.tsx`).
+
+## PWA/offline
+- PWA is configured in `next.config.ts` using `@ducanh2912/next-pwa`; offline fallback route is `/offline` (`src/app/offline`).
+- Health check endpoint for Docker/monitoring: `GET /api/health` (`src/app/api/health/route.ts`).
 # Copilot Instructions – DNA Web App
 
 ---

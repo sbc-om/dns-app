@@ -4,6 +4,7 @@ import type { User } from '@/lib/db/repositories/userRepository';
 import type { AuthUser } from '@/lib/auth/auth';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
 import type { Locale } from '@/config/i18n';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ import {
   Trophy,
   UserCircle,
 } from 'lucide-react';
+import { AnimatedStatCard } from '@/components/AnimatedStatCard';
 import { ImageUpload } from '@/components/ImageUpload';
 import { StudentMedalsDisplay } from '@/components/StudentMedalsDisplay';
 import { updateUserProfilePictureAction } from '@/lib/actions/userActions';
@@ -94,13 +96,15 @@ export function KidProfileClient({
   const [assessmentSubmitting, setAssessmentSubmitting] = useState(false);
   const [assessmentForm, setAssessmentForm] = useState<AssessmentFormState>({
     sessionDate: new Date().toISOString().split('T')[0],
-    speed: '',
-    agility: '',
-    balance: '',
-    power: '',
-    reaction: '',
-    coordination: '',
-    flexibility: '',
+    // New assessment UI uses 1–10 points for each category.
+    // Keep strings for controlled inputs.
+    speed: '5',
+    agility: '5',
+    balance: '5',
+    power: '5',
+    reaction: '5',
+    coordination: '5',
+    flexibility: '5',
     notes: '',
   });
 
@@ -340,7 +344,8 @@ export function KidProfileClient({
         flexibility: Number(assessmentForm.flexibility),
       };
 
-      const invalid = Object.values(tests).some((v) => !Number.isFinite(v));
+      const values = Object.values(tests);
+      const invalid = values.some((v) => !Number.isFinite(v) || v < 1 || v > 10);
       if (invalid) {
         alert(dictionary.common.error);
         return;
@@ -372,13 +377,13 @@ export function KidProfileClient({
       setAssessmentDialogOpen(false);
       setAssessmentForm({
         sessionDate: new Date().toISOString().split('T')[0],
-        speed: '',
-        agility: '',
-        balance: '',
-        power: '',
-        reaction: '',
-        coordination: '',
-        flexibility: '',
+        speed: '5',
+        agility: '5',
+        balance: '5',
+        power: '5',
+        reaction: '5',
+        coordination: '5',
+        flexibility: '5',
         notes: '',
       });
 
@@ -479,25 +484,31 @@ export function KidProfileClient({
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, type: 'spring', stiffness: 260, damping: 22 }}
+      className="relative space-y-6"
+    >
+      {/* Local game-like glow */}
+      <div className="pointer-events-none absolute -inset-x-10 -top-10 -z-10 h-72 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.16),transparent_55%),radial-gradient(circle_at_80%_20%,rgba(249,115,22,0.16),transparent_55%),radial-gradient(circle_at_60%_80%,rgba(168,85,247,0.12),transparent_55%)] blur-2xl" />
+
       {/* Header */}
-      <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] overflow-hidden rounded-2xl">
-        <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000]">
+      <motion.div whileHover={{ rotateX: 2, rotateY: -2 }} style={{ transformStyle: 'preserve-3d' }}>
+        <Card className="bg-white/6 border border-white/10 backdrop-blur-xl overflow-hidden rounded-3xl shadow-[0_30px_90px_-50px_rgba(0,0,0,0.7)]">
+          <CardHeader className="bg-white/5 border-b border-white/10">
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#262626] dark:text-white truncate">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white truncate">
                   {currentKid.fullName || currentKid.username}
                 </h1>
                 <div className="mt-1 flex flex-wrap gap-2">
-                  <Badge variant="outline" className="border-2 border-[#DDDDDD] dark:border-[#000000]">
-                    {dictionary.users.roles.kid}
-                  </Badge>
-                  <Badge variant="secondary" className="bg-white dark:bg-[#262626] border border-[#DDDDDD] dark:border-[#000000] text-[#262626] dark:text-white">
+                  <Badge variant="secondary" className="bg-white/5 border border-white/10 text-white/90">
                     {dictionary.playerProfile?.labels?.stage ?? 'Stage'}: {stageLabel(profile?.currentStage)}
                   </Badge>
                   {latestAssessment && (
-                    <Badge className="bg-[#262626] text-white border-0">
+                    <Badge className="border-0 bg-linear-to-r from-orange-500 to-fuchsia-600 text-white">
                       {dictionary.playerProfile?.labels?.naScore ?? 'NA'}: {latestAssessment.naScore}
                     </Badge>
                   )}
@@ -514,53 +525,55 @@ export function KidProfileClient({
                       currentImage={currentKid.profilePicture}
                       aspectRatio={1}
                       maxSizeMB={2}
+                      shape="square"
+                      size="sm"
                     />
                   ) : currentKid.profilePicture ? (
                     <img
                       src={currentKid.profilePicture}
                       alt={currentKid.fullName || currentKid.username}
-                      className="w-20 h-20 rounded-full object-cover border-2 border-[#DDDDDD] dark:border-[#000000]"
+                      className="w-20 h-20 rounded-2xl object-cover border border-white/15"
                     />
                   ) : (
-                    <div className="w-20 h-20 rounded-full bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] flex items-center justify-center">
-                      <UserCircle className="w-10 h-10 text-gray-600 dark:text-gray-300" />
+                    <div className="w-20 h-20 rounded-2xl bg-white/6 border border-white/15 flex items-center justify-center">
+                      <UserCircle className="w-10 h-10 text-white/70" />
                     </div>
                   )}
 
                   {/* Mobile: national ID directly under the photo */}
                   {currentKid.nationalId && (
                     <div className="mt-3 sm:hidden text-center">
-                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]">
-                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/15 bg-white/5">
+                        <span className="text-xs font-semibold text-white/70">
                           {dictionary.users.nationalId}
                         </span>
-                        <span className="text-xs font-bold text-[#262626] dark:text-white">{currentKid.nationalId}</span>
+                        <span className="text-xs font-bold text-white">{currentKid.nationalId}</span>
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div className="min-w-0 w-full sm:w-auto text-sm text-gray-700 dark:text-gray-200 space-y-1 text-center sm:text-left rtl:sm:text-right">
+                <div className="min-w-0 w-full sm:w-auto text-sm text-white/80 space-y-1 text-center sm:text-left rtl:sm:text-right">
                   {currentKid.nationalId && (
                     <div className="hidden sm:block truncate">
-                      <span className="font-semibold">{dictionary.users.nationalId}:</span> {currentKid.nationalId}
+                      <span className="font-semibold text-white/90">{dictionary.users.nationalId}:</span> {currentKid.nationalId}
                     </div>
                   )}
                   {currentKid.birthDate && (
                     <div className="truncate">
-                      <span className="font-semibold">{dictionary.playerProfile?.labels?.birthDate ?? 'Birth date'}:</span>{' '}
+                      <span className="font-semibold text-white/90">{dictionary.playerProfile?.labels?.birthDate ?? 'Birth date'}:</span>{' '}
                       {new Date(currentKid.birthDate).toLocaleDateString(locale)}
                     </div>
                   )}
                   {currentKid.school && (
                     <div className="truncate">
-                      <span className="font-semibold">{dictionary.playerProfile?.labels?.school ?? 'School'}:</span> {currentKid.school}
+                      <span className="font-semibold text-white/90">{dictionary.playerProfile?.labels?.school ?? 'School'}:</span> {currentKid.school}
                       {currentKid.grade ? ` · ${currentKid.grade}` : ''}
                     </div>
                   )}
                   {currentKid.position && (
                     <div className="truncate">
-                      <span className="font-semibold">{dictionary.playerProfile?.labels?.position ?? 'Position'}:</span> {currentKid.position}
+                      <span className="font-semibold text-white/90">{dictionary.playerProfile?.labels?.position ?? 'Position'}:</span> {currentKid.position}
                     </div>
                   )}
                 </div>
@@ -572,7 +585,7 @@ export function KidProfileClient({
                     type="button"
                     onClick={() => router.push(`/${locale}/dashboard/kids/${currentKid.id}/edit`)}
                     variant="outline"
-                    className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]"
+                    className="border-white/15 bg-white/5 text-white hover:bg-white/10"
                   >
                     <Edit className="h-4 w-4 me-2" />
                     {dictionary.users.editUser}
@@ -582,7 +595,7 @@ export function KidProfileClient({
                   <Button
                     type="button"
                     onClick={() => setAssessmentDialogOpen(true)}
-                    className="bg-[#262626] hover:bg-black text-white"
+                    className="bg-linear-to-r from-orange-500 to-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/20 hover:from-orange-400 hover:to-fuchsia-500"
                   >
                     <Plus className="h-4 w-4 me-2" />
                     {dictionary.playerProfile?.actions?.newAssessment ?? 'New Assessment'}
@@ -593,7 +606,7 @@ export function KidProfileClient({
                     type="button"
                     onClick={openGrantBadgeDialog}
                     variant="outline"
-                    className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]"
+                    className="border-white/15 bg-white/5 text-white hover:bg-white/10"
                   >
                     <Award className="h-4 w-4 me-2" />
                     {dictionary.playerProfile?.actions?.grantBadge ?? 'Grant Badge'}
@@ -603,7 +616,7 @@ export function KidProfileClient({
                   <Button
                     type="button"
                     onClick={handleApproveStageUpgrade}
-                    className="bg-[#FF5F02] hover:bg-[#e55502] text-white"
+                    className="bg-linear-to-r from-emerald-500 to-cyan-600 text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-400 hover:to-cyan-500"
                   >
                     <Flag className="h-4 w-4 me-2" />
                     {dictionary.playerProfile?.actions?.approveStageUpgrade ?? 'Approve Stage Upgrade'}
@@ -616,8 +629,8 @@ export function KidProfileClient({
 
         <CardContent className="pt-6">
           <div className="flex items-center gap-2 mb-3">
-            <Trophy className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-            <div className="font-bold text-[#262626] dark:text-white">
+            <Trophy className="w-5 h-5 text-white/80" />
+            <div className="font-bold text-white">
               {dictionary.playerProfile?.labels?.progress ?? 'Stage Progress'}
             </div>
           </div>
@@ -626,36 +639,94 @@ export function KidProfileClient({
             <progress
               value={Math.round((stageEvaluation?.evaluation?.overallProgress || 0) * 100)}
               max={100}
-              className="w-full h-4 rounded-md overflow-hidden border-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-100 dark:bg-[#1a1a1a]"
+              className="w-full h-4 rounded-md overflow-hidden border border-white/10 bg-white/5"
             />
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="p-3 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.daysInStage ?? 'Days in stage'}</div>
-                <div className="mt-1 text-lg font-bold text-[#262626] dark:text-white">{stageEvaluation?.evaluation?.timeInStageDays ?? 0}</div>
-              </div>
-              <div className="p-3 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.attendance ?? 'Attendance'}</div>
-                <div className="mt-1 text-lg font-bold text-[#262626] dark:text-white">{formatPct(stageEvaluation?.attendance?.attendanceRate)}</div>
-              </div>
-              <div className="p-3 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.naImprovement ?? 'NA improvement'}</div>
-                <div className="mt-1 text-lg font-bold text-[#262626] dark:text-white">{formatPct(stageEvaluation?.evaluation?.naImprovementPct)}</div>
-              </div>
-              <div className="p-3 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
-                <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.xp ?? 'XP'}</div>
-                <div className="mt-1 text-lg font-bold text-[#262626] dark:text-white">{profile?.xpTotal ?? 0}</div>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <AnimatedStatCard
+                title={dictionary.playerProfile?.labels?.daysInStage ?? 'Days in stage'}
+                value={stageEvaluation?.evaluation?.timeInStageDays ?? 0}
+                icon={Calendar}
+                gradient="bg-linear-to-br from-blue-500 to-cyan-600"
+                delay={0.05}
+              />
+              <AnimatedStatCard
+                title={dictionary.playerProfile?.labels?.attendance ?? 'Attendance'}
+                value={formatPct(stageEvaluation?.attendance?.attendanceRate)}
+                icon={Activity}
+                gradient="bg-linear-to-br from-emerald-500 to-teal-600"
+                delay={0.1}
+              />
+              <AnimatedStatCard
+                title={dictionary.playerProfile?.labels?.naImprovement ?? 'NA improvement'}
+                value={formatPct(stageEvaluation?.evaluation?.naImprovementPct)}
+                icon={Trophy}
+                gradient="bg-linear-to-br from-orange-500 to-fuchsia-600"
+                delay={0.15}
+              />
+              <AnimatedStatCard
+                title={dictionary.playerProfile?.labels?.xp ?? 'XP'}
+                value={profile?.xpTotal ?? 0}
+                icon={Star}
+                gradient="bg-linear-to-br from-violet-500 to-purple-600"
+                delay={0.2}
+              />
             </div>
           </div>
 
           {loadingProfile && (
-            <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">{dictionary.common.loading}</div>
+            <div className="mt-4 text-sm text-white/70">{dictionary.common.loading}</div>
           )}
           {profileError && (
             <div className="mt-4 text-sm text-red-600">{profileError}</div>
           )}
         </CardContent>
-      </Card>
+        </Card>
+      </motion.div>
+
+      {/* Sticky mobile actions */}
+      {canManage && (
+        <div className="md:hidden fixed bottom-4 left-3 right-3 z-50">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, type: 'spring', stiffness: 260, damping: 22 }}
+            className="rounded-2xl border border-white/10 bg-black/55 backdrop-blur-xl shadow-[0_20px_60px_-30px_rgba(0,0,0,0.8)] p-2"
+          >
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                onClick={() => setAssessmentDialogOpen(true)}
+                className="h-11 bg-linear-to-r from-orange-500 to-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/20 hover:from-orange-400 hover:to-fuchsia-500"
+              >
+                <Plus className="h-4 w-4 me-2" />
+                {dictionary.playerProfile?.actions?.newAssessment ?? 'New Assessment'}
+              </Button>
+              <Button
+                type="button"
+                onClick={openGrantBadgeDialog}
+                variant="outline"
+                className="h-11 border-white/15 bg-white/5 text-white hover:bg-white/10"
+              >
+                <Award className="h-4 w-4 me-2" />
+                {dictionary.playerProfile?.actions?.grantBadge ?? 'Grant Badge'}
+              </Button>
+            </div>
+
+            {stageEvaluation?.evaluation?.readyForStageUpgrade && (
+              <div className="mt-2">
+                <Button
+                  type="button"
+                  onClick={handleApproveStageUpgrade}
+                  className="h-11 w-full bg-linear-to-r from-emerald-500 to-cyan-600 text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-400 hover:to-cyan-500"
+                >
+                  <Flag className="h-4 w-4 me-2" />
+                  {dictionary.playerProfile?.actions?.approveStageUpgrade ?? 'Approve Stage Upgrade'}
+                </Button>
+              </div>
+            )}
+          </motion.div>
+        </div>
+      )}
 
       <Tabs defaultValue="overview" className="w-full">
         <div className="-mx-4 sm:mx-0">
@@ -677,24 +748,39 @@ export function KidProfileClient({
               defer
             >
               <div className="pb-1">
-                <TabsList className="inline-flex w-max min-w-full items-center justify-start gap-1 rounded-xl bg-gray-100 dark:bg-[#1a1a1a] p-1">
-                  <TabsTrigger value="overview" className="min-w-max gap-2">
+                <TabsList className="inline-flex w-max min-w-full items-center justify-start gap-1 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-1.5">
+                  <TabsTrigger
+                    value="overview"
+                    className="min-w-max gap-2 text-white/70 hover:text-white hover:bg-white/5 data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-500/60 data-[state=active]:to-purple-600/60 data-[state=active]:text-white"
+                  >
                     <Activity className="w-4 h-4" />
                     {dictionary.playerProfile?.tabs?.overview ?? 'Overview'}
                   </TabsTrigger>
-                  <TabsTrigger value="assessments" className="min-w-max gap-2">
+                  <TabsTrigger
+                    value="assessments"
+                    className="min-w-max gap-2 text-white/70 hover:text-white hover:bg-white/5 data-[state=active]:bg-linear-to-r data-[state=active]:from-orange-500/70 data-[state=active]:to-fuchsia-600/70 data-[state=active]:text-white"
+                  >
                     <Calendar className="w-4 h-4" />
                     {dictionary.playerProfile?.tabs?.assessments ?? 'Assessments'}
                   </TabsTrigger>
-                  <TabsTrigger value="badges" className="min-w-max gap-2">
+                  <TabsTrigger
+                    value="badges"
+                    className="min-w-max gap-2 text-white/70 hover:text-white hover:bg-white/5 data-[state=active]:bg-linear-to-r data-[state=active]:from-emerald-500/70 data-[state=active]:to-teal-600/70 data-[state=active]:text-white"
+                  >
                     <Star className="w-4 h-4" />
                     {dictionary.playerProfile?.tabs?.badges ?? 'Badges'}
                   </TabsTrigger>
-                  <TabsTrigger value="courses" className="min-w-max gap-2">
+                  <TabsTrigger
+                    value="courses"
+                    className="min-w-max gap-2 text-white/70 hover:text-white hover:bg-white/5 data-[state=active]:bg-linear-to-r data-[state=active]:from-cyan-500/60 data-[state=active]:to-blue-600/60 data-[state=active]:text-white"
+                  >
                     <BookOpen className="w-4 h-4" />
                     {dictionary.playerProfile?.tabs?.courses ?? 'Courses'}
                   </TabsTrigger>
-                  <TabsTrigger value="achievements" className="min-w-max gap-2">
+                  <TabsTrigger
+                    value="achievements"
+                    className="min-w-max gap-2 text-white/70 hover:text-white hover:bg-white/5 data-[state=active]:bg-linear-to-r data-[state=active]:from-violet-500/70 data-[state=active]:to-purple-600/70 data-[state=active]:text-white"
+                  >
                     <Award className="w-4 h-4" />
                     {dictionary.playerProfile?.tabs?.achievements ?? 'Achievements'}
                   </TabsTrigger>
@@ -704,24 +790,24 @@ export function KidProfileClient({
           </div>
         </div>
 
-        <TabsContent value="overview">
+        <TabsContent value="overview" className="mt-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] lg:col-span-2 rounded-2xl overflow-hidden">
-              <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000] flex items-center justify-center min-h-14">
-                <CardTitle className="text-[#262626] dark:text-white text-center">
+            <Card className="bg-white/6 border border-white/10 backdrop-blur-xl lg:col-span-2 rounded-3xl overflow-hidden shadow-[0_30px_90px_-50px_rgba(0,0,0,0.7)]">
+              <CardHeader className="bg-white/5 border-b border-white/10 flex items-center justify-center min-h-14">
+                <CardTitle className="text-white text-center">
                   {dictionary.playerProfile?.sections?.insights ?? 'Insights'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-6">
                 {!latestAssessment ? (
-                  <div className="text-gray-600 dark:text-gray-300">
+                  <div className="text-white/70">
                     {dictionary.playerProfile?.empty?.noAssessments ?? 'No assessments yet.'}
                   </div>
                 ) : (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
-                        <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                      <div className="p-4 rounded-2xl border border-white/10 bg-white/5">
+                        <div className="text-sm font-semibold text-white/85">
                           {dictionary.playerProfile?.labels?.strengths ?? 'Strengths'}
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
@@ -731,12 +817,9 @@ export function KidProfileClient({
                             </Badge>
                           ))}
                         </div>
-                        <div className="mt-3 text-xs text-gray-600 dark:text-gray-400">
-                          {dictionary.playerProfile?.hints?.strengthsHint ?? ''}
-                        </div>
                       </div>
-                      <div className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
-                        <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                      <div className="p-4 rounded-2xl border border-white/10 bg-white/5">
+                        <div className="text-sm font-semibold text-white/85">
                           {dictionary.playerProfile?.labels?.developmentAreas ?? 'Development areas'}
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
@@ -746,26 +829,23 @@ export function KidProfileClient({
                             </Badge>
                           ))}
                         </div>
-                        <div className="mt-3 text-xs text-gray-600 dark:text-gray-400">
-                          {dictionary.playerProfile?.hints?.developmentHint ?? ''}
-                        </div>
                       </div>
                     </div>
 
                     <div>
-                      <div className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+                      <div className="text-sm font-semibold text-white/85 mb-3">
                         {dictionary.playerProfile?.labels?.latestAssessment ?? 'Latest assessment'}: {latestAssessment.sessionDate}
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {Object.entries(latestAssessment.tests).map(([k, v]) => (
                           <div
                             key={k}
-                            className="p-3 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]"
+                            className="p-3 rounded-2xl border border-white/10 bg-white/5"
                           >
-                            <div className="text-xs text-gray-600 dark:text-gray-400">{categoryLabel(k)}</div>
+                            <div className="text-xs text-white/55">{categoryLabel(k)}</div>
                             <div className="mt-1 flex items-end justify-between gap-3">
-                              <div className="text-lg font-bold text-[#262626] dark:text-white">{v}</div>
-                              <div className="text-xs font-semibold text-gray-600 dark:text-gray-300">
+                              <div className="text-lg font-bold text-white">{v}</div>
+                              <div className="text-xs font-semibold text-white/65">
                                 {Math.round(insights?.scores?.[k] ?? 0)}/100
                               </div>
                             </div>
@@ -778,36 +858,36 @@ export function KidProfileClient({
               </CardContent>
             </Card>
 
-            <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] rounded-2xl overflow-hidden">
-              <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000] flex items-center justify-center min-h-14">
-                <CardTitle className="text-[#262626] dark:text-white text-center">
+            <Card className="bg-white/6 border border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-[0_30px_90px_-50px_rgba(0,0,0,0.7)]">
+              <CardHeader className="bg-white/5 border-b border-white/10 flex items-center justify-center min-h-14">
+                <CardTitle className="text-white text-center">
                   {dictionary.playerProfile?.sections?.status ?? 'Status'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                <div className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
-                  <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.assessmentStatus ?? 'Assessment status'}</div>
-                  <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
+                <div className="p-4 rounded-2xl border border-white/10 bg-white/5">
+                  <div className="text-xs text-white/55">{dictionary.playerProfile?.labels?.assessmentStatus ?? 'Assessment status'}</div>
+                  <div className="mt-1 text-base font-bold text-white">
                     {assessmentStatusLabel(profile?.assessmentStatus)}
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
-                  <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.stageStart ?? 'Stage start'}</div>
-                  <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
+                <div className="p-4 rounded-2xl border border-white/10 bg-white/5">
+                  <div className="text-xs text-white/55">{dictionary.playerProfile?.labels?.stageStart ?? 'Stage start'}</div>
+                  <div className="mt-1 text-base font-bold text-white">
                     {profile?.stageStartDate ? new Date(profile.stageStartDate).toLocaleDateString(locale) : '-'}
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
-                  <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.lastAssessment ?? 'Last assessment'}</div>
-                  <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
+                <div className="p-4 rounded-2xl border border-white/10 bg-white/5">
+                  <div className="text-xs text-white/55">{dictionary.playerProfile?.labels?.lastAssessment ?? 'Last assessment'}</div>
+                  <div className="mt-1 text-base font-bold text-white">
                     {latestAssessment ? latestAssessment.sessionDate : '-'}
                   </div>
                 </div>
 
                 {loadingProfile && (
-                  <div className="text-sm text-gray-600 dark:text-gray-300">{dictionary.common.loading}</div>
+                  <div className="text-sm text-white/70">{dictionary.common.loading}</div>
                 )}
                 {profileError && (
                   <div className="text-sm text-red-600">{profileError}</div>
@@ -817,38 +897,41 @@ export function KidProfileClient({
           </div>
         </TabsContent>
 
-        <TabsContent value="assessments">
-          <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000] flex items-center justify-center min-h-14">
-              <CardTitle className="text-[#262626] dark:text-white text-center">
+        <TabsContent value="assessments" className="mt-4">
+          <Card className="bg-white/6 border border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-[0_30px_90px_-50px_rgba(0,0,0,0.7)]">
+            <CardHeader className="bg-white/5 border-b border-white/10 flex items-center justify-center min-h-14">
+              <CardTitle className="text-white text-center">
                 {dictionary.playerProfile?.sections?.assessmentHistory ?? 'Assessment history'}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               {assessments.length === 0 ? (
-                <div className="text-gray-600 dark:text-gray-300">
+                <div className="text-white/70">
                   {dictionary.playerProfile?.empty?.noAssessments ?? 'No assessments yet.'}
                 </div>
               ) : (
                 <div className="space-y-3">
                   {assessments.map((a) => (
-                    <div
+                    <motion.div
                       key={a.id}
-                      className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35 }}
+                      className="p-4 rounded-2xl border border-white/10 bg-white/5"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div className="min-w-0">
-                          <div className="font-bold text-[#262626] dark:text-white">
+                          <div className="font-bold text-white">
                             {a.sessionDate}
                           </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-300">
+                          <div className="text-sm text-white/70">
                             {dictionary.playerProfile?.labels?.naScore ?? 'NA Score'}: <span className="font-semibold">{a.naScore}</span>
                           </div>
                         </div>
                         {canAdmin && (
                           <Button
                             variant="outline"
-                            className="border-2 border-[#DDDDDD] dark:border-[#000000]"
+                            className="border-white/15 bg-white/5 text-white hover:bg-white/10"
                             onClick={() => handleDeleteAssessment(a.id)}
                           >
                             <Trash2 className="h-4 w-4 me-2" />
@@ -856,7 +939,7 @@ export function KidProfileClient({
                           </Button>
                         )}
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
@@ -864,10 +947,10 @@ export function KidProfileClient({
           </Card>
         </TabsContent>
 
-        <TabsContent value="badges">
-          <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000] flex items-center justify-center min-h-14">
-              <CardTitle className="text-[#262626] dark:text-white text-center">
+        <TabsContent value="badges" className="mt-4">
+          <Card className="bg-white/6 border border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-[0_30px_90px_-50px_rgba(0,0,0,0.7)]">
+            <CardHeader className="bg-white/5 border-b border-white/10 flex items-center justify-center min-h-14">
+              <CardTitle className="text-white text-center">
                 {dictionary.playerProfile?.sections?.badges ?? 'Badges'}
               </CardTitle>
             </CardHeader>
@@ -881,15 +964,15 @@ export function KidProfileClient({
                       className={`p-4 rounded-xl border-2 ${
                         unlocked
                           ? 'border-green-300 dark:border-green-900 bg-green-50 dark:bg-green-900/10'
-                          : 'border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]'
+                          : 'border-white/10 bg-white/5'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <div className="font-bold text-[#262626] dark:text-white truncate">
+                          <div className="font-bold text-white truncate">
                             {t(b.nameKey)}
                           </div>
-                          <div className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                          <div className="mt-1 text-sm text-white/70">
                             {unlocked ? t(b.descriptionKey) : t(b.lockedHintKey)}
                           </div>
                         </div>
@@ -899,7 +982,7 @@ export function KidProfileClient({
                               {dictionary.playerProfile?.labels?.unlocked ?? 'Unlocked'}
                             </Badge>
                           ) : (
-                            <Badge variant="secondary" className="bg-gray-100 dark:bg-[#0a0a0a]">
+                            <Badge variant="secondary" className="bg-white/10 text-white/80 border border-white/10">
                               {dictionary.playerProfile?.labels?.locked ?? 'Locked'}
                             </Badge>
                           )}
@@ -913,18 +996,18 @@ export function KidProfileClient({
           </Card>
         </TabsContent>
 
-        <TabsContent value="courses">
-          <Card className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000]">
+        <TabsContent value="courses" className="mt-4">
+          <Card className="bg-white/6 border border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-[0_30px_90px_-50px_rgba(0,0,0,0.7)]">
+            <CardHeader className="bg-white/5 border-b border-white/10">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <CardTitle className="text-[#262626] dark:text-white">
+                <CardTitle className="text-white">
                   {dictionary.playerProfile?.sections?.courses ?? 'Courses'}
                 </CardTitle>
                 {canAdmin && availableCourses.length > 0 && (
                   <Button
                     size="sm"
                     onClick={() => (editingCourse ? handleCancelEdit() : setEditingCourse(true))}
-                    className="bg-[#262626] hover:bg-black text-white"
+                    className="bg-linear-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-400 hover:to-blue-500"
                   >
                     <Plus className="h-4 w-4 me-2" />
                     {dictionary.playerProfile?.actions?.addCourse ?? 'Add Course'}
@@ -934,16 +1017,16 @@ export function KidProfileClient({
             </CardHeader>
             <CardContent className="pt-6">
               {editingCourse && canAdmin ? (
-                <div className="space-y-4 p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]">
+                <div className="space-y-4 p-4 rounded-2xl border border-white/10 bg-white/5">
                   <div>
-                    <Label className="text-[#262626] dark:text-white font-semibold">
+                    <Label className="text-white font-semibold">
                       {dictionary.playerProfile?.labels?.selectCourse ?? 'Select course'}
                     </Label>
                     <Select value={selectedCourseId} onValueChange={setSelectedCourseId}>
-                      <SelectTrigger className="mt-2 h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                      <SelectTrigger className="mt-2 h-12 bg-black/40 border border-white/10 text-white">
                         <SelectValue placeholder={dictionary.playerProfile?.placeholders?.selectCourse ?? 'Select a course'} />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                      <SelectContent className="bg-[#0a0a0a] border border-white/10 text-white">
                         {availableCourses.map((course) => (
                           <SelectItem key={course.id} value={course.id} className="cursor-pointer">
                             {locale === 'ar' ? course.nameAr : course.name} - {course.price} {course.currency}
@@ -956,18 +1039,18 @@ export function KidProfileClient({
                     <Button
                       onClick={handleSaveCourse}
                       disabled={savingCourse || !selectedCourseId}
-                      className="bg-[#262626] hover:bg-black text-white"
+                      className="bg-linear-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-400 hover:to-blue-500"
                     >
                       <Save className="h-4 w-4 me-2" />
                       {dictionary.common.save}
                     </Button>
-                    <Button variant="outline" className="border-2" onClick={handleCancelEdit}>
+                    <Button variant="outline" className="border-white/15 bg-white/5 text-white hover:bg-white/10" onClick={handleCancelEdit}>
                       {dictionary.common.cancel}
                     </Button>
                   </div>
                 </div>
               ) : enrollments.length === 0 ? (
-                <div className="text-gray-600 dark:text-gray-300">
+                <div className="text-white/70">
                   {dictionary.playerProfile?.empty?.noCourses ?? 'No courses.'}
                 </div>
               ) : (
@@ -984,11 +1067,11 @@ export function KidProfileClient({
                     return (
                       <div
                         key={enrollment.id}
-                        className="p-4 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a]"
+                        className="p-4 rounded-2xl border border-white/10 bg-white/5"
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div className="min-w-0">
-                            <div className="font-bold text-[#262626] dark:text-white truncate">
+                            <div className="font-bold text-white truncate">
                               {locale === 'ar' ? enrollment.course?.nameAr : enrollment.course?.name}
                             </div>
                             <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -1005,7 +1088,7 @@ export function KidProfileClient({
                                 {statusLabel}
                               </Badge>
                               {enrollment.course?.startDate && enrollment.course?.endDate && (
-                                <Badge variant="secondary" className="bg-gray-100 dark:bg-[#0a0a0a]">
+                                <Badge variant="secondary" className="bg-white/10 text-white/80 border border-white/10">
                                   <Calendar className="h-3.5 w-3.5 me-1" />
                                   {new Date(enrollment.course.startDate).toLocaleDateString(locale)} -{' '}
                                   {new Date(enrollment.course.endDate).toLocaleDateString(locale)}
@@ -1019,7 +1102,7 @@ export function KidProfileClient({
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="border-2"
+                                className="border-white/15 bg-white/5 text-white hover:bg-white/10"
                                 onClick={() => handleEditEnrollment(enrollment)}
                                 disabled={isDeleting}
                               >
@@ -1028,7 +1111,7 @@ export function KidProfileClient({
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="border-2"
+                                className="border-white/15 bg-white/5 text-white hover:bg-white/10"
                                 onClick={() => handleDeleteEnrollment(enrollment.id)}
                                 disabled={isDeleting}
                               >
@@ -1047,7 +1130,7 @@ export function KidProfileClient({
           </Card>
         </TabsContent>
 
-        <TabsContent value="achievements">
+        <TabsContent value="achievements" className="mt-4">
           <StudentMedalsDisplay
             studentId={currentKid.id}
             title={dictionary.playerProfile?.sections?.medals ?? 'Medals'}
@@ -1059,12 +1142,17 @@ export function KidProfileClient({
 
       {/* Assessment dialog */}
       <Dialog open={assessmentDialogOpen} onOpenChange={setAssessmentDialogOpen}>
-        <DialogContent className="sm:max-w-[720px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[760px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{dictionary.playerProfile?.actions?.newAssessment ?? 'New Assessment'}</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
+          <div className="grid gap-5">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+              className="grid gap-2"
+            >
               <Label htmlFor="sessionDate">{dictionary.playerProfile?.labels?.assessmentDate ?? 'Assessment date'}</Label>
               <Input
                 id="sessionDate"
@@ -1072,44 +1160,94 @@ export function KidProfileClient({
                 value={assessmentForm.sessionDate}
                 onChange={(e) => setAssessmentForm((p) => ({ ...p, sessionDate: e.target.value }))}
               />
-            </div>
+            </motion.div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {(
                 [
-                  { key: 'speed', min: 0, max: 20, step: 0.1, unit: 's' },
-                  { key: 'agility', min: 0, max: 30, step: 0.1, unit: 's' },
-                  { key: 'balance', min: 0, max: 120, step: 1, unit: 's' },
-                  { key: 'power', min: 0, max: 300, step: 5, unit: 'cm' },
-                  { key: 'reaction', min: 0, max: 1000, step: 10, unit: 'ms' },
-                  { key: 'coordination', min: 0, max: 100, step: 1, unit: '' },
-                  { key: 'flexibility', min: 0, max: 50, step: 1, unit: 'cm' },
+                  { key: 'speed', icon: Activity },
+                  { key: 'agility', icon: Trophy },
+                  { key: 'balance', icon: Star },
+                  { key: 'power', icon: Award },
+                  { key: 'reaction', icon: Flag },
+                  { key: 'coordination', icon: BookOpen },
+                  { key: 'flexibility', icon: UserCircle },
                 ] as const
-              ).map((f) => (
-                <div key={f.key} className="grid gap-2">
-                  <div className="flex items-center justify-between mb-2">
-                    <Label htmlFor={f.key}>{categoryLabel(f.key)}</Label>
-                    <div className="px-3 py-1 rounded-lg bg-blue-500 text-white font-bold text-sm">
-                      {assessmentForm[f.key] || '0'} {f.unit}
+              ).map((f, idx) => {
+                const valueRaw = assessmentForm[f.key];
+                const value = Number(valueRaw || 5);
+                const Icon = f.icon;
+                const inputId = `assessment-${f.key}`;
+
+                return (
+                  <motion.div
+                    key={f.key}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.03, duration: 0.35 }}
+                    whileHover={{ scale: 1.01 }}
+                    className="rounded-2xl border border-white/10 bg-white/5 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <motion.div
+                            whileHover={{ rotate: 8 }}
+                            className="shrink-0 rounded-xl border border-white/10 bg-black/30 p-2"
+                            aria-hidden
+                          >
+                            <Icon className="h-5 w-5 text-white/80" />
+                          </motion.div>
+                          <Label htmlFor={inputId} className="truncate text-white/90">
+                            {categoryLabel(f.key)}
+                          </Label>
+                        </div>
+                        <div className="mt-2 text-xs text-white/55">
+                          Score: {Math.min(10, Math.max(1, value))}/10
+                        </div>
+                      </div>
+
+                      <motion.div
+                        initial={{ scale: 0.98, opacity: 0.9 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="shrink-0 rounded-xl border border-white/10 bg-black/40 px-3 py-1 text-sm font-bold text-white"
+                      >
+                        {Math.min(10, Math.max(1, value))}
+                      </motion.div>
                     </div>
-                  </div>
-                  <input
-                    id={f.key}
-                    type="range"
-                    min={f.min}
-                    max={f.max}
-                    step={f.step}
-                    value={assessmentForm[f.key] || f.min.toString()}
-                    onChange={(e) => setAssessmentForm((p) => ({ ...p, [f.key]: e.target.value }))}
-                    className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                    aria-label={categoryLabel(f.key)}
-                    title={categoryLabel(f.key)}
-                    style={{
-                      background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((parseFloat(assessmentForm[f.key] || f.min.toString()) - f.min) / (f.max - f.min)) * 100}%, rgb(229, 231, 235) ${((parseFloat(assessmentForm[f.key] || f.min.toString()) - f.min) / (f.max - f.min)) * 100}%, rgb(229, 231, 235) 100%)`
-                    }}
-                  />
-                </div>
-              ))}
+
+                    <div className="mt-4">
+                      <input
+                        id={inputId}
+                        type="range"
+                        min={1}
+                        max={10}
+                        step={1}
+                        value={Number.isFinite(value) ? String(Math.min(10, Math.max(1, value))) : '5'}
+                        onChange={(e) => setAssessmentForm((p) => ({ ...p, [f.key]: e.target.value }))}
+                        className="dna-range w-full"
+                        aria-label={categoryLabel(f.key)}
+                        title={categoryLabel(f.key)}
+                      />
+
+                      <div className="mt-2 flex justify-between text-[11px] text-white/45">
+                        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                          <span
+                            key={n}
+                            className={
+                              n === Math.min(10, Math.max(1, value))
+                                ? 'text-white/85 font-semibold'
+                                : undefined
+                            }
+                          >
+                            {n}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
 
             <div className="grid gap-2">
@@ -1170,8 +1308,6 @@ export function KidProfileClient({
         </DialogContent>
       </Dialog>
 
-
-
-    </div>
+    </motion.div>
   );
 }

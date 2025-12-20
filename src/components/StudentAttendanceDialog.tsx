@@ -139,10 +139,10 @@ export function StudentAttendanceDialog({
                 <img
                   src={student.profilePicture}
                   alt={studentName}
-                  className="w-12 h-12 rounded-full object-cover border-2 border-[#FF5F02]"
+                  className="w-12 h-12 rounded-xl object-cover border-2 border-[#FF5F02]"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-[#262626] dark:bg-[#1a1a1a] flex items-center justify-center border-2 border-[#DDDDDD] dark:border-[#000000]">
+                <div className="w-12 h-12 rounded-xl bg-[#262626] dark:bg-[#1a1a1a] flex items-center justify-center border-2 border-[#DDDDDD] dark:border-[#000000]">
                   <UserCircle className="h-8 w-8 text-white" />
                 </div>
               )}
@@ -243,9 +243,6 @@ export function StudentAttendanceDialog({
                       value={score ?? 5}
                       onChange={(e) => setScore(parseInt(e.target.value))}
                       className="slider w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                      style={{
-                        background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${((score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) ${((score ?? 5) - 1) / 9 * 100}%, rgb(229, 231, 235) 100%)`
-                      }}
                       aria-label={locale === 'ar' ? 'تقييم الأداء' : 'Performance Rating'}
                       title={locale === 'ar' ? 'تقييم الأداء' : 'Performance Rating'}
                     />

@@ -4,7 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { OverlayScrollbarsProvider } from '@/components/OverlayScrollbarsProvider';
 import "./globals.css";
-import "./overlayscrollbars.css";
+// Scrollbar theme lives in `globals.css`.
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

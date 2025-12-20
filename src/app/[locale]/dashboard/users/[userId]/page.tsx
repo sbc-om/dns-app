@@ -42,7 +42,7 @@ export default async function UserProfilePage({
   // If user is a kid, show kid profile
   if (targetUser.role === 'kid') {
     return (
-      <div className="h-full overflow-y-auto">
+      <div className="h-full min-h-0">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl space-y-6">
           <KidProfileClient
             dictionary={dictionary}
@@ -76,7 +76,7 @@ export default async function UserProfilePage({
     .sort((a, b) => a.academyName.localeCompare(b.academyName));
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full min-h-0">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl space-y-6">
         <UserDetailsClient
           dictionary={dictionary}

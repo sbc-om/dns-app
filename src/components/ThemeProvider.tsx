@@ -12,16 +12,22 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
+export function ThemeProvider({
+  children,
+  forcedTheme,
+}: {
+  children: React.ReactNode;
+  forcedTheme?: Theme;
+}) {
+  const [theme, setThemeState] = useState<Theme>(forcedTheme ?? 'light');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Check localStorage and system preference
+
     const savedTheme = localStorage.getItem('theme') as Theme;
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const initialTheme = savedTheme || systemTheme;
+    const initialTheme = forcedTheme ?? savedTheme ?? systemTheme;
     
     setThemeState(initialTheme);
     
@@ -29,19 +35,24 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.classList.remove('light', 'dark');
     // Add the correct class
     document.documentElement.classList.add(initialTheme);
-  }, []);
+  }, [forcedTheme]);
 
   const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem('theme', newTheme);
+    const nextTheme = forcedTheme ?? newTheme;
+    setThemeState(nextTheme);
+
+    if (!forcedTheme) {
+      localStorage.setItem('theme', nextTheme);
+    }
     
     // Remove both classes first
     document.documentElement.classList.remove('light', 'dark');
     // Add the correct class
-    document.documentElement.classList.add(newTheme);
+    document.documentElement.classList.add(nextTheme);
   };
 
   const toggleTheme = () => {
+    if (forcedTheme) return;
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
   };

@@ -1,11 +1,19 @@
 export type DnaAssessmentTests = {
-  speed: number; // seconds (lower is better)
-  agility: number; // seconds (lower is better)
-  balance: number; // seconds (higher is better)
-  power: number; // cm (higher is better)
-  reaction: number; // ms (lower is better)
-  coordination: number; // reps (higher is better)
-  flexibility: number; // cm (higher is better)
+  /**
+   * Assessment values stored per category.
+   *
+   * The app historically stored raw measurements (seconds, cm, ms, reps).
+   * Newer UI can store a simple 1–10 coach score.
+   *
+   * Scoring functions below auto-detect the scale and normalize to 0–100.
+   */
+  speed: number;
+  agility: number;
+  balance: number;
+  power: number;
+  reaction: number;
+  coordination: number;
+  flexibility: number;
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -24,9 +32,41 @@ function scoreHigherBetter(value: number, worst: number, best: number): number {
   return ((v - worst) / (best - worst)) * 100;
 }
 
+function isPointScale(tests: DnaAssessmentTests): boolean {
+  // Treat sessions as point-based when all values are within a typical 1–10 range.
+  // This keeps legacy sessions (e.g. reaction=350ms, power=180cm) using the old normalization.
+  const values = Object.values(tests);
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+
+  // Allow slight flexibility for existing UI defaults; still requires <=10.
+  return Number.isFinite(max) && Number.isFinite(min) && max <= 10 && min >= 0;
+}
+
+function scoreTenPointScale(value: number): number {
+  // Normalize 1–10 to 0–100 (1 => 0, 10 => 100). Clamp just in case.
+  if (!Number.isFinite(value)) return 0;
+  const v = clamp(value, 1, 10);
+  return ((v - 1) / 9) * 100;
+}
+
 export function calculateCategoryScores(
   tests: DnaAssessmentTests
 ): Record<keyof DnaAssessmentTests, number> {
+  // New simplified flow: 1–10 points per test (higher is better).
+  if (isPointScale(tests)) {
+    return {
+      speed: scoreTenPointScale(tests.speed),
+      agility: scoreTenPointScale(tests.agility),
+      balance: scoreTenPointScale(tests.balance),
+      power: scoreTenPointScale(tests.power),
+      reaction: scoreTenPointScale(tests.reaction),
+      coordination: scoreTenPointScale(tests.coordination),
+      flexibility: scoreTenPointScale(tests.flexibility),
+    };
+  }
+
+  // Legacy flow: raw measurements with per-category normalization.
   return {
     speed: scoreLowerBetter(tests.speed, 3.0, 8.0),
     agility: scoreLowerBetter(tests.agility, 10.0, 25.0),

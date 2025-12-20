@@ -1,6 +1,8 @@
 'use client';
 
 import { ReactNode, useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
 import { DashboardSidebar } from '@/components/DashboardSidebar';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
@@ -31,13 +33,11 @@ export function DashboardLayoutClient({
   direction
 }: DashboardLayoutClientProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [isPushSupported, setIsPushSupported] = useState(true);
-
-  // Check if push notifications are supported
-  useEffect(() => {
-    const supported = 'serviceWorker' in navigator && 'PushManager' in window;
-    setIsPushSupported(supported);
-  }, []);
+  const [isPushSupported] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return 'serviceWorker' in navigator && 'PushManager' in window;
+  });
+  const pathname = usePathname();
 
   // Use fallback polling for devices without push notification support (like iOS)
   useNotificationFallback(!isPushSupported);
@@ -55,7 +55,17 @@ export function DashboardLayoutClient({
   }, [isMobileSidebarOpen]);
 
   return (
-    <div className="flex h-screen bg-[#DDDDDD] dark:bg-[#000000] overflow-hidden relative" dir={direction}>
+    <div
+      className="flex h-screen overflow-hidden relative bg-linear-to-br from-slate-950 via-indigo-950 to-purple-950"
+      dir={direction}
+    >
+      {/* Game-like background */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-32 -left-32 h-120 w-120 rounded-full bg-orange-500/15 blur-3xl" />
+        <div className="absolute -bottom-40 -right-32 h-136 w-136 rounded-full bg-fuchsia-500/15 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.12),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.10),transparent_55%)]" />
+      </div>
+
       {/* Initialize Push Notifications (only on supported devices) */}
       {isPushSupported && <PushNotificationInit />}
       
@@ -101,7 +111,18 @@ export function DashboardLayoutClient({
           }}
           defer
         >
-          {children}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.45, type: 'spring', stiffness: 260, damping: 24 }}
+              className="min-h-full"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </OverlayScrollbarsComponent>
 
         {/* Mobile Bottom Navigation */}
