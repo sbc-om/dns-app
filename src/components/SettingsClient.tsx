@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, Database, Download, Upload, Clock, Bell, UserCog, Award, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -143,15 +144,29 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
 
   return (
     <>
-      <div className="p-6 space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, type: 'spring', stiffness: 220, damping: 22 }}
+        className="p-6 space-y-6"
+      >
         {/* Header */}
         <div className="space-y-3">
-          <h1 className="text-3xl font-bold text-[#262626] dark:text-white flex items-center gap-3">
-            <div className="p-2 bg-white dark:bg-[#262626] rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="text-3xl font-black text-[#262626] dark:text-white flex items-center gap-3"
+          >
+            <motion.div
+              whileHover={{ rotate: -2, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 18 }}
+              className="p-2 bg-white/80 dark:bg-white/5 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] backdrop-blur-sm"
+            >
               <Settings className="h-6 w-6 text-[#262626] dark:text-white" />
-            </div>
+            </motion.div>
             {dictionary.nav.settings || 'Settings'}
-          </h1>
+          </motion.h1>
           <p className="text-base text-gray-600 dark:text-gray-400">
             {dictionary.settings?.description || 'Manage application settings and data backup'}
           </p>
@@ -208,7 +223,14 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
 
           {/* Notifications Tab */}
           <TabsContent value="notifications" className="space-y-4">
-            <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] overflow-hidden">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+              whileHover={{ rotateY: 1, rotateX: 1 }}
+              className="transform-3d"
+            >
+              <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] overflow-hidden">
               <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000] py-4">
                 <CardTitle className="text-xl font-bold text-[#262626] dark:text-white flex items-center gap-3">
                   <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg">
@@ -223,7 +245,8 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
                   description=""
                 />
               </CardContent>
-            </Card>
+              </Card>
+            </motion.div>
           </TabsContent>
 
           {/* Backup & Restore Tab */}
@@ -251,12 +274,15 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
                     </p>
                   </div>
                   <Button
+                    asChild
                     onClick={handleCreateBackup}
                     disabled={loading}
-                    className="h-12 px-6 bg-[#262626] hover:bg-black text-white active:scale-95 transition-colors disabled:opacity-50"
+                    className="h-12 px-6 bg-[#262626] hover:bg-black text-white disabled:opacity-50 dark:bg-white dark:text-[#262626] dark:hover:bg-gray-100"
                   >
-                    <Download className="mr-2 h-4 w-4" />
-                    {loading ? dictionary.common.loading : dictionary.settings?.create || 'Create'}
+                    <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+                      <Download className="mr-2 h-4 w-4" />
+                      {loading ? dictionary.common.loading : dictionary.settings?.create || 'Create'}
+                    </motion.button>
                   </Button>
                 </div>
 
@@ -272,12 +298,15 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
                     </p>
                   </div>
                   <Button
+                    asChild
                     onClick={handleRestoreBackup}
                     disabled={restoring}
-                    className="h-12 px-6 bg-[#262626] hover:bg-black text-white active:scale-95 transition-colors disabled:opacity-50"
+                    className="h-12 px-6 bg-[#262626] hover:bg-black text-white disabled:opacity-50 dark:bg-white dark:text-[#262626] dark:hover:bg-gray-100"
                   >
-                    <Upload className="mr-2 h-4 w-4" />
-                    {restoring ? dictionary.common.loading : dictionary.settings?.restore || 'Restore'}
+                    <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+                      <Upload className="mr-2 h-4 w-4" />
+                      {restoring ? dictionary.common.loading : dictionary.settings?.restore || 'Restore'}
+                    </motion.button>
                   </Button>
                 </div>
 
@@ -315,11 +344,14 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
                             </div>
                           </div>
                           <Button
+                            asChild
                             size="sm"
                             onClick={() => handleDownloadBackup(backup.filename)}
-                            className="h-10 bg-[#262626] hover:bg-black text-white active:scale-95 transition-colors"
+                            className="h-10 bg-[#262626] hover:bg-black text-white dark:bg-white dark:text-[#262626] dark:hover:bg-gray-100"
                           >
-                            <Download className="h-4 w-4" />
+                            <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+                              <Download className="h-4 w-4" />
+                            </motion.button>
                           </Button>
                         </div>
                       ))}
@@ -382,7 +414,9 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-[#262626] dark:text-white px-3 py-1.5 bg-black/5 dark:bg-white/5 rounded-lg">
-                        {locale === 'ar' ? 'العربية' : 'English'}
+                        {locale === 'ar'
+                          ? (dictionary.settings?.languageArabicName || 'Arabic')
+                          : (dictionary.settings?.languageEnglishName || 'English')}
                       </span>
                     </div>
                   </div>
@@ -467,7 +501,7 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
+      </motion.div>
 
       <ConfirmDialog />
     </>

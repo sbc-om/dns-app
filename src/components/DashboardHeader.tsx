@@ -158,10 +158,10 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-      className="sticky top-0 z-40 border-b-2 border-white/10 dark:border-white/5 bg-gradient-to-r from-white/95 via-blue-50/50 to-purple-50/50 dark:from-gray-900/95 dark:via-blue-950/50 dark:to-purple-950/50 backdrop-blur-xl shadow-lg"
+      className="sticky top-0 z-40 border-b-2 border-white/10 dark:border-white/5 bg-linear-to-r from-white/95 via-blue-50/50 to-purple-50/50 dark:from-gray-900/95 dark:via-blue-950/50 dark:to-purple-950/50 backdrop-blur-xl shadow-lg"
     >
       {/* Animated gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5 opacity-50" />
+      <div className="absolute inset-0 bg-linear-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5 opacity-50" />
       
       <div className="relative flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4 lg:px-6 gap-2 sm:gap-3">
         {/* Left Section: Menu + Title */}
@@ -173,7 +173,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                 variant="ghost"
                 size="icon"
                 onClick={handleBack}
-                className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl hover:bg-gradient-to-br hover:from-blue-500/10 hover:to-purple-500/10 dark:hover:from-blue-500/20 dark:hover:to-purple-500/20 active:scale-95 transition-all border-2 border-transparent hover:border-blue-500/20 dark:hover:border-blue-500/30"
+                className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl hover:bg-linear-to-br hover:from-blue-500/10 hover:to-purple-500/10 dark:hover:from-blue-500/20 dark:hover:to-purple-500/20 active:scale-95 transition-all border-2 border-transparent hover:border-blue-500/20 dark:hover:border-blue-500/30"
                 aria-label="Go back"
               >
                 <ArrowLeft className="h-5 w-5 text-gray-800 dark:text-gray-100 rtl:rotate-180" />
@@ -186,7 +186,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                 variant="ghost"
                 size="icon"
                 onClick={handleMobileMenuToggle}
-                className="lg:hidden h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl hover:bg-gradient-to-br hover:from-blue-500/10 hover:to-purple-500/10 dark:hover:from-blue-500/20 dark:hover:to-purple-500/20 active:scale-95 transition-all border-2 border-transparent hover:border-blue-500/20 dark:hover:border-blue-500/30"
+                className="lg:hidden h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl hover:bg-linear-to-br hover:from-blue-500/10 hover:to-purple-500/10 dark:hover:from-blue-500/20 dark:hover:to-purple-500/20 active:scale-95 transition-all border-2 border-transparent hover:border-blue-500/20 dark:hover:border-blue-500/30"
                 aria-label="Toggle menu"
               >
                 <AnimatePresence mode="wait">
@@ -220,7 +220,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
           <motion.h1 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="hidden sm:block text-base md:text-lg font-bold truncate bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
+            className="hidden sm:block text-base md:text-lg font-bold truncate bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
             style={{
               backgroundSize: '200% auto',
               animation: 'gradient 3s linear infinite'
@@ -283,7 +283,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl hover:bg-gradient-to-br hover:from-blue-500/10 hover:to-purple-500/10 dark:hover:from-blue-500/20 dark:hover:to-purple-500/20 active:scale-95 transition-all border-2 border-transparent hover:border-blue-500/20 dark:hover:border-blue-500/30 relative"
+                  className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl hover:bg-linear-to-br hover:from-blue-500/10 hover:to-purple-500/10 dark:hover:from-blue-500/20 dark:hover:to-purple-500/20 active:scale-95 transition-all border-2 border-transparent hover:border-blue-500/20 dark:hover:border-blue-500/30 relative"
                   aria-label={dictionary.nav.notifications}
                 >
                   <Bell className="h-4 w-4 text-gray-700 dark:text-gray-200" />
@@ -291,7 +291,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                     <motion.span 
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-gradient-to-br from-red-500 to-pink-600 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white dark:border-gray-900 shadow-lg"
+                      className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-linear-to-br from-red-500 to-pink-600 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white dark:border-gray-900 shadow-lg"
                     >
                       <motion.span
                         animate={{ scale: [1, 1.2, 1] }}
@@ -315,7 +315,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                     className="h-9 w-9 sm:h-10 sm:w-10 rounded-full active:scale-95 transition-all border-2 border-transparent hover:border-blue-500/30 dark:hover:border-blue-500/50 relative overflow-hidden"
                     aria-label="User menu"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 opacity-0 hover:opacity-100 transition-opacity" />
+                    <div className="absolute inset-0 bg-linear-to-br from-blue-500/20 to-purple-500/20 opacity-0 hover:opacity-100 transition-opacity" />
                     {user.profilePicture ? (
                       <img
                         key={user.profilePicture}
@@ -324,7 +324,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                         className="h-full w-full rounded-full object-cover relative z-10"
                       />
                     ) : (
-                      <div className="h-full w-full rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-xs font-bold relative z-10">
+                      <div className="h-full w-full rounded-full bg-linear-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-xs font-bold relative z-10">
                         {user.fullName?.[0]?.toUpperCase() || 'U'}
                       </div>
                     )}

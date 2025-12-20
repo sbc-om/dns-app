@@ -41,8 +41,8 @@ export function AnimatedDashboardClient({
         transition={{ duration: 0.6, type: 'spring' }}
         className="relative"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-3xl blur-3xl" />
-        <div className="relative bg-gradient-to-br from-white/80 to-white/60 dark:from-gray-900/80 dark:to-gray-800/60 backdrop-blur-xl p-8 rounded-3xl border-2 border-white/20 dark:border-white/10 shadow-2xl">
+        <div className="absolute inset-0 bg-linear-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-3xl blur-3xl" />
+        <div className="relative bg-linear-to-br from-white/80 to-white/60 dark:from-gray-900/80 dark:to-gray-800/60 backdrop-blur-xl p-8 rounded-3xl border-2 border-white/20 dark:border-white/10 shadow-2xl">
           <motion.h1 
             className="text-4xl md:text-5xl font-bold mb-3"
             animate={{ 
@@ -76,7 +76,7 @@ export function AnimatedDashboardClient({
           title={dictionary.dashboard.totalUsers}
           value={stats.totalUsers}
           icon={Users}
-          gradient="bg-gradient-to-br from-blue-500 to-blue-600"
+          gradient="bg-linear-to-br from-blue-500 to-blue-600"
           delay={0}
         />
         
@@ -84,7 +84,7 @@ export function AnimatedDashboardClient({
           title={dictionary.dashboard.activeUsers}
           value={stats.activeUsers}
           icon={UserCheck}
-          gradient="bg-gradient-to-br from-green-500 to-emerald-600"
+          gradient="bg-linear-to-br from-green-500 to-emerald-600"
           delay={0.1}
         />
         
@@ -92,7 +92,7 @@ export function AnimatedDashboardClient({
           title={dictionary.dashboard.totalAppointments}
           value={stats.totalAppointments}
           icon={Calendar}
-          gradient="bg-gradient-to-br from-purple-500 to-purple-600"
+          gradient="bg-linear-to-br from-purple-500 to-purple-600"
           delay={0.2}
         />
         
@@ -100,7 +100,7 @@ export function AnimatedDashboardClient({
           title={dictionary.dashboard.pendingAppointments}
           value={stats.pendingAppointments}
           icon={Clock}
-          gradient="bg-gradient-to-br from-yellow-500 to-orange-500"
+          gradient="bg-linear-to-br from-yellow-500 to-orange-500"
           delay={0.3}
         />
         
@@ -108,7 +108,7 @@ export function AnimatedDashboardClient({
           title={dictionary.dashboard.todayAppointments}
           value={stats.todayAppointments}
           icon={CheckCircle}
-          gradient="bg-gradient-to-br from-cyan-500 to-blue-500"
+          gradient="bg-linear-to-br from-cyan-500 to-blue-500"
           delay={0.4}
         />
         
@@ -117,7 +117,7 @@ export function AnimatedDashboardClient({
           value={stats.totalCourses}
           subtitle={`${stats.activeCourses} ${dictionary.users.active || 'active'}`}
           icon={GraduationCap}
-          gradient="bg-gradient-to-br from-indigo-500 to-purple-600"
+          gradient="bg-linear-to-br from-indigo-500 to-purple-600"
           delay={0.5}
         />
         
@@ -126,7 +126,7 @@ export function AnimatedDashboardClient({
           value={stats.totalEnrollments}
           subtitle={`${stats.paidEnrollments} ${dictionary.payments?.paid || 'paid'}`}
           icon={TrendingUp}
-          gradient="bg-gradient-to-br from-pink-500 to-rose-600"
+          gradient="bg-linear-to-br from-pink-500 to-rose-600"
           delay={0.6}
         />
         
@@ -134,7 +134,7 @@ export function AnimatedDashboardClient({
           title={dictionary.dashboard.totalCoaches || 'Total Coaches'}
           value={stats.totalCoaches}
           icon={Award}
-          gradient="bg-gradient-to-br from-violet-500 to-purple-600"
+          gradient="bg-linear-to-br from-violet-500 to-purple-600"
           delay={0.7}
         />
         
@@ -142,7 +142,7 @@ export function AnimatedDashboardClient({
           title={dictionary.dashboard.totalKids || 'Total Kids'}
           value={stats.totalKids}
           icon={User}
-          gradient="bg-gradient-to-br from-teal-500 to-cyan-600"
+          gradient="bg-linear-to-br from-teal-500 to-cyan-600"
           delay={0.8}
         />
       </div>

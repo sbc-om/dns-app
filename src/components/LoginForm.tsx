@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, AlertCircle, ArrowRight, ArrowLeft, Shield, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -196,9 +197,18 @@ export function LoginForm({ dictionary, locale }: LoginFormProps) {
         )}
       </div>
 
-      {/* Step 1: Email */}
-      {currentStep === 'email' && (
-        <form onSubmit={handleEmailSubmit} className="space-y-6">
+      <AnimatePresence mode="wait" initial={false}>
+        {/* Step 1: Email */}
+        {currentStep === 'email' && (
+          <motion.form
+            key="login-step-email"
+            onSubmit={handleEmailSubmit}
+            className="space-y-6"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}
+          >
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-[#262626] dark:text-white">
               {dictionary.common.email}
@@ -225,21 +235,32 @@ export function LoginForm({ dictionary, locale }: LoginFormProps) {
             </div>
           )}
 
-          <Button 
-            type="submit" 
+          <Button
+            asChild
+            type="submit"
             className="w-full h-12 bg-[#262626] dark:bg-white text-white dark:text-[#262626] hover:bg-black dark:hover:bg-gray-100 font-semibold transition-colors"
           >
-            <span className="flex items-center justify-center gap-2">
-              {dictionary.common?.continue || 'Continue'}
-              <ArrowRight className="w-5 h-5" />
-            </span>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <span className="flex items-center justify-center gap-2">
+                {dictionary.common?.continue || 'Continue'}
+                <ArrowRight className="w-5 h-5" />
+              </span>
+            </motion.button>
           </Button>
-        </form>
-      )}
+          </motion.form>
+        )}
 
-      {/* Step 2: Password */}
-      {currentStep === 'password' && (
-        <form onSubmit={handlePasswordSubmit} className="space-y-6">
+        {/* Step 2: Password */}
+        {currentStep === 'password' && (
+          <motion.form
+            key="login-step-password"
+            onSubmit={handlePasswordSubmit}
+            className="space-y-6"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}
+          >
           <div className="p-3 bg-gray-50 dark:bg-[#1a1a1a] rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000]">
             <p className="text-sm text-[#262626] dark:text-white font-medium truncate">
               <Mail className="w-4 h-4 inline mr-2 text-gray-500 dark:text-gray-300" />
@@ -283,35 +304,49 @@ export function LoginForm({ dictionary, locale }: LoginFormProps) {
           </div>
 
           <div className="flex gap-3">
-            <Button 
+            <Button
+              asChild
               type="button"
               onClick={goBack}
               variant="outline"
               className="h-12 border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] hover:bg-gray-50 dark:hover:bg-[#262626]"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <ArrowLeft className="w-5 h-5" />
+              </motion.button>
             </Button>
-            <Button 
-              type="submit" 
-              className="flex-1 h-12 bg-[#262626] dark:bg-white text-white dark:text-[#262626] hover:bg-black dark:hover:bg-gray-100 font-semibold transition-colors" 
+            <Button
+              asChild
+              type="submit"
+              className="flex-1 h-12 bg-[#262626] dark:bg-white text-white dark:text-[#262626] hover:bg-black dark:hover:bg-gray-100 font-semibold transition-colors"
               disabled={isSubmitting}
             >
-              {isSubmitting ? (
-                <span className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {dictionary.common.loading}
-                </span>
-              ) : (
-                dictionary.auth.loginButton
-              )}
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {dictionary.common.loading}
+                  </span>
+                ) : (
+                  dictionary.auth.loginButton
+                )}
+              </motion.button>
             </Button>
           </div>
-        </form>
-      )}
+          </motion.form>
+        )}
 
-      {/* Step 3: Two-Factor Authentication (optional) */}
-      {currentStep === 'twoFactor' && (
-        <form onSubmit={handleTwoFactorSubmit} className="space-y-6">
+        {/* Step 3: Two-Factor Authentication (optional) */}
+        {currentStep === 'twoFactor' && (
+          <motion.form
+            key="login-step-2fa"
+            onSubmit={handleTwoFactorSubmit}
+            className="space-y-6"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}
+          >
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-gray-50 dark:bg-[#1a1a1a] rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#DDDDDD] dark:border-[#000000]">
               <Shield className="w-8 h-8 text-[#262626] dark:text-white" />
@@ -353,31 +388,38 @@ export function LoginForm({ dictionary, locale }: LoginFormProps) {
           )}
 
           <div className="flex gap-3">
-            <Button 
+            <Button
+              asChild
               type="button"
               onClick={goBack}
               variant="outline"
               className="h-12 border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] hover:bg-gray-50 dark:hover:bg-[#262626]"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <ArrowLeft className="w-5 h-5" />
+              </motion.button>
             </Button>
-            <Button 
-              type="submit" 
-              className="flex-1 h-12 bg-[#262626] dark:bg-white text-white dark:text-[#262626] hover:bg-black dark:hover:bg-gray-100 font-semibold transition-colors" 
+            <Button
+              asChild
+              type="submit"
+              className="flex-1 h-12 bg-[#262626] dark:bg-white text-white dark:text-[#262626] hover:bg-black dark:hover:bg-gray-100 font-semibold transition-colors"
               disabled={isSubmitting}
             >
-              {isSubmitting ? (
-                <span className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {dictionary.common.loading}
-                </span>
-              ) : (
-                dictionary.auth?.verifyAndLogin || 'Verify & Login'
-              )}
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {dictionary.common.loading}
+                  </span>
+                ) : (
+                  dictionary.auth?.verifyAndLogin || 'Verify & Login'
+                )}
+              </motion.button>
             </Button>
           </div>
-        </form>
-      )}
+          </motion.form>
+        )}
+      </AnimatePresence>
 
     </div>
   );

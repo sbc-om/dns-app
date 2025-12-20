@@ -1,16 +1,18 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { getDictionary, type Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { ProgramsSlider } from '@/components/ProgramsSlider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
+import Autoplay from 'embla-carousel-autoplay';
 import { 
   Target, 
   Trophy, 
@@ -18,7 +20,12 @@ import {
   Award, 
   ChevronRight,
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  Sparkles,
+  Star,
+  TrendingUp,
+  Users,
+  Activity
 } from 'lucide-react';
 
 interface PageProps {
@@ -36,10 +43,6 @@ export default function HomePage({ params }: PageProps) {
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
   const [user, setUser] = useState<SessionUser | null>(null);
   const [email, setEmail] = useState('');
-  const { scrollY } = useScroll();
-  const heroTextOpacity = useTransform(scrollY, [0, 240], [1, 0]);
-  const heroTextY = useTransform(scrollY, [0, 240], [0, -28]);
-  const heroTextScale = useTransform(scrollY, [0, 240], [1, 0.98]);
 
   useEffect(() => {
     async function loadData() {
@@ -157,171 +160,160 @@ export default function HomePage({ params }: PageProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-background" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-[#0a0a0a]" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <Header dictionary={dictionary} locale={locale} user={user} />
       
       <main className="overflow-hidden">
-        {/* Hero Section */}
-        <section className="relative">
-          {/* Background (static, full width, auto height) */}
-          <div className="relative w-full">
-            <Image
-              src="/hero.png"
-              alt=""
-              width={2400}
-              height={1600}
-              priority
-              sizes="100vw"
-              className="w-full h-auto"
-            />
-            {/* Gentle fade into page background (not darkening the image) */}
-            <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent via-transparent to-background/90" />
-            {/* Subtle grid texture */}
-            <div className="pointer-events-none absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03]" />
-          </div>
-          
-          <motion.div
-            style={{ opacity: heroTextOpacity, y: heroTextY, scale: heroTextScale }}
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-            className="absolute inset-0 flex items-center justify-center px-4 py-6 sm:py-12"
-          >
-            <div className="w-full max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center">
-            
-            <motion.h1 
-              variants={itemVariants}
-              className="text-white font-black tracking-tight leading-[1.05] drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] text-[clamp(1.9rem,7vw,5rem)]"
+        {/* Intro section (no hero image, no background glow) */}
+        <section className="relative py-16 px-4">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={containerVariants}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
             >
-              {dictionary.pages.home.hero.title}
-            </motion.h1>
-            
-            <motion.p 
-              variants={itemVariants}
-              className="mt-3 text-white/95 font-semibold leading-snug drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] text-[clamp(0.95rem,2.7vw,1.6rem)] max-w-3xl"
-            >
-              {dictionary.pages.home.hero.subtitle}
-            </motion.p>
-            
-            <motion.div 
-              variants={itemVariants}
-              className="mt-6 flex flex-col gap-3 w-full max-w-sm mx-auto sm:flex-row sm:max-w-none sm:w-auto sm:justify-center"
-            >
-              <Link href={`/${locale}/book-appointment`}>
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto h-12 sm:h-14 rounded-xl bg-[#FF5F02] text-white font-bold px-6 sm:px-8 border-2 border-transparent hover:bg-[#ff6b1a] shadow-lg"
-                >
-                  {dictionary.pages.home.hero.cta}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              {user ? (
-                <Link href={`/${locale}/dashboard`}>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full sm:w-auto h-12 sm:h-14 rounded-xl bg-white/10 backdrop-blur-md border-2 border-white/70 text-white hover:bg-white hover:text-[#262626] px-6 sm:px-8 font-bold shadow-lg"
-                  >
-                    {dictionary.nav.dashboard}
-                    <ChevronRight className="ml-2 w-5 h-5" />
-                  </Button>
-                </Link>
-              ) : (
-                <Link href={`/${locale}/auth/login`}>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full sm:w-auto h-12 sm:h-14 rounded-xl bg-white/10 backdrop-blur-md border-2 border-white/70 text-white hover:bg-white hover:text-[#262626] px-6 sm:px-8 font-bold shadow-lg"
-                  >
-                    {dictionary.pages.home.hero.loginCta}
-                    <ChevronRight className="ml-2 w-5 h-5" />
-                  </Button>
-                </Link>
-              )}
+              <motion.div variants={itemVariants} className="lg:col-span-7">
+                <div className="relative group h-full">
+                  <div className="absolute -inset-px rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.25),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.18),transparent_55%)] blur-2xl" />
+                  <div className="relative h-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 mb-6">
+                      <Sparkles className="w-4 h-4 text-blue-300" />
+                      <span className="text-sm font-semibold text-white/90">Discover Your Natural Ability</span>
+                    </div>
+
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.05] text-white">
+                      {dictionary.pages.home.hero.title}
+                    </h1>
+                    <p className="mt-5 text-gray-300 font-medium leading-relaxed text-base sm:text-lg max-w-2xl">
+                      {dictionary.pages.home.hero.subtitle}
+                    </p>
+
+                    <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                      <Link href={`/${locale}/book-appointment`} className="w-full sm:w-auto">
+                        <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+                          <Button
+                            size="lg"
+                            className="w-full sm:w-auto h-14 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 border border-blue-400/30"
+                          >
+                            <span className="flex items-center">
+                              {dictionary.pages.home.hero.cta}
+                              <ArrowRight className="ml-2 w-5 h-5" />
+                            </span>
+                          </Button>
+                        </motion.div>
+                      </Link>
+
+                      {user ? (
+                        <Link href={`/${locale}/dashboard`} className="w-full sm:w-auto">
+                          <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+                            <Button
+                              size="lg"
+                              variant="outline"
+                              className="w-full sm:w-auto h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/20 text-white hover:bg-white/10"
+                            >
+                              {dictionary.nav.dashboard}
+                              <ChevronRight className="ml-2 w-5 h-5" />
+                            </Button>
+                          </motion.div>
+                        </Link>
+                      ) : (
+                        <Link href={`/${locale}/auth/login`} className="w-full sm:w-auto">
+                          <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+                            <Button
+                              size="lg"
+                              variant="outline"
+                              className="w-full sm:w-auto h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/20 text-white hover:bg-white/10"
+                            >
+                              {dictionary.pages.home.hero.loginCta}
+                              <ChevronRight className="ml-2 w-5 h-5" />
+                            </Button>
+                          </motion.div>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div variants={itemVariants} className="lg:col-span-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4 h-full">
+                  {[
+                    { icon: Users, label: '500+', sublabel: 'Athletes' },
+                    { icon: Trophy, label: '50+', sublabel: 'Champions' },
+                    { icon: Star, label: '4.9', sublabel: 'Rating' },
+                  ].map((stat, i) => (
+                    <motion.div
+                      key={i}
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="relative group"
+                    >
+                      <div className="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_30%_20%,rgba(236,72,153,0.20),transparent_55%),radial-gradient(circle_at_70%_80%,rgba(96,165,250,0.18),transparent_55%)] blur-2xl" />
+                      <div className="relative rounded-2xl p-5 border border-white/10 bg-white/5 backdrop-blur-xl">
+                        <stat.icon className="w-6 h-6 text-blue-300 mb-3" />
+                        <div className="text-3xl font-black text-white">{stat.label}</div>
+                        <div className="text-sm text-gray-400">{stat.sublabel}</div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
             </motion.div>
-            </div>
-          </motion.div>
+          </div>
         </section>
 
-        {/* Partners Section */}
-        <section className="py-16 bg-muted/30">
-          <div className="max-w-7xl mx-auto px-4">
+        {/* Features Section */}
+        <section className="relative py-24 px-4 bg-[#0f0f0f]">
+          <div className="max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-center"
+              className="text-center mb-16"
             >
-              <h2 className="text-3xl md:text-4xl font-black mb-12 text-foreground">
-                {dictionary.pages.home.partners.title}
+              <h2 className="text-4xl md:text-5xl font-black mb-4 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Why Choose DNA?
               </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-60">
-                {[
-                  'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop',
-                  'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=200&h=200&fit=crop',
-                  'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&h=200&fit=crop',
-                  'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=200&h=200&fit=crop'
-                ].map((img, i) => (
-                  <div key={i} className="flex items-center justify-center p-8 bg-background rounded-lg shadow-sm">
-                    <img src={img} alt={`Partner ${i + 1}`} className="w-24 h-24 object-cover rounded-full grayscale hover:grayscale-0 transition-all" />
-                  </div>
-                ))}
-              </div>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                Discover your natural abilities with our cutting-edge assessment system
+              </p>
             </motion.div>
-          </div>
-        </section>
 
-        {/* Philosophy Section */}
-        <section className="py-20 px-4 bg-white dark:bg-[#262626]">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <div className="bg-[#FF5F02] text-white px-4 py-2 rounded-full inline-block mb-4 text-sm font-bold">
-                  {dictionary.pages.home.philosophy.badge}
-                </div>
-                <h2 className="text-4xl md:text-6xl font-black mb-4 text-foreground">
-                  {dictionary.pages.home.philosophy.title}
-                </h2>
-                <p className="text-xl text-muted-foreground mb-6">
-                  {dictionary.pages.home.philosophy.subtitle}
-                </p>
-                <div className="space-y-4">
-                  <Card className="border-l-4 border-[#FF5F02]">
-                    <CardContent className="p-6">
-                      <h3 className="text-2xl font-bold mb-2">{dictionary.pages.home.philosophy.description}</h3>
-                      <p className="text-muted-foreground">{dictionary.pages.home.philosophy.goal}</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="relative"
-              >
-                <img 
-                  src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&h=600&fit=crop" 
-                  alt="Philosophy" 
-                  className="w-full rounded-2xl shadow-2xl object-cover h-[500px]"
-                />
-              </motion.div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                { icon: Target, title: 'Precision Assessment', desc: 'Advanced AI-powered analysis of physical abilities', color: 'from-blue-500 to-cyan-500' },
+                { icon: Trophy, title: 'Track Progress', desc: 'Monitor development with detailed performance metrics', color: 'from-purple-500 to-pink-500' },
+                { icon: Zap, title: 'Instant Feedback', desc: 'Real-time insights and personalized recommendations', color: 'from-orange-500 to-red-500' },
+              ].map((feature, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.2, duration: 0.6 }}
+                  whileHover={{ y: -10, scale: 1.02 }}
+                  className="relative group"
+                >
+                  <div className={`absolute inset-0 bg-linear-to-br ${feature.color} opacity-0 group-hover:opacity-10 rounded-3xl blur-2xl transition-opacity`} />
+                  <div className="relative bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 hover:border-white/20 transition-colors h-full">
+                    <div className={`w-16 h-16 rounded-2xl bg-linear-to-br ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                      <feature.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-3">{feature.title}</h3>
+                    <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Programs Section */}
-        <section className="py-24 px-4 bg-[#DDDDDD] dark:bg-[#000000]">
-          <div className="max-w-7xl mx-auto">
+        {/* How It Works Section */}
+        <section className="relative py-24 px-4 bg-[#1a1a1a] overflow-hidden">
+          <div className="max-w-7xl mx-auto relative">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -329,156 +321,171 @@ export default function HomePage({ params }: PageProps) {
               transition={{ duration: 0.6 }}
               className="text-center mb-20"
             >
-              <div className="inline-block">
-                <h2 className="text-5xl md:text-7xl font-black mb-6 text-[#262626] dark:text-white tracking-tight">
-                  {dictionary.pages.home.programs.title}
-                </h2>
-                <div className="h-2 w-32 bg-[#FF5F02] mx-auto rounded-full mb-6"></div>
-              </div>
-              <p className="text-2xl md:text-3xl text-muted-foreground font-semibold max-w-3xl mx-auto">
-                {dictionary.pages.home.programs.subtitle}
+              <motion.div
+                initial={{ scale: 0.9 }}
+                whileInView={{ scale: 1 }}
+                className="inline-flex items-center gap-2 bg-linear-to-r from-blue-600/20 to-purple-600/20 text-blue-300 px-5 py-2.5 rounded-full mb-6 border border-blue-500/30"
+              >
+                <TrendingUp className="w-5 h-5" />
+                <span className="text-sm font-bold">HOW IT WORKS</span>
+              </motion.div>
+              <h2 className="text-4xl md:text-6xl font-black mb-6 bg-linear-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent leading-tight">
+                Your Journey to Excellence
+              </h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                Transform your potential into measurable performance through our scientifically-proven 3-step process
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {programs.map((program, index) => (
+            <div className="grid md:grid-cols-3 gap-8 relative">
+              {[
+                {
+                  step: '01',
+                  icon: Target,
+                  title: 'Assessment',
+                  description: 'Comprehensive analysis of your natural physical abilities using advanced testing protocols',
+                  color: 'from-blue-500 to-cyan-500',
+                  delay: 0
+                },
+                {
+                  step: '02',
+                  icon: Activity,
+                  title: 'Development',
+                  description: 'Personalized training program designed to enhance your strengths and improve weaknesses',
+                  color: 'from-purple-500 to-pink-500',
+                  delay: 0.2
+                },
+                {
+                  step: '03',
+                  icon: Trophy,
+                  title: 'Achievement',
+                  description: 'Track progress, earn badges, and advance through performance stages to reach your peak',
+                  color: 'from-orange-500 to-red-500',
+                  delay: 0.4
+                }
+              ].map((item, i) => (
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
+                  key={i}
+                  initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.15 }}
-                  className="h-full"
+                  transition={{ delay: item.delay, duration: 0.6 }}
+                  whileHover={{ y: -10 }}
+                  className="relative"
                 >
-                  <Card className="group h-full flex flex-col hover:shadow-2xl transition-all duration-500 overflow-hidden border-2 hover:border-[#FF5F02] cursor-pointer hover:-translate-y-2">
-                    <CardContent className="p-0 flex flex-col h-full">
-                      <div className={`h-64 relative overflow-hidden`}>
-                        <img 
-                          src={program.image} 
-                          alt={program.title} 
-                          className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" 
-                        />
+                  {/* Step number circle */}
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-10">
+                    <motion.div
+                      whileHover={{ rotate: 360, scale: 1.1 }}
+                      transition={{ duration: 0.6 }}
+                      className={`w-16 h-16 rounded-full bg-linear-to-br ${item.color} flex items-center justify-center shadow-lg`}
+                    >
+                      <span className="text-2xl font-black text-white">{item.step}</span>
+                    </motion.div>
+                  </div>
+
+                  {/* Card */}
+                  <div className="relative mt-10 group">
+                    <div className={`absolute inset-0 bg-linear-to-br ${item.color} opacity-0 group-hover:opacity-10 rounded-3xl blur-2xl transition-opacity`} />
+                    <div className="relative bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 hover:border-white/30 transition-all h-full">
+                      <div className={`w-14 h-14 rounded-2xl bg-linear-to-br ${item.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                        <item.icon className="w-7 h-7 text-white" />
                       </div>
-                      <div className="p-8 flex-1 flex flex-col">
-                        <h3 className="text-2xl font-black mb-3 group-hover:text-[#FF5F02] transition-colors min-h-14">
-                          {program.title}
-                        </h3>
-                        <p className="text-muted-foreground mb-6 flex-1 text-base leading-relaxed">
-                          {program.description}
-                        </p>
-                        <Button 
-                          variant="ghost" 
-                          className="w-full group-hover:bg-[#FF5F02] group-hover:text-white transition-all duration-300 py-6 text-base font-bold rounded-xl"
-                        >
-                          {dictionary.pages.home.programs.learnMore}
-                          <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
+                      <p className="text-gray-400 leading-relaxed">{item.description}</p>
+                    </div>
+                  </div>
                 </motion.div>
               ))}
             </div>
+
+            {/* CTA Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="text-center mt-16"
+            >
+              <Link href={`/${locale}/book-appointment`}>
+                <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    size="lg"
+                    className="h-14 rounded-2xl bg-linear-to-r from-blue-600 to-purple-600 text-white font-bold px-10 border-2 border-blue-500/50 hover:border-blue-400 shadow-lg shadow-blue-600/50 relative overflow-hidden group"
+                  >
+                    <span className="relative z-10 flex items-center text-lg">
+                      Start Your Journey
+                      <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                    <div className="absolute inset-0 bg-linear-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Button>
+                </motion.div>
+              </Link>
+            </motion.div>
           </div>
         </section>
 
-        {/* Recognition Section */}
-        <section className="py-20 px-4 bg-white dark:bg-[#262626]">
-          <div className="max-w-7xl mx-auto">
+        {/* Programs Section - Animated Slider */}
+        <ProgramsSlider dictionary={dictionary} locale={locale} programs={programs} />
+
+        {/* Recognition Section - Simplified */}
+        <section className="relative py-24 px-4 bg-[#0f0f0f] overflow-hidden">
+          <div className="max-w-7xl mx-auto relative">
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-12"
+              className="text-center mb-16"
             >
-              <h2 className="text-4xl md:text-6xl font-black mb-4">
+              <h2 className="text-4xl md:text-5xl font-black mb-4 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 {dictionary.pages.home.recognition.title}
               </h2>
-              <p className="text-2xl text-muted-foreground font-bold">
+              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
                 {dictionary.pages.home.recognition.subtitle}
               </p>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { icon: Target, title: dictionary.pages.home.recognition.point1 },
-                { icon: Trophy, title: dictionary.pages.home.recognition.point2 },
-                { icon: Zap, title: dictionary.pages.home.recognition.point3 },
-                { icon: Award, title: dictionary.pages.home.recognition.point4 }
+                { icon: Target, title: dictionary.pages.home.recognition.point1, color: 'from-blue-500 to-cyan-500' },
+                { icon: Trophy, title: dictionary.pages.home.recognition.point2, color: 'from-purple-500 to-pink-500' },
+                { icon: Zap, title: dictionary.pages.home.recognition.point3, color: 'from-orange-500 to-red-500' },
+                { icon: Award, title: dictionary.pages.home.recognition.point4, color: 'from-green-500 to-emerald-500' }
               ].map((item, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card className="text-center p-8 hover:shadow-xl transition-all border-2 hover:border-[#FF5F02]">
-                    <item.icon className="w-16 h-16 mx-auto mb-4 text-[#FF5F02]" />
-                    <h3 className="text-xl font-bold">{item.title}</h3>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials Section */}
-        <section className="py-20 px-4 bg-[#DDDDDD] dark:bg-[#000000]">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl md:text-6xl font-black mb-2">
-                {dictionary.pages.home.testimonials.title}
-              </h2>
-              <p className="text-3xl font-bold text-muted-foreground">
-                {dictionary.pages.home.testimonials.subtitle}
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{ y: -10 }}
+                  className="relative group"
                 >
-                  <Card className="h-full hover:shadow-xl transition-all">
-                    <CardContent className="p-8">
-                      <img 
-                        src={testimonial.image} 
-                        alt={testimonial.name}
-                        className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
-                      />
-                      <p className="text-muted-foreground mb-4 italic">
-                        &ldquo;{testimonial.content}&rdquo;
-                      </p>
-                      <h4 className="font-bold">{testimonial.name}</h4>
-                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                    </CardContent>
-                  </Card>
+                    <div className={`absolute inset-0 bg-linear-to-br ${item.color} opacity-0 group-hover:opacity-10 rounded-2xl blur-xl transition-opacity`} />
+                  <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:border-white/20 transition-all text-center">
+                      <div className={`w-16 h-16 rounded-xl bg-linear-to-br ${item.color} flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
+                      <item.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white">{item.title}</h3>
+                  </div>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* FAQ Section */}
-        <section className="py-20 px-4 bg-muted/30">
-          <div className="max-w-4xl mx-auto">
+        {/* Testimonials Section - Removed for cleaner design */}
+
+        {/* FAQ Section - Simplified */}
+        <section className="relative py-24 px-4 bg-[#1a1a1a] overflow-hidden">
+          <div className="max-w-4xl mx-auto relative">
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-12"
+              className="text-center mb-16"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-8">
+              <h2 className="text-4xl md:text-5xl font-black mb-4 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 {dictionary.pages.home.faq.title}
               </h2>
             </motion.div>
@@ -491,80 +498,121 @@ export default function HomePage({ params }: PageProps) {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{ x: 5 }}
+                  className="group"
                 >
-                  <Card className="hover:shadow-lg transition-all">
-                    <CardContent className="p-6">
-                      <h3 className="text-lg font-bold mb-2 flex items-start gap-2">
-                        <CheckCircle2 className="w-6 h-6 text-[#FF5F02] shrink-0 mt-1" />
-                        {faq.q}
-                      </h3>
-                      <p className="text-muted-foreground ml-8">{faq.a}</p>
-                    </CardContent>
-                  </Card>
+                  <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all">
+                    <h3 className="text-lg font-bold text-white mb-2 flex items-start gap-3">
+                      <CheckCircle2 className="w-6 h-6 text-blue-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                      {faq.q}
+                    </h3>
+                    <p className="text-gray-400 ml-9 leading-relaxed">{faq.a}</p>
+                  </div>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Newsletter Section */}
-        <section className="py-20 px-4 bg-[#FF5F02]">
-          <div className="max-w-3xl mx-auto text-center">
+        {/* Stats & Achievements Section */}
+        <section className="relative py-24 px-4 bg-linear-to-br from-blue-600 via-purple-600 to-pink-600 overflow-hidden">
+          {/* Animated background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+              className="absolute top-1/4 left-1/4 w-96 h-96 border-2 border-white/20 rounded-full"
+            />
+            <motion.div
+              animate={{ rotate: -360 }}
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              className="absolute bottom-1/4 right-1/4 w-64 h-64 border-2 border-white/20 rounded-full"
+            />
+          </div>
+
+          <div className="max-w-7xl mx-auto relative">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
             >
-              <div className="bg-white text-[#FF5F02] px-4 py-2 rounded-full inline-block mb-4 text-sm font-bold">
-                {dictionary.pages.home.newsletter.badge}
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-8">
-                {dictionary.pages.home.newsletter.title}
+              <motion.div
+                initial={{ scale: 0.9 }}
+                whileInView={{ scale: 1 }}
+                className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-xl text-white px-5 py-2.5 rounded-full mb-6 border border-white/30"
+              >
+                <Trophy className="w-5 h-5" />
+                <span className="text-sm font-bold">OUR ACHIEVEMENTS</span>
+              </motion.div>
+              <h2 className="text-4xl md:text-6xl font-black text-white mb-4">
+                Building Champions
               </h2>
-              <div className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
-                <Input 
-                  type="email" 
-                  placeholder={dictionary.pages.home.newsletter.placeholder}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 bg-white border-0 text-lg py-6"
-                />
-                <Button size="lg" className="bg-[#262626] text-white hover:bg-[#000000] px-8 py-6 text-lg font-bold">
-                  {dictionary.pages.home.newsletter.button}
-                </Button>
-              </div>
-              <p className="text-white opacity-80 text-sm mt-4">
-                {dictionary.pages.home.newsletter.privacy}
+              <p className="text-xl text-white/90 max-w-2xl mx-auto">
+                Join thousands of athletes who have discovered their potential
               </p>
             </motion.div>
-          </div>
-        </section>
 
-        {/* Discover Section */}
-        <section className="py-20 px-4 bg-[#262626] text-white">
-          <div className="max-w-7xl mx-auto text-center">
-            <motion.h2
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="text-6xl md:text-8xl font-black mb-12"
-            >
-              {dictionary.pages.home.discover.title}
-            </motion.h2>
-            <div className="flex flex-wrap justify-center gap-8">
-              {dictionary.pages.home.discover.sports.map((sport: string, index: number) => (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+              {[
+                { number: '5000+', label: 'Athletes Trained', icon: Users },
+                { number: '150+', label: 'Champions Created', icon: Trophy },
+                { number: '98%', label: 'Success Rate', icon: TrendingUp },
+                { number: '25+', label: 'Years Experience', icon: Award },
+              ].map((stat, i) => (
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="text-2xl md:text-3xl font-bold text-white opacity-70 hover:opacity-100 hover:text-[#FF5F02] transition-colors cursor-pointer"
+                  transition={{ delay: i * 0.1, duration: 0.5 }}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  className="relative group"
                 >
-                  {sport}
+                  <div className="absolute inset-0 bg-white/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-white/20 hover:border-white/40 transition-all">
+                    <stat.icon className="w-10 h-10 md:w-12 md:h-12 text-white mb-4 mx-auto group-hover:scale-110 transition-transform" />
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      whileInView={{ scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1 + 0.3, duration: 0.5, type: 'spring' }}
+                      className="text-3xl md:text-5xl font-black text-white mb-2"
+                    >
+                      {stat.number}
+                    </motion.div>
+                    <p className="text-sm md:text-base text-white/80 font-medium">
+                      {stat.label}
+                    </p>
+                  </div>
                 </motion.div>
               ))}
             </div>
+
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="text-center mt-16"
+            >
+              <Link href={`/${locale}/book-appointment`}>
+                <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    size="lg"
+                    className="h-16 rounded-2xl bg-white text-purple-600 font-bold px-12 hover:bg-white/90 shadow-2xl shadow-black/30 text-lg relative overflow-hidden group"
+                  >
+                    <span className="relative z-10 flex items-center">
+                      Become a Champion
+                      <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </Button>
+                </motion.div>
+              </Link>
+            </motion.div>
           </div>
         </section>
       </main>

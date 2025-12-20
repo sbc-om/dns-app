@@ -161,7 +161,7 @@ export function ImageUpload({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#30B2D2]/20 to-[#1E3A8A]/20 flex items-center justify-center">
+            <div className="w-full h-full bg-linear-to-br from-[#30B2D2]/20 to-[#1E3A8A]/20 flex items-center justify-center">
               {icon || <UserCircle className="w-24 h-24 text-gray-400" />}
             </div>
           )}
@@ -205,7 +205,7 @@ export function ImageUpload({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="w-full flex items-center justify-center bg-gray-100 rounded-lg p-4 overflow-hidden" style={{ maxHeight: 'calc(80vh - 200px)' }}>
+          <div className="w-full flex items-center justify-center bg-gray-100 rounded-lg p-4 overflow-hidden max-h-[calc(80vh-200px)]">
             {imageToCrop && (
               <ReactCrop
                 crop={crop}
@@ -218,7 +218,7 @@ export function ImageUpload({
                   ref={imgRef}
                   src={imageToCrop}
                   alt="Crop preview"
-                  style={{ maxHeight: 'calc(80vh - 220px)', width: 'auto', maxWidth: '100%', objectFit: 'contain' }}
+                  className="max-h-[calc(80vh-220px)] w-auto max-w-full object-contain"
                 />
               </ReactCrop>
             )}

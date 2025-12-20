@@ -315,7 +315,7 @@ export function NotificationsClient({ dictionary, locale }: NotificationsClientP
             >
               <BellRing className="h-4 w-4" />
               <span>All</span>
-              <Badge className="ml-1 bg-orange-600 text-white border-0 h-5 min-w-[20px] px-1.5">
+              <Badge className="ml-1 bg-orange-600 text-white border-0 h-5 min-w-5 px-1.5">
                 {notifications.length}
               </Badge>
             </TabsTrigger>
@@ -325,7 +325,7 @@ export function NotificationsClient({ dictionary, locale }: NotificationsClientP
             >
               <Calendar className="h-4 w-4" />
               <span className="hidden sm:inline">Appointments</span>
-              <Badge className="ml-1 bg-orange-200 text-orange-900 dark:bg-orange-900/50 dark:text-orange-100 border-0 h-5 min-w-[20px] px-1.5">
+              <Badge className="ml-1 bg-orange-200 text-orange-900 dark:bg-orange-900/50 dark:text-orange-100 border-0 h-5 min-w-5 px-1.5">
                 {notifications.filter(n => n.category === 'appointments').length}
               </Badge>
             </TabsTrigger>
@@ -335,7 +335,7 @@ export function NotificationsClient({ dictionary, locale }: NotificationsClientP
             >
               <UserPlus className="h-4 w-4" />
               <span className="hidden sm:inline">Users</span>
-              <Badge className="ml-1 bg-orange-200 text-orange-900 dark:bg-orange-900/50 dark:text-orange-100 border-0 h-5 min-w-[20px] px-1.5">
+              <Badge className="ml-1 bg-orange-200 text-orange-900 dark:bg-orange-900/50 dark:text-orange-100 border-0 h-5 min-w-5 px-1.5">
                 {notifications.filter(n => n.category === 'users').length}
               </Badge>
             </TabsTrigger>
@@ -345,7 +345,7 @@ export function NotificationsClient({ dictionary, locale }: NotificationsClientP
             >
               <MessageSquare className="h-4 w-4" />
               <span className="hidden sm:inline">Messages</span>
-              <Badge className="ml-1 bg-orange-200 text-orange-900 dark:bg-orange-900/50 dark:text-orange-100 border-0 h-5 min-w-[20px] px-1.5">
+              <Badge className="ml-1 bg-orange-200 text-orange-900 dark:bg-orange-900/50 dark:text-orange-100 border-0 h-5 min-w-5 px-1.5">
                 {notifications.filter(n => n.category === 'messages').length}
               </Badge>
             </TabsTrigger>
@@ -355,7 +355,7 @@ export function NotificationsClient({ dictionary, locale }: NotificationsClientP
             >
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">System</span>
-              <Badge className="ml-1 bg-orange-200 text-orange-900 dark:bg-orange-900/50 dark:text-orange-100 border-0 h-5 min-w-[20px] px-1.5">
+              <Badge className="ml-1 bg-orange-200 text-orange-900 dark:bg-orange-900/50 dark:text-orange-100 border-0 h-5 min-w-5 px-1.5">
                 {notifications.filter(n => n.category === 'system').length}
               </Badge>
             </TabsTrigger>
@@ -408,7 +408,7 @@ export function NotificationsClient({ dictionary, locale }: NotificationsClientP
                       <div className="flex items-start gap-4 p-5 relative">
                         {/* Icon with enhanced styling */}
                         <div className={cn(
-                          "h-14 w-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg border-2 transition-transform group-hover:scale-110",
+                          "h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg border-2 transition-transform group-hover:scale-110",
                           getNotificationColor(notification.type)
                         )}>
                           <Icon className="h-7 w-7" />
@@ -470,7 +470,7 @@ export function NotificationsClient({ dictionary, locale }: NotificationsClientP
                             </div>
 
                             {/* Action buttons */}
-                            <div className="flex items-center gap-1 flex-shrink-0">
+                            <div className="flex items-center gap-1 shrink-0">
                               {isUnread && (
                                 <Button
                                   variant="ghost"
@@ -517,7 +517,7 @@ export function NotificationsClient({ dictionary, locale }: NotificationsClientP
 
                       {/* Bottom accent line for unread */}
                       {isUnread && (
-                        <div className="h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent"></div>
+                        <div className="h-1 bg-linear-to-r from-transparent via-orange-500 to-transparent"></div>
                       )}
                     </Card>
                   );

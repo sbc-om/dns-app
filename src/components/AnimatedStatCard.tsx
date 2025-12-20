@@ -50,7 +50,7 @@ export function AnimatedStatCard({
       />
       
       {/* Card */}
-      <div className="relative bg-gradient-to-br from-white/10 to-white/5 dark:from-gray-900/50 dark:to-gray-800/30 backdrop-blur-xl p-6 rounded-2xl border-2 border-white/20 dark:border-white/10 overflow-hidden h-full flex flex-col">
+      <div className="relative bg-linear-to-br from-white/10 to-white/5 dark:from-gray-900/50 dark:to-gray-800/30 backdrop-blur-xl p-6 rounded-2xl border-2 border-white/20 dark:border-white/10 overflow-hidden h-full flex flex-col">
         {/* Animated background pattern */}
         <div className="absolute inset-0 opacity-5">
           <motion.div
@@ -77,7 +77,7 @@ export function AnimatedStatCard({
               {title}
             </motion.p>
             <motion.p 
-              className="text-4xl font-bold bg-gradient-to-br from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent"
+              className="text-4xl font-bold bg-linear-to-br from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent"
               animate={isHovered ? { scale: [1, 1.1, 1] } : {}}
               transition={{ duration: 0.5 }}
             >

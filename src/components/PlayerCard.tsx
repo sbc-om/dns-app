@@ -62,7 +62,7 @@ export function PlayerCard({ player, physicalTest }: PlayerCardProps) {
   const overall = physicalTest?.overallRating || 50;
 
   return (
-    <Card className={`relative w-full max-w-sm overflow-hidden bg-gradient-to-br ${cardColor} p-1`}>
+    <Card className={`relative w-full max-w-sm overflow-hidden bg-linear-to-br ${cardColor} p-1`}>
       <div className="bg-black/10 backdrop-blur-sm p-4 rounded-lg">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">

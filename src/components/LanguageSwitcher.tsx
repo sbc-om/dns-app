@@ -2,15 +2,9 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { Languages } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Locale, locales, localeNames } from '@/config/i18n';
-import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 export function LanguageSwitcher() {
   const pathname = usePathname();
@@ -23,51 +17,41 @@ export function LanguageSwitcher() {
   };
 
   const currentLocale = getCurrentLocale();
+  
+  // Get the other locale (not current)
+  const otherLocale = locales.find(l => l !== currentLocale) || 'en';
 
-  const switchLocale = (newLocale: Locale) => {
+  const switchLocale = () => {
     const segments = pathname.split('/');
     const currentLocaleInPath = locales.includes(segments[1] as Locale);
 
     let newPathname: string;
     if (currentLocaleInPath) {
-      segments[1] = newLocale;
+      segments[1] = otherLocale;
       newPathname = segments.join('/');
     } else {
-      newPathname = `/${newLocale}${pathname}`;
+      newPathname = `/${otherLocale}${pathname}`;
     }
 
     router.push(newPathname);
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          className="h-10 gap-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-        >
-          <Languages className="h-5 w-5 text-[#30B2D2]" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {currentLocale.toUpperCase()}
-          </span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-40">
-        {locales.map((locale: Locale) => (
-          <DropdownMenuItem
-            key={locale}
-            onClick={() => switchLocale(locale)}
-            className={cn(
-              "cursor-pointer gap-2 py-2.5",
-              currentLocale === locale && 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 font-semibold'
-            )}
-          >
-            <Languages className="h-4 w-4" />
-            {localeNames[locale]}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+    >
+      <Button 
+        variant="ghost" 
+        size="sm"
+        onClick={switchLocale}
+        className="h-10 gap-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all backdrop-blur-xl"
+      >
+        <Languages className="h-5 w-5 text-blue-400" />
+        <span className="text-sm font-semibold text-white">
+          {localeNames[otherLocale]}
+        </span>
+      </Button>
+    </motion.div>
   );
 }

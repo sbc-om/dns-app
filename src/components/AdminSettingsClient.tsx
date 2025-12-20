@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { Save, Plus, Trash2, Tag } from 'lucide-react';
 import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import type { Dictionary } from '@/lib/i18n/getDictionary';
 import {
   getAdminSettingsAction,
   updateAdminSettingsAction,
@@ -24,7 +26,7 @@ import toast from 'react-hot-toast';
 
 interface AdminSettingsClientProps {
   locale: string;
-  dict: any;
+  dict: Dictionary;
 }
 
 export default function AdminSettingsClient({ locale, dict }: AdminSettingsClientProps) {
@@ -70,7 +72,7 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
 
   const handleAddCategory = async () => {
     if (!newCategory.name || !newCategory.nameAr) {
-      toast.error(locale === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill all fields');
+      toast.error(dict.adminSettings?.fillAllFields || dict.errors?.validationError || 'Please fill all fields');
       return;
     }
 
@@ -78,28 +80,28 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
     const result = await createCategoryAction(newCategory);
     
     if (result.success) {
-      toast.success(locale === 'ar' ? 'تم إضافة الفئة بنجاح' : 'Category added successfully');
+      toast.success(dict.adminSettings?.categoryAdded || 'Category added successfully');
       setNewCategory({ name: '', nameAr: '' });
       loadCategories();
       router.refresh();
     } else {
-      toast.error(locale === 'ar' ? 'فشل في إضافة الفئة' : 'Failed to add category');
+      toast.error(dict.adminSettings?.categoryAddFailed || 'Failed to add category');
     }
     setAddingCategory(false);
   };
 
   const handleDeleteCategory = async (id: string) => {
-    if (!confirm(locale === 'ar' ? 'هل أنت متأكد من حذف هذه الفئة؟' : 'Are you sure you want to delete this category?')) {
+    if (!confirm(dict.adminSettings?.confirmDeleteCategory || 'Are you sure you want to delete this category?')) {
       return;
     }
 
     const result = await deleteCategoryAction(id);
     if (result.success) {
-      toast.success(locale === 'ar' ? 'تم حذف الفئة بنجاح' : 'Category deleted successfully');
+      toast.success(dict.adminSettings?.categoryDeleted || 'Category deleted successfully');
       loadCategories();
       router.refresh();
     } else {
-      toast.error(locale === 'ar' ? 'فشل في حذف الفئة' : 'Failed to delete category');
+      toast.error(dict.adminSettings?.categoryDeleteFailed || 'Failed to delete category');
     }
   };
 
@@ -107,102 +109,112 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
     setSaving(true);
     const result = await updateAdminSettingsAction(formData);
     if (result.success) {
-      toast.success(locale === 'ar' ? 'تم حفظ الإعدادات بنجاح' : 'Settings saved successfully');
+      toast.success(dict.adminSettings?.settingsSaved || 'Settings saved successfully');
     } else {
-      toast.error(locale === 'ar' ? 'فشل في حفظ الإعدادات' : 'Failed to save settings');
+      toast.error(dict.adminSettings?.settingsFailed || 'Failed to save settings');
     }
     setSaving(false);
   };
 
   if (loading) {
-    return <div className="p-6">{locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}</div>;
+    return <div className="p-6">{dict.common?.loading || 'Loading...'}</div>;
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-4xl">
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, type: 'spring', stiffness: 220, damping: 22 }}
+      className="p-6 space-y-6 max-w-4xl"
+    >
       <div className="space-y-3">
-        <h1 className="text-3xl font-bold text-[#262626] dark:text-white">
-          {locale === 'ar' ? 'إعدادات النظام' : 'System Settings'}
+        <h1 className="text-3xl font-black text-[#262626] dark:text-white">
+          {dict.adminSettings?.title || 'System Settings'}
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          {locale === 'ar' ? 'إدارة معلومات الحساب البنكي وتعليمات الدفع والفئات' : 'Manage bank account, payment instructions, and categories'}
+          {dict.adminSettings?.description || 'Manage bank account information and payment instructions'}
         </p>
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
         <TabsList className="bg-gray-100 dark:bg-[#1a1a1a] p-1 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
-          <TabsTrigger value="general" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#262626] data-[state=active]:shadow-lg rounded-lg transition-all text-gray-600 dark:text-gray-400 data-[state=active]:text-[#FF5F02]">{locale === 'ar' ? 'عام' : 'General'}</TabsTrigger>
+          <TabsTrigger value="general" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#262626] data-[state=active]:shadow-lg rounded-lg transition-all text-gray-600 dark:text-gray-400 data-[state=active]:text-[#FF5F02]">
+            {dict.settings?.general || 'General'}
+          </TabsTrigger>
           <TabsTrigger value="categories" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#262626] data-[state=active]:shadow-lg rounded-lg transition-all text-gray-600 dark:text-gray-400 data-[state=active]:text-[#FF5F02]">
             <Tag className="w-4 h-4 mr-2" />
-            {locale === 'ar' ? 'فئات الدورات' : 'Course Categories'}
+            {dict.adminSettings?.categoriesTab || 'Course Categories'}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-6">
-          <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]">
-            <CardHeader className="py-4">
-              <CardTitle className="text-[#262626] dark:text-white">{locale === 'ar' ? 'المعلومات الشخصية' : 'Personal Information'}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <motion.div whileHover={{ rotateY: 1, rotateX: 1 }} className="transform-3d">
+            <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] overflow-hidden">
+              <CardHeader className="py-4">
+                <CardTitle className="text-[#262626] dark:text-white">{dict.adminSettings?.personalInfo || 'Personal Information'}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="fullName" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'الاسم الكامل' : 'Full Name'}</Label>
+                  <Label htmlFor="fullName" className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.fullName || 'Full Name'}</Label>
                   <Input
                     id="fullName"
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    placeholder={locale === 'ar' ? 'أدخل اسمك الكامل' : 'Enter your full name'}
+                    placeholder={dict.adminSettings?.placeholders?.fullName || ''}
                     className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
+                  <Label htmlFor="email" className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.email || 'Email'}</Label>
                   <Input
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder={locale === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
+                    placeholder={dict.adminSettings?.placeholders?.email || ''}
                     className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
               </div>
               <div>
-                <Label htmlFor="phoneNumber" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'رقم الهاتف' : 'Phone Number'}</Label>
+                <Label htmlFor="phoneNumber" className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.phoneNumber || 'Phone Number'}</Label>
                 <Input
                   id="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  placeholder={locale === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone number'}
+                  placeholder={dict.adminSettings?.placeholders?.phoneNumber || ''}
                   className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] shadow-lg">
-            <CardHeader className="py-4">
-              <CardTitle className="text-[#262626] dark:text-white">{locale === 'ar' ? 'معلومات الحساب البنكي' : 'Bank Account Information'}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <motion.div whileHover={{ rotateY: 1, rotateX: 1 }} className="transform-3d">
+            <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] shadow-lg overflow-hidden">
+              <CardHeader className="py-4">
+                <CardTitle className="text-[#262626] dark:text-white">{dict.adminSettings?.bankInfo || 'Bank Account Information'}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="bankName" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'اسم البنك' : 'Bank Name'}</Label>
+                  <Label htmlFor="bankName" className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.bankName || 'Bank Name'}</Label>
                   <Input
                     id="bankName"
                     value={formData.bankName}
                     onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
-                    placeholder={locale === 'ar' ? 'أدخل اسم البنك' : 'Enter bank name'}
+                    placeholder={dict.adminSettings?.placeholders?.bankName || ''}
                     className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="bankAccountHolder" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'اسم صاحب الحساب' : 'Account Holder Name'}</Label>
+                  <Label htmlFor="bankAccountHolder" className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.accountHolder || 'Account Holder Name'}</Label>
                   <Input
                     id="bankAccountHolder"
                     value={formData.bankAccountHolder}
                     onChange={(e) => setFormData({ ...formData, bankAccountHolder: e.target.value })}
-                    placeholder={locale === 'ar' ? 'أدخل اسم صاحب الحساب' : 'Enter account holder name'}
+                    placeholder={dict.adminSettings?.placeholders?.accountHolder || ''}
                     className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
@@ -210,109 +222,123 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="bankAccountNumber" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'رقم الحساب' : 'Account Number'}</Label>
+                  <Label htmlFor="bankAccountNumber" className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.accountNumber || 'Account Number'}</Label>
                   <Input
                     id="bankAccountNumber"
                     value={formData.bankAccountNumber}
                     onChange={(e) => setFormData({ ...formData, bankAccountNumber: e.target.value })}
-                    placeholder={locale === 'ar' ? 'أدخل رقم الحساب' : 'Enter account number'}
+                    placeholder={dict.adminSettings?.placeholders?.accountNumber || ''}
                     className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="iban" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'رقم الآيبان (IBAN)' : 'IBAN'}</Label>
+                  <Label htmlFor="iban" className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.iban || 'IBAN'}</Label>
                   <Input
                     id="iban"
                     value={formData.iban}
                     onChange={(e) => setFormData({ ...formData, iban: e.target.value })}
-                    placeholder={locale === 'ar' ? 'أدخل رقم الآيبان' : 'Enter IBAN'}
+                    placeholder={dict.adminSettings?.placeholders?.iban || ''}
                     className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="swiftCode" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'رمز السويفت (SWIFT)' : 'SWIFT Code'}</Label>
+                <Label htmlFor="swiftCode" className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.swiftCode || 'Swift Code'}</Label>
                 <Input
                   id="swiftCode"
                   value={formData.swiftCode}
                   onChange={(e) => setFormData({ ...formData, swiftCode: e.target.value })}
-                  placeholder={locale === 'ar' ? 'أدخل رمز السويفت' : 'Enter SWIFT code'}
+                  placeholder={dict.adminSettings?.placeholders?.swiftCode || ''}
                   className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-[#FF5F02] dark:focus:border-[#FF5F02] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] shadow-lg">
-            <CardHeader className="py-4">
-              <CardTitle className="text-[#262626] dark:text-white">{locale === 'ar' ? 'تعليمات الدفع' : 'Payment Instructions'}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <motion.div whileHover={{ rotateY: 1, rotateX: 1 }} className="transform-3d">
+            <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] shadow-lg overflow-hidden">
+              <CardHeader className="py-4">
+                <CardTitle className="text-[#262626] dark:text-white">{dict.adminSettings?.paymentInfo || 'Payment Instructions'}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="paymentInstructions" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'التعليمات (إنجليزي)' : 'Instructions (English)'}</Label>
+                <Label htmlFor="paymentInstructions" className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.instructions || 'Instructions (English)'}</Label>
                 <Textarea
                   id="paymentInstructions"
                   value={formData.paymentInstructions}
                   onChange={(e) => setFormData({ ...formData, paymentInstructions: e.target.value })}
-                  placeholder="Please transfer the amount to the account above and upload the receipt..."
+                  placeholder={dict.adminSettings?.placeholders?.instructions || ''}
                   rows={4}
                   className="resize-none bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-gray-400 dark:focus:border-gray-600 text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
               <div>
-                <Label htmlFor="paymentInstructionsAr" className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'التعليمات (عربي)' : 'Instructions (Arabic)'}</Label>
+                <Label htmlFor="paymentInstructionsAr" className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.instructionsAr || 'Instructions (Arabic)'}</Label>
                 <Textarea
                   id="paymentInstructionsAr"
                   value={formData.paymentInstructionsAr}
                   onChange={(e) => setFormData({ ...formData, paymentInstructionsAr: e.target.value })}
-                  placeholder="يرجى تحويل المبلغ إلى الحساب أعلاه ورفع إيصال الدفع..."
+                  placeholder={dict.adminSettings?.placeholders?.instructionsAr || ''}
                   dir="rtl"
                   rows={4}
                   className="resize-none bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-gray-400 dark:focus:border-gray-600 text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
 
           <div className="flex justify-end">
-            <Button onClick={handleSave} disabled={saving} className="h-12 bg-[#262626] hover:bg-black text-white dark:bg-white dark:hover:bg-gray-200 dark:text-black active:scale-95 transition-transform">
-              <Save className="h-4 w-4 mr-2" />
-              {saving ? (locale === 'ar' ? 'جاري الحفظ...' : 'Saving...') : (locale === 'ar' ? 'حفظ الإعدادات' : 'Save Settings')}
+            <Button
+              asChild
+              onClick={handleSave}
+              disabled={saving}
+              className="h-12 bg-[#262626] hover:bg-black text-white dark:bg-white dark:hover:bg-gray-200 dark:text-black"
+            >
+              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+                <Save className="h-4 w-4 mr-2" />
+                {saving ? (dict.common?.loading || 'Loading...') : (dict.adminSettings?.saveSettings || 'Save Settings')}
+              </motion.button>
             </Button>
           </div>
         </TabsContent>
 
         <TabsContent value="categories">
-          <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]">
-            <CardHeader className="py-4">
-              <CardTitle className="text-[#262626] dark:text-white">{locale === 'ar' ? 'إدارة الفئات' : 'Category Management'}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+          <motion.div whileHover={{ rotateY: 1, rotateX: 1 }} className="transform-3d">
+            <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] overflow-hidden">
+              <CardHeader className="py-4">
+                <CardTitle className="text-[#262626] dark:text-white">{dict.adminSettings?.categoriesTitle || 'Category Management'}</CardTitle>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{dict.adminSettings?.categoriesDescription || ''}</p>
+              </CardHeader>
+              <CardContent className="space-y-6">
               {/* Add New Category */}
               <div className="flex flex-col md:flex-row gap-4 items-end bg-gray-100 dark:bg-[#1a1a1a] p-4 rounded-lg border-2 border-[#DDDDDD] dark:border-[#000000]">
                 <div className="flex-1 space-y-2 w-full">
-                  <Label className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'اسم الفئة (إنجليزي)' : 'Category Name (English)'}</Label>
+                  <Label className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.categoryNameEn || 'Category Name (English)'}</Label>
                   <Input
                     value={newCategory.name}
                     onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-                    placeholder="e.g. Football"
+                    placeholder={dict.adminSettings?.placeholders?.categoryNameEn || ''}
                     className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-gray-400 dark:focus:border-gray-600 text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
                 <div className="flex-1 space-y-2 w-full">
-                  <Label className="text-[#262626] dark:text-white font-semibold">{locale === 'ar' ? 'اسم الفئة (عربي)' : 'Category Name (Arabic)'}</Label>
+                  <Label className="text-[#262626] dark:text-white font-semibold">{dict.adminSettings?.categoryNameAr || 'Category Name (Arabic)'}</Label>
                   <Input
                     value={newCategory.nameAr}
                     onChange={(e) => setNewCategory({ ...newCategory, nameAr: e.target.value })}
-                    placeholder="مثال: كرة القدم"
+                    placeholder={dict.adminSettings?.placeholders?.categoryNameAr || ''}
                     dir="rtl"
                     className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-gray-400 dark:focus:border-gray-600 text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
-                <Button onClick={handleAddCategory} disabled={addingCategory} className="h-12 bg-[#262626] hover:bg-black text-white dark:bg-white dark:hover:bg-gray-200 dark:text-black active:scale-95 transition-transform">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {addingCategory ? (locale === 'ar' ? 'جاري الإضافة...' : 'Adding...') : (locale === 'ar' ? 'إضافة' : 'Add')}
+                <Button asChild onClick={handleAddCategory} disabled={addingCategory} className="h-12 bg-[#262626] hover:bg-black text-white dark:bg-white dark:hover:bg-gray-200 dark:text-black">
+                  <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    {addingCategory ? (dict.adminSettings?.addingCategory || dict.common?.loading || 'Loading...') : (dict.adminSettings?.addCategory || 'Add')}
+                  </motion.button>
                 </Button>
               </div>
 
@@ -344,14 +370,15 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
                 ))}
                 {categories.length === 0 && (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                    {locale === 'ar' ? 'لا توجد فئات مضافة' : 'No categories added yet'}
+                    {dict.adminSettings?.noCategories || 'No categories added yet'}
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
         </TabsContent>
       </Tabs>
-    </div>
+    </motion.div>
   );
 }

@@ -22,9 +22,9 @@ export default async function AboutPage({ params }: PageProps) {
       
       <main>
         {/* Hero Section */}
-        <section className="py-20 px-4 text-center bg-gradient-to-br from-[#F2574C]/10 via-[#30B2D2]/10 to-[#E8A12D]/10">
+        <section className="py-20 px-4 text-center bg-linear-to-br from-[#F2574C]/10 via-[#30B2D2]/10 to-[#E8A12D]/10">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#E8A12D] bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-linear-to-r from-[#F2574C] via-[#30B2D2] to-[#E8A12D] bg-clip-text text-transparent">
               {dictionary.pages.about.title}
             </h1>
             <p className="text-xl text-muted-foreground">
@@ -46,7 +46,7 @@ export default async function AboutPage({ params }: PageProps) {
                   {dictionary.pages.about.mission.description}
                 </p>
               </div>
-              <div className="relative h-64 md:h-96 bg-gradient-to-br from-[#F2574C]/20 via-[#30B2D2]/20 to-[#E8A12D]/20 rounded-2xl flex items-center justify-center">
+              <div className="relative h-64 md:h-96 bg-linear-to-br from-[#F2574C]/20 via-[#30B2D2]/20 to-[#E8A12D]/20 rounded-2xl flex items-center justify-center">
                 <Target className="w-32 h-32 text-[#30B2D2]" />
               </div>
             </div>
@@ -54,7 +54,7 @@ export default async function AboutPage({ params }: PageProps) {
         </section>
 
         {/* Educational System Section */}
-        <section className="py-20 px-4 bg-gradient-to-br from-[#30B2D2]/5 to-[#E8A12D]/5">
+        <section className="py-20 px-4 bg-linear-to-br from-[#30B2D2]/5 to-[#E8A12D]/5">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-5xl font-bold mb-4">
@@ -67,7 +67,7 @@ export default async function AboutPage({ params }: PageProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Gamification */}
-              <Card className="border-2 border-[#F2574C] bg-gradient-to-br from-[#F2574C]/5 to-transparent">
+              <Card className="border-2 border-[#F2574C] bg-linear-to-br from-[#F2574C]/5 to-transparent">
                 <CardHeader>
                   <div className="flex items-start gap-4">
                     <div className="p-4 rounded-xl bg-[#F2574C]/10">
@@ -86,7 +86,7 @@ export default async function AboutPage({ params }: PageProps) {
               </Card>
 
               {/* Athletic Profile */}
-              <Card className="border-2 border-[#30B2D2] bg-gradient-to-br from-[#30B2D2]/5 to-transparent">
+              <Card className="border-2 border-[#30B2D2] bg-linear-to-br from-[#30B2D2]/5 to-transparent">
                 <CardHeader>
                   <div className="flex items-start gap-4">
                     <div className="p-4 rounded-xl bg-[#30B2D2]/10">
@@ -105,7 +105,7 @@ export default async function AboutPage({ params }: PageProps) {
               </Card>
 
               {/* Progress Tracking */}
-              <Card className="border-2 border-[#E8A12D] bg-gradient-to-br from-[#E8A12D]/5 to-transparent">
+              <Card className="border-2 border-[#E8A12D] bg-linear-to-br from-[#E8A12D]/5 to-transparent">
                 <CardHeader>
                   <div className="flex items-start gap-4">
                     <div className="p-4 rounded-xl bg-[#E8A12D]/10">
@@ -124,7 +124,7 @@ export default async function AboutPage({ params }: PageProps) {
               </Card>
 
               {/* Reward System */}
-              <Card className="border-2 border-[#F2574C] bg-gradient-to-br from-[#F2574C]/5 to-transparent">
+              <Card className="border-2 border-[#F2574C] bg-linear-to-br from-[#F2574C]/5 to-transparent">
                 <CardHeader>
                   <div className="flex items-start gap-4">
                     <div className="p-4 rounded-xl bg-[#F2574C]/10">
@@ -148,9 +148,9 @@ export default async function AboutPage({ params }: PageProps) {
         {/* Approach Section */}
         <section className="py-20 px-4 bg-background">
           <div className="max-w-5xl mx-auto">
-            <Card className="border-2 border-[#30B2D2] bg-gradient-to-br from-[#30B2D2]/10 to-[#E8A12D]/10">
+            <Card className="border-2 border-[#30B2D2] bg-linear-to-br from-[#30B2D2]/10 to-[#E8A12D]/10">
               <CardHeader className="text-center">
-                <CardTitle className="text-3xl md:text-4xl mb-4 bg-gradient-to-r from-[#30B2D2] to-[#E8A12D] bg-clip-text text-transparent">
+                <CardTitle className="text-3xl md:text-4xl mb-4 bg-linear-to-r from-[#30B2D2] to-[#E8A12D] bg-clip-text text-transparent">
                   {dictionary.pages.about.approach.title}
                 </CardTitle>
                 <CardDescription className="text-lg leading-relaxed text-foreground/80">
@@ -162,7 +162,7 @@ export default async function AboutPage({ params }: PageProps) {
         </section>
 
         {/* Stats Section */}
-        <section className="py-20 px-4 bg-gradient-to-r from-[#F2574C] via-[#30B2D2] to-[#E8A12D]">
+        <section className="py-20 px-4 bg-linear-to-r from-[#F2574C] via-[#30B2D2] to-[#E8A12D]">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center text-white">
               <div>
