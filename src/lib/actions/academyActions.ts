@@ -15,6 +15,7 @@ import {
   createAcademy,
   getAllAcademies,
   updateAcademy,
+  deleteAcademy,
   type CreateAcademyInput,
   type UpdateAcademyInput,
   ensureDefaultAcademyExists,
@@ -146,11 +147,30 @@ export async function updateAcademyAction(id: string, input: UpdateAcademyInput)
       return { success: false as const, error: 'Academy not found' };
     }
 
+    revalidatePath('/[locale]/dashboard/academies', 'page');
     revalidatePath('/[locale]/dashboard/settings', 'page');
     return { success: true as const, academy };
   } catch (error) {
     console.error('Update academy error:', error);
     return { success: false as const, error: 'Failed to update academy' };
+  }
+}
+
+export async function deleteAcademyAction(id: string) {
+  try {
+    await requireAdmin();
+    const deleted = await deleteAcademy(id);
+    if (!deleted) {
+      return { success: false as const, error: 'Academy not found' };
+    }
+
+    revalidatePath('/[locale]/dashboard/academies', 'page');
+    revalidatePath('/[locale]/dashboard/settings', 'page');
+    return { success: true as const };
+  } catch (error) {
+    console.error('Delete academy error:', error);
+    const message = error instanceof Error ? error.message : 'Failed to delete academy';
+    return { success: false as const, error: message };
   }
 }
 

@@ -132,6 +132,24 @@ export async function getActiveAcademies(): Promise<Academy[]> {
   return all.filter((a) => a.isActive);
 }
 
+export async function deleteAcademy(id: string): Promise<boolean> {
+  const db = getDatabase();
+  const existing = await findAcademyById(id);
+  if (!existing) return false;
+
+  // Prevent deleting default academy
+  if (id === DEFAULT_ACADEMY_ID) {
+    throw new Error('Cannot delete default academy');
+  }
+
+  // Remove slug index
+  await db.remove(`${ACADEMY_BY_SLUG_PREFIX}${existing.slug}`);
+  // Remove academy
+  await db.remove(`${ACADEMY_PREFIX}${id}`);
+
+  return true;
+}
+
 /**
  * Ensure a default academy exists for legacy single-tenant data.
  */

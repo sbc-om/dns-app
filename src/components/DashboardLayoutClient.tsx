@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DashboardSidebar } from '@/components/DashboardSidebar';
 import { DashboardHeader } from '@/components/DashboardHeader';
-import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { PushNotificationInit } from '@/components/PushNotificationInit';
 import { useNotificationFallback } from '@/lib/notifications/fallback';
@@ -38,6 +37,7 @@ export function DashboardLayoutClient({
     return 'serviceWorker' in navigator && 'PushManager' in window;
   });
   const pathname = usePathname();
+  const isMessagesRoute = pathname?.includes('/dashboard/messages');
 
   // Use fallback polling for devices without push notification support (like iOS)
   useNotificationFallback(!isPushSupported);
@@ -60,7 +60,7 @@ export function DashboardLayoutClient({
       dir={direction}
     >
       {/* Game-like background */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute -top-32 -left-32 h-120 w-120 rounded-full bg-orange-500/15 blur-3xl" />
         <div className="absolute -bottom-40 -right-32 h-136 w-136 rounded-full bg-fuchsia-500/15 blur-3xl" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.12),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.10),transparent_55%)]" />
@@ -94,39 +94,53 @@ export function DashboardLayoutClient({
           onMobileMenuToggle={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
         />
 
-        <OverlayScrollbarsComponent
-          element="main"
-          className="flex-1 min-h-0 pb-20 lg:pb-0"
-          options={{ 
-            scrollbars: { 
-              autoHide: 'move',
-              autoHideDelay: 800,
-              theme: 'os-theme-dark',
-              visibility: 'auto'
-            },
-            overflow: {
-              x: 'hidden',
-              y: 'scroll'
-            }
-          }}
-          defer
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={pathname}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.45, type: 'spring', stiffness: 260, damping: 24 }}
-              className="min-h-full"
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
-        </OverlayScrollbarsComponent>
-
-        {/* Mobile Bottom Navigation */}
-        <MobileBottomNav locale={locale} accessibleResources={accessibleResources} />
+        {isMessagesRoute ? (
+          <main className="flex-1 min-h-0 overflow-hidden">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={pathname}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.45, type: 'spring', stiffness: 260, damping: 24 }}
+                className="h-full min-h-0"
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
+          </main>
+        ) : (
+          <OverlayScrollbarsComponent
+            element="main"
+            className="flex-1 min-h-0"
+            options={{
+              scrollbars: {
+                autoHide: 'move',
+                autoHideDelay: 800,
+                theme: 'os-theme-dark',
+                visibility: 'auto'
+              },
+              overflow: {
+                x: 'hidden',
+                y: 'scroll'
+              }
+            }}
+            defer
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={pathname}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.45, type: 'spring', stiffness: 260, damping: 24 }}
+                className="min-h-full"
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
+          </OverlayScrollbarsComponent>
+        )}
       </div>
     </div>
   );

@@ -182,16 +182,14 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
             </div>
           </div>
 
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-            <Button
-              onClick={() => router.push(`/${locale}/dashboard/courses/new`)}
-              className="h-11 rounded-2xl bg-linear-to-r from-[#FF5F02] to-orange-600 text-white shadow-lg shadow-orange-500/20 hover:from-[#FF5F02]/90 hover:to-orange-600/90"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              <span className="font-semibold">{dict.courses?.createCourse || dict.common?.create || 'Create'}</span>
-              <Sparkles className="h-4 w-4 ml-2 text-white/80" />
-            </Button>
-          </motion.div>
+          <Button
+            onClick={() => router.push(`/${locale}/dashboard/courses/new`)}
+            className="h-11 rounded-2xl bg-linear-to-r from-[#FF5F02] to-orange-600 text-white shadow-lg shadow-orange-500/20 hover:from-[#FF5F02]/90 hover:to-orange-600/90"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            <span className="font-semibold">{dict.courses?.createCourse || dict.common?.create || 'Create'}</span>
+            <Sparkles className="h-4 w-4 ml-2 text-white/80" />
+          </Button>
         </div>
       </div>
 
@@ -260,17 +258,11 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
             const courseDescription = locale === 'ar' ? course.descriptionAr || course.description : course.description;
 
             return (
-              <motion.div
+              <div
                 key={course.id}
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 18 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ scale: 1.02, rotateX: 1.5, rotateY: locale === 'ar' ? -1.5 : 1.5 }}
-                style={{ transformStyle: 'preserve-3d' }}
                 className="h-full"
               >
-                <Card className="relative h-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl shadow-black/25">
+                <Card className="relative h-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl shadow-black/25 transition-transform hover:scale-[1.01]">
                   <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/5 via-transparent to-white/5" />
                   <div className="pointer-events-none absolute -top-20 -right-24 h-56 w-56 rounded-full bg-linear-to-br from-[#FF5F02]/20 to-purple-500/20 blur-3xl" />
 
@@ -343,43 +335,55 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
                     </div>
 
                     <div className="flex gap-2 pt-4 border-t border-white/10">
-                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditNavigate(course.id)}
-                          className="w-full rounded-2xl border-white/15 bg-white/5 text-white hover:bg-white/10"
-                        >
-                          <Edit className="h-3.5 w-3.5 mr-2" />
-                          {dict.common?.edit || 'Edit'}
-                        </Button>
-                      </motion.div>
-                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleToggleActive(course)}
-                          className="w-full rounded-2xl border-white/15 bg-white/5 text-white hover:bg-white/10"
-                        >
-                          {course.isActive
-                            ? dict.courses?.deactivate || 'Deactivate'
-                            : dict.courses?.activate || 'Activate'}
-                        </Button>
-                      </motion.div>
-                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDelete(course.id)}
-                          className="rounded-2xl"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </motion.div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleEditNavigate(course.id);
+                        }}
+                        className="flex-1 rounded-2xl border-blue-500/50 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:border-blue-400 transition-all active:scale-95"
+                      >
+                        <Edit className="h-3.5 w-3.5 mr-2" />
+                        {dict.common?.edit || 'Edit'}
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleToggleActive(course);
+                        }}
+                        className={`flex-1 rounded-2xl transition-all active:scale-95 ${
+                          course.isActive
+                            ? 'border-amber-500/50 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:border-amber-400'
+                            : 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-400'
+                        }`}
+                      >
+                        {course.isActive
+                          ? dict.courses?.deactivate || 'Deactivate'
+                          : dict.courses?.activate || 'Activate'}
+                      </Button>
+                      
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete(course.id);
+                        }}
+                        className="rounded-2xl bg-red-500/20 border border-red-500/50 text-red-300 hover:bg-red-500/30 hover:border-red-400 transition-all active:scale-95"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             );
           })}
         </AnimatePresence>

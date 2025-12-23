@@ -24,7 +24,7 @@ export default async function MessagesPage({
   const allUsers = currentUser.role === 'admin' ? await getAllUsers() : [];
 
   return (
-    <div className="h-full">
+    <div className="h-full min-h-0 overflow-hidden">
       <MessagesClient 
         dictionary={dictionary} 
         locale={locale} 

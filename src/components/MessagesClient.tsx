@@ -112,9 +112,12 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
     loadData();
   }, [loadData]);
 
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll to bottom when messages change (but not on first mount)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > 0) {
+      // Use instant scroll to prevent layout shift
+      messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+    }
   }, [messages]);
 
   // Auto-refresh messages every 5 seconds
@@ -238,6 +241,10 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
   const handleSelectConversationMobile = (conversation: { type: 'user' | 'group'; id: string; name: string }) => {
     setShowMobileSidebar(false);
     handleSelectConversation(conversation);
+    // Prevent scroll jump on mobile
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }, 0);
   };
 
   const toggleMemberSelection = (userId: string) => {
@@ -649,7 +656,7 @@ export function MessagesClient({ dictionary, locale, currentUser, allUsers, perm
                 </OverlayScrollbarsComponent>
 
                 {/* Message Input */}
-                <div className="p-3 sm:p-4 border-t bg-white dark:bg-[#262626] pb-[88px] lg:pb-3 sm:lg:pb-4 relative">
+                <div className="p-3 sm:p-4 border-t bg-white dark:bg-[#262626] relative">
                   {/* Emoji Picker - Positioned above emoji button */}
                   {showEmojiPicker && (
                     <div 
