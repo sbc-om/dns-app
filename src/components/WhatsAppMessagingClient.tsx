@@ -152,11 +152,11 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
     try {
       setIsFetchingProfiles(true);
       const response = await fetch('/api/whatsapp/profiles');
-      const data = await response.json();
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+
       if (response.ok && data?.success) {
         setProfiles(data.profiles || []);
-      } else {
-        // Keep silent; page should still work without profiles.
       }
     } catch (error) {
       console.error('Error fetching WhatsApp profiles:', error);
@@ -169,10 +169,9 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
     try {
       setIsFetchingGroups(true);
       const response = await fetch('/api/whatsapp/groups');
-      const data = await response.json();
-      if (response.ok && data?.success) {
-        setGroups(data.groups || []);
-      }
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await response.json() : null;
+      if (response.ok && data?.success) setGroups(data.groups || []);
     } catch (error) {
       console.error('Error fetching WhatsApp groups:', error);
     } finally {
