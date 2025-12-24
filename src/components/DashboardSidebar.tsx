@@ -14,7 +14,8 @@ import {
   Settings,
   BookOpen,
   DollarSign,
-  MessageCircle
+  MessageCircle,
+  Link2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Dictionary } from '@/lib/i18n/getDictionary';
@@ -58,6 +59,20 @@ const menuItems: MenuItem[] = [
     labelKey: 'academies',
     href: '/dashboard/academies',
     icon: Building2,
+  },
+  {
+    key: 'trainingDays',
+    resourceKey: 'dashboard.training-days',
+    labelKey: 'trainingDays',
+    href: '/dashboard/training-days',
+    icon: CalendarClock,
+  },
+  {
+    key: 'activations',
+    resourceKey: 'dashboard.activations',
+    labelKey: 'activations',
+    href: '/dashboard/activations',
+    icon: Link2,
   },
   {
     key: 'messages',

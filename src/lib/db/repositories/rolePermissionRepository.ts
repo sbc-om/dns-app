@@ -28,6 +28,8 @@ export interface RolePermission {
     canManageCourses: boolean;
     canViewPayments: boolean;
     canSendWhatsApp: boolean;
+    canManageTrainingDays: boolean;
+    canManageActivations: boolean;
   };
   updatedAt: string;
   updatedBy: string;
@@ -55,6 +57,8 @@ const DEFAULT_PERMISSIONS: Record<UserRole, RolePermission['permissions']> = {
     canManageCourses: true,
     canViewPayments: true,
     canSendWhatsApp: true,
+    canManageTrainingDays: true,
+    canManageActivations: true,
   },
   [ROLES.MANAGER]: {
     canAccessDashboard: true,
@@ -75,6 +79,8 @@ const DEFAULT_PERMISSIONS: Record<UserRole, RolePermission['permissions']> = {
     canManageCourses: true,
     canViewPayments: true,
     canSendWhatsApp: true,
+    canManageTrainingDays: true,
+    canManageActivations: true,
   },
   [ROLES.COACH]: {
     canAccessDashboard: true,
@@ -95,6 +101,8 @@ const DEFAULT_PERMISSIONS: Record<UserRole, RolePermission['permissions']> = {
     canManageCourses: false,
     canViewPayments: false,
     canSendWhatsApp: true,
+    canManageTrainingDays: true,
+    canManageActivations: false,
   },
   [ROLES.PARENT]: {
     canAccessDashboard: true,
@@ -115,6 +123,8 @@ const DEFAULT_PERMISSIONS: Record<UserRole, RolePermission['permissions']> = {
     canManageCourses: false,
     canViewPayments: true,
     canSendWhatsApp: false,
+    canManageTrainingDays: false,
+    canManageActivations: false,
   },
   [ROLES.KID]: {
     canAccessDashboard: true,
@@ -135,6 +145,8 @@ const DEFAULT_PERMISSIONS: Record<UserRole, RolePermission['permissions']> = {
     canManageCourses: false,
     canViewPayments: false,
     canSendWhatsApp: false,
+    canManageTrainingDays: false,
+    canManageActivations: false,
   },
 };
 

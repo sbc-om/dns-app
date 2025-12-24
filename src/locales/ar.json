@@ -68,7 +68,9 @@
     "courses": "الدورات",
     "payments": "المدفوعات",
     "settings": "الإعدادات",
-    "academies": "الأكاديميات"
+    "academies": "الأكاديميات",
+    "trainingDays": "أيام التدريب",
+    "activations": "التفعيلات"
   },
   "footer": {
     "description": "كن بطلاً!",
@@ -511,6 +513,14 @@
       "canManageSchedules": {
         "title": "إدارة الجداول",
         "description": "إنشاء جداول المواعيد وإدارتها."
+      },
+      "canManageTrainingDays": {
+        "title": "إدارة أيام التدريب",
+        "description": "ضبط أيام التدريب للمجموعات (أيام فقط) داخل الأكاديمية."
+      },
+      "canManageActivations": {
+        "title": "إدارة التفعيلات",
+        "description": "إنشاء وإدارة روابط تفعيل ولي الأمر وتدفق الاشتراك."
       },
       "canManageCourses": {
         "title": "إدارة الدورات",

@@ -13,6 +13,25 @@ export interface User {
   profilePicture?: string; // Profile image URL
   role: UserRole;
   parentId?: string; // For kids - reference to parent user
+
+  /**
+   * Parent contact details for kid accounts.
+   *
+   * DNA onboarding uses a single player account, with the parent linked as contact data (no separate parent user required).
+   * Legacy flows may still use parentId.
+   */
+  parentContactName?: string;
+  parentContactEmail?: string;
+  parentContactPhone?: string;
+
+  /**
+   * DNA activation state for the player.
+   * - pending_activation: created by academy, awaiting parent confirmation/payment
+   * - active_awaiting_assessment: paid/activated, waiting for Discover assessment
+   * - active: assessment completed and profile is fully available
+   */
+  dnaActivationStatus?: 'pending_activation' | 'active_awaiting_assessment' | 'active';
+  dnaActivatedAt?: string;
   
   // Extended Profile for Kids
   birthDate?: string;
@@ -46,6 +65,12 @@ export interface CreateUserInput {
   nationalId?: string;
   role?: UserRole;
   parentId?: string;
+
+  parentContactName?: string;
+  parentContactEmail?: string;
+  parentContactPhone?: string;
+  dnaActivationStatus?: User['dnaActivationStatus'];
+  dnaActivatedAt?: string;
   
   birthDate?: string;
   ageCategory?: string;
@@ -75,6 +100,12 @@ export interface UpdateUserInput {
   role?: UserRole;
   isActive?: boolean;
   parentId?: string;
+
+  parentContactName?: string;
+  parentContactEmail?: string;
+  parentContactPhone?: string;
+  dnaActivationStatus?: User['dnaActivationStatus'];
+  dnaActivatedAt?: string;
   
   birthDate?: string;
   ageCategory?: string;
@@ -142,6 +173,12 @@ export async function createUser(input: CreateUserInput): Promise<User> {
     nationalId: input.nationalId,
     role: input.role || ROLES.KID,
     parentId: input.parentId,
+
+    parentContactName: input.parentContactName,
+    parentContactEmail: input.parentContactEmail,
+    parentContactPhone: input.parentContactPhone,
+    dnaActivationStatus: input.dnaActivationStatus,
+    dnaActivatedAt: input.dnaActivatedAt,
     
     birthDate: input.birthDate,
     ageCategory: input.ageCategory,
@@ -258,6 +295,12 @@ export async function updateUser(id: string, input: UpdateUserInput): Promise<Us
     role: input.role !== undefined ? input.role : user.role,
     parentId: input.parentId !== undefined ? input.parentId : user.parentId,
     isActive: input.isActive !== undefined ? input.isActive : user.isActive,
+
+    parentContactName: input.parentContactName !== undefined ? input.parentContactName : user.parentContactName,
+    parentContactEmail: input.parentContactEmail !== undefined ? input.parentContactEmail : user.parentContactEmail,
+    parentContactPhone: input.parentContactPhone !== undefined ? input.parentContactPhone : user.parentContactPhone,
+    dnaActivationStatus: input.dnaActivationStatus !== undefined ? input.dnaActivationStatus : user.dnaActivationStatus,
+    dnaActivatedAt: input.dnaActivatedAt !== undefined ? input.dnaActivatedAt : user.dnaActivatedAt,
     
     birthDate: input.birthDate !== undefined ? input.birthDate : user.birthDate,
     ageCategory: input.ageCategory !== undefined ? input.ageCategory : user.ageCategory,
