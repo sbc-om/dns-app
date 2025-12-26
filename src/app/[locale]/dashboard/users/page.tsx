@@ -19,7 +19,7 @@ export default async function UsersPage({
   
   const dictionary = await getDictionary(locale);
 
-  const users =
+  let users =
     currentUser.role === ROLES.ADMIN
       ? await listUsers()
       : await (async () => {
@@ -29,12 +29,18 @@ export default async function UsersPage({
           return getUsersByIds(ids);
         })();
 
+  // Filter: managers should only see parent, coach, and player roles
+  if (currentUser.role === ROLES.MANAGER) {
+    users = users.filter(u => u.role === ROLES.PARENT || u.role === ROLES.COACH || u.role === ROLES.KID);
+  }
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
       <UsersClient
         dictionary={dictionary}
         initialUsers={users}
         locale={locale}
+        currentUserRole={currentUser.role}
       />
     </div>
   );

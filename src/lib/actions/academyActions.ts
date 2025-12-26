@@ -244,13 +244,17 @@ export async function getMyAcademiesAction(locale: string = 'en') {
       return { success: true as const, academies, currentAcademyId: ctx.academyId };
     }
 
-    // Managers should only see academies where they are the academy manager.
-    const academyIds =
-      ctx.user.role === ROLES.MANAGER
-        ? Object.entries(await getUserAcademyRoles(ctx.user.id))
-            .filter(([, r]) => r === 'manager')
-            .map(([id]) => id)
-        : await getUserAcademyIds(ctx.user.id);
+    // Managers must be locked to their current academy only.
+    if (ctx.user.role === ROLES.MANAGER) {
+      const academy = (await getAllAcademies()).find((a) => a.id === ctx.academyId);
+      return {
+        success: true as const,
+        academies: academy ? [academy] : [],
+        currentAcademyId: ctx.academyId,
+      };
+    }
+
+    const academyIds = await getUserAcademyIds(ctx.user.id);
     const all = await getAllAcademies();
     const academies = all.filter((a) => academyIds.includes(a.id));
 
@@ -266,14 +270,9 @@ export async function setCurrentAcademyAction(locale: string, academyId: string)
     // Must be authenticated and allowed to access the academy
     const ctx = await requireAcademyContext(locale);
 
+    // Only admins can switch academies.
     if (ctx.user.role !== ROLES.ADMIN) {
-      const allowed =
-        ctx.user.role === ROLES.MANAGER
-          ? (await getUserAcademyRoles(ctx.user.id))[academyId] === 'manager'
-          : (await getUserAcademyIds(ctx.user.id)).includes(academyId);
-      if (!allowed) {
-        return { success: false as const, error: 'Not allowed for this academy' };
-      }
+      return { success: false as const, error: 'Only admins can switch academies' };
     }
 
     await setSelectedAcademyIdCookie(academyId);
@@ -296,6 +295,17 @@ export async function getAcademyUiContextAction(locale: string = 'en') {
         success: true as const,
         userRole: ctx.user.role,
         academies,
+        currentAcademyId: ctx.academyId,
+      };
+    }
+
+    // Managers must be locked to their current academy only.
+    if (ctx.user.role === ROLES.MANAGER) {
+      const academy = (await getAllAcademies()).find((a) => a.id === ctx.academyId);
+      return {
+        success: true as const,
+        userRole: ctx.user.role,
+        academies: academy ? [academy] : [],
         currentAcademyId: ctx.academyId,
       };
     }

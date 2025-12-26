@@ -4,7 +4,7 @@ import { Suspense, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
@@ -88,117 +88,64 @@ export default function LoginPageClient({ dictionary, locale }: LoginPageClientP
                 {dictionary.nav.home}
               </motion.span>
             </Link>
-
-            <div className="hidden md:flex items-center gap-2 text-xs text-white/60">
-              <ShieldCheck className="h-4 w-4" />
-              <span>{dictionary.auth.login}</span>
-            </div>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
-            {/* Left hero */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.05 }}
+            className="mx-auto w-full max-w-lg"
+          >
             <motion.div
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.05 }}
-              className="hidden lg:block"
+              whileHover={{ rotateY: 4, rotateX: 3, scale: 1.01 }}
+              transition={{ type: 'spring', stiffness: 240, damping: 18 }}
+              className="transform-3d"
+              style={{ transformStyle: 'preserve-3d' }}
             >
-              <motion.div
-                whileHover={{ rotateY: -5, rotateX: 4, scale: 1.01 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-                className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl"
-                style={{ transformStyle: 'preserve-3d' }}
-              >
-                <div className="absolute inset-0 bg-linear-to-br from-white/10 via-transparent to-transparent" />
-                <div className="relative">
+              <Card className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
+                <div className="pointer-events-none absolute inset-0">
+                  <motion.div
+                    className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-linear-to-br from-[#FF5F02]/20 via-purple-500/10 to-transparent blur-3xl"
+                    animate={{ scale: [1, 1.1, 1], opacity: [0.35, 0.7, 0.35] }}
+                    transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                  <motion.div
+                    className="absolute -bottom-28 -left-28 h-80 w-80 rounded-full bg-linear-to-tr from-blue-500/18 via-[#FF5F02]/10 to-transparent blur-3xl"
+                    animate={{ scale: [1, 1.06, 1], opacity: [0.28, 0.62, 0.28] }}
+                    transition={{ duration: 6.1, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                </div>
+
+                <CardHeader className="relative border-b border-white/10 px-6 py-7">
                   <div className="flex items-center gap-3">
                     <motion.div
-                      whileHover={{ rotate: -2, scale: 1.02 }}
+                      whileHover={{ rotate: 2, scale: 1.02 }}
                       transition={{ type: 'spring', stiffness: 320, damping: 18 }}
-                      className="h-14 w-14 rounded-2xl border border-white/10 bg-black/30 backdrop-blur-sm flex items-center justify-center"
+                      className="h-12 w-12 rounded-2xl border border-white/10 bg-black/30 backdrop-blur-sm flex items-center justify-center"
                     >
-                      <Image src="/logo.png" alt="DNA" width={40} height={40} priority />
+                      <Image src="/logo-white.png" alt="DNA" width={34} height={34} priority />
                     </motion.div>
-                    <div className="text-white">
-                      <div className="text-sm font-semibold text-white/70">DNA</div>
-                      <div className="text-2xl font-black tracking-tight">{dictionary.auth.loginTitle}</div>
+                    <div>
+                      <CardTitle className="text-xl font-black tracking-tight text-white">
+                        {dictionary.auth.loginTitle}
+                      </CardTitle>
+                      <CardDescription className="text-sm font-medium text-white/65">
+                        {dictionary.auth.loginSubtitle}
+                      </CardDescription>
                     </div>
                   </div>
+                </CardHeader>
 
-                  <p className="mt-4 text-sm font-medium text-white/70">{dictionary.auth.loginSubtitle}</p>
-
-                  <div className="mt-7 grid gap-3">
-                    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
-                      <Zap className="h-5 w-5 text-white/80" />
-                      <div className="text-sm text-white/80">{dictionary.nav.dashboard}</div>
-                    </div>
-                    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
-                      <Sparkles className="h-5 w-5 text-white/80" />
-                      <div className="text-sm text-white/80">{dictionary.nav.analytics}</div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+                <CardContent className="relative px-6 py-6">
+                  <Suspense
+                    fallback={<div className="text-center text-sm text-white/60">{dictionary.common.loading}</div>}
+                  >
+                    <LoginForm dictionary={dictionary} locale={locale} />
+                  </Suspense>
+                </CardContent>
+              </Card>
             </motion.div>
-
-            {/* Right card */}
-            <motion.div
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="w-full"
-            >
-              <motion.div
-                whileHover={{ rotateY: 4, rotateX: 3, scale: 1.01 }}
-                transition={{ type: 'spring', stiffness: 240, damping: 18 }}
-                className="transform-3d"
-                style={{ transformStyle: 'preserve-3d' }}
-              >
-                <Card className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
-                  <div className="pointer-events-none absolute inset-0">
-                    <motion.div
-                      className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-linear-to-br from-[#FF5F02]/20 via-purple-500/10 to-transparent blur-3xl"
-                      animate={{ scale: [1, 1.1, 1], opacity: [0.35, 0.7, 0.35] }}
-                      transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                    <motion.div
-                      className="absolute -bottom-28 -left-28 h-80 w-80 rounded-full bg-linear-to-tr from-blue-500/18 via-[#FF5F02]/10 to-transparent blur-3xl"
-                      animate={{ scale: [1, 1.06, 1], opacity: [0.28, 0.62, 0.28] }}
-                      transition={{ duration: 6.1, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                  </div>
-
-                  <CardHeader className="relative border-b border-white/10 px-6 py-7">
-                    <div className="flex items-center gap-3">
-                      <motion.div
-                        whileHover={{ rotate: 2, scale: 1.02 }}
-                        transition={{ type: 'spring', stiffness: 320, damping: 18 }}
-                        className="h-12 w-12 rounded-2xl border border-white/10 bg-black/30 backdrop-blur-sm flex items-center justify-center"
-                      >
-                        <Image src="/logo.png" alt="DNA" width={34} height={34} priority />
-                      </motion.div>
-                      <div>
-                        <CardTitle className="text-xl font-black tracking-tight text-white">
-                          {dictionary.auth.loginTitle}
-                        </CardTitle>
-                        <CardDescription className="text-sm font-medium text-white/65">
-                          {dictionary.auth.loginSubtitle}
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="relative px-6 py-6">
-                    <Suspense
-                      fallback={<div className="text-center text-sm text-white/60">{dictionary.common.loading}</div>}
-                    >
-                      <LoginForm dictionary={dictionary} locale={locale} />
-                    </Suspense>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </motion.div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>

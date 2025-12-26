@@ -29,7 +29,7 @@ export default function RegisterPageClient({ dictionary, locale }: RegisterPageC
           <CardHeader className="text-center bg-white dark:bg-[#262626] py-6 border-b border-[#DDDDDD] dark:border-[#262626]">
             <Link href={`/${locale}`} className="flex items-center justify-center mb-4">
               <Image 
-                src="/logo.png" 
+                src="/logo-white.png" 
                 alt="DNA Logo" 
                 width={80} 
                 height={80}

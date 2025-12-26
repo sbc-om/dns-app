@@ -29,6 +29,7 @@ export interface CreateUserDialogProps {
   onUserCreated: (user: User) => void;
   parents?: User[];
   locale: string;
+  fixedRole?: UserRole;
 }
 
 export function CreateUserDialog({
@@ -38,19 +39,24 @@ export function CreateUserDialog({
   onUserCreated,
   parents = [],
   locale,
+  fixedRole,
 }: CreateUserDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [academies, setAcademies] = useState<Academy[]>([]);
   const [currentUserRole, setCurrentUserRole] = useState<UserRole | null>(null);
   const [academyId, setAcademyId] = useState<string>('');
   const [kidParentMode, setKidParentMode] = useState<'none' | 'existing' | 'create'>('none');
+  const [birthDay, setBirthDay] = useState('');
+  const [birthMonth, setBirthMonth] = useState('');
+  const [birthYear, setBirthYear] = useState('');
+  const [ageCategories, setAgeCategories] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     email: '',
     username: '',
     password: '',
     fullName: '',
     phoneNumber: '',
-    role: ROLES.KID as UserRole,
+    role: (fixedRole || ROLES.KID) as UserRole,
     parentId: '',
     birthDate: '',
     ageCategory: '',
@@ -76,6 +82,21 @@ export function CreateUserDialog({
       setAcademies(result.academies);
       setCurrentUserRole(result.userRole as UserRole);
       setAcademyId(result.currentAcademyId);
+      
+      // Load age categories from training days
+      try {
+        const trainingDaysResp = await fetch('/api/training-days?locale=' + locale);
+        if (trainingDaysResp.ok) {
+          const trainingDaysData = await trainingDaysResp.json();
+          if (trainingDaysData.success && trainingDaysData.trainingDays) {
+            const categories = trainingDaysData.trainingDays.map((td: any) => td.groupKey).filter(Boolean);
+            setAgeCategories(categories);
+          }
+        }
+      } catch (e) {
+        // fallback to default categories
+        setAgeCategories(['U6', 'U8', 'U10', 'U12', 'U14', 'U16', 'U18', 'U21']);
+      }
     }
   };
 
@@ -84,6 +105,11 @@ export function CreateUserDialog({
     setIsSubmitting(true);
 
     const canPickAcademy = currentUserRole === ROLES.ADMIN;
+
+    // Construct birthDate from components
+    const birthDate = formData.role === ROLES.KID && birthDay && birthMonth && birthYear
+      ? `${birthYear}-${birthMonth.padStart(2, '0')}-${birthDay.padStart(2, '0')}`
+      : formData.birthDate;
 
     let resolvedParentId = formData.parentId;
     if (formData.role === ROLES.KID && kidParentMode === 'create') {
@@ -119,7 +145,7 @@ export function CreateUserDialog({
         phoneNumber: formData.phoneNumber,
         role: formData.role,
         parentId: formData.role === ROLES.KID && resolvedParentId ? resolvedParentId : undefined,
-        birthDate: formData.role === ROLES.KID ? formData.birthDate : undefined,
+        birthDate: formData.role === ROLES.KID ? birthDate : undefined,
         ageCategory: formData.role === ROLES.KID ? formData.ageCategory : undefined,
       },
       {
@@ -141,8 +167,9 @@ export function CreateUserDialog({
         parentId: '',
         birthDate: '',
         ageCategory: '',
-      });
-      setKidParentMode('none');
+      });      setBirthDay('');
+      setBirthMonth('');
+      setBirthYear('');      setKidParentMode('none');
       setParentFormData({ email: '', username: '', password: '', fullName: '', phoneNumber: '' });
     } else {
       alert(result.error || 'Failed to create user');
@@ -191,23 +218,17 @@ export function CreateUserDialog({
                       </motion.div>
                       <div>
                         <DialogTitle className="text-xl font-black tracking-tight text-[#262626] dark:text-white">
-                          {dictionary.users.createUser}
+                          {fixedRole === ROLES.KID 
+                            ? (locale === 'ar' ? 'إضافة لاعب' : 'Add Player')
+                            : fixedRole === ROLES.COACH
+                            ? (locale === 'ar' ? 'إضافة مدرب' : 'Add Coach')
+                            : dictionary.users.createUser}
                         </DialogTitle>
                         <DialogDescription className="text-sm text-gray-600 dark:text-gray-400">
                           {dictionary.users.userDetails}
                         </DialogDescription>
                       </div>
                     </div>
-
-                    <motion.div
-                      className="hidden sm:flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-semibold text-[#262626] backdrop-blur-sm dark:border-white/10 dark:bg-white/5 dark:text-white"
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.1 }}
-                    >
-                      <Shield className="h-4 w-4" />
-                      {dictionary.users.role}
-                    </motion.div>
                   </div>
                 </DialogHeader>
 
@@ -292,32 +313,34 @@ export function CreateUserDialog({
                         />
                       </div>
 
-                      <div className="grid gap-2">
-                        <Label htmlFor="role" className="text-sm font-semibold text-[#262626] dark:text-white">
-                          {dictionary.users.role}
-                        </Label>
-                        <Select
-                          value={formData.role}
-                          onValueChange={(value) => setFormData({ ...formData, role: value as UserRole })}
-                        >
-                          <SelectTrigger className="h-12 rounded-xl border-2 border-[#DDDDDD] bg-white/80 dark:border-[#000000] dark:bg-white/5">
-                            <SelectValue placeholder={dictionary.users.role} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {(currentUserRole === ROLES.MANAGER
-                              ? [
-                                  ['PARENT', ROLES.PARENT] as const,
-                                  ['KID', ROLES.KID] as const,
-                                ]
-                              : (Object.entries(ROLES) as Array<[string, UserRole]>)
-                            ).map(([key, value]) => (
-                              <SelectItem key={value} value={value}>
-                                {key}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      {!fixedRole && (
+                        <div className="grid gap-2">
+                          <Label htmlFor="role" className="text-sm font-semibold text-[#262626] dark:text-white">
+                            {dictionary.users.role}
+                          </Label>
+                          <Select
+                            value={formData.role}
+                            onValueChange={(value) => setFormData({ ...formData, role: value as UserRole })}
+                          >
+                            <SelectTrigger className="h-12 rounded-xl border-2 border-[#DDDDDD] bg-white/80 dark:border-[#000000] dark:bg-white/5">
+                              <SelectValue placeholder={dictionary.users.role} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {(currentUserRole === ROLES.MANAGER
+                                ? [
+                                    ['PARENT', ROLES.PARENT] as const,
+                                    ['PLAYER', ROLES.KID] as const,
+                                  ]
+                                : (Object.entries(ROLES) as Array<[string, UserRole]>)
+                              ).map(([key, value]) => (
+                                <SelectItem key={value} value={value}>
+                                  {key}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -353,33 +376,96 @@ export function CreateUserDialog({
                           {dictionary.dashboard?.academyAdmin?.playerRegistration ?? 'Player registration'}
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4">
                           <div className="grid gap-2">
-                            <Label htmlFor="birthDate" className="text-sm font-semibold text-[#262626] dark:text-white">
+                            <Label className="text-sm font-semibold text-[#262626] dark:text-white">
                               {dictionary.dashboard?.academyAdmin?.birthDate ?? 'Birth date'}
                             </Label>
-                            <Input
-                              id="birthDate"
-                              type="date"
-                              value={formData.birthDate}
-                              onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-                              required
-                              className="h-12 rounded-xl border-2 border-[#DDDDDD] bg-white/80 dark:border-[#000000] dark:bg-white/5"
-                            />
+                            <div className="grid grid-cols-3 gap-3">
+                              <div>
+                                <Select value={birthDay} onValueChange={setBirthDay} required>
+                                  <SelectTrigger className="h-12 rounded-xl border-2 border-[#DDDDDD] bg-white/80 dark:border-[#000000] dark:bg-white/5 font-medium">
+                                    <SelectValue placeholder={locale === 'ar' ? 'يوم' : 'Day'} />
+                                  </SelectTrigger>
+                                  <SelectContent className="max-h-[300px]">
+                                    {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                                      <SelectItem key={day} value={String(day)}>
+                                        {day}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Select value={birthMonth} onValueChange={setBirthMonth} required>
+                                  <SelectTrigger className="h-12 rounded-xl border-2 border-[#DDDDDD] bg-white/80 dark:border-[#000000] dark:bg-white/5 font-medium">
+                                    <SelectValue placeholder={locale === 'ar' ? 'شهر' : 'Month'} />
+                                  </SelectTrigger>
+                                  <SelectContent className="max-h-[300px]">
+                                    <SelectItem value="1">{locale === 'ar' ? 'يناير' : 'January'}</SelectItem>
+                                    <SelectItem value="2">{locale === 'ar' ? 'فبراير' : 'February'}</SelectItem>
+                                    <SelectItem value="3">{locale === 'ar' ? 'مارس' : 'March'}</SelectItem>
+                                    <SelectItem value="4">{locale === 'ar' ? 'أبريل' : 'April'}</SelectItem>
+                                    <SelectItem value="5">{locale === 'ar' ? 'مايو' : 'May'}</SelectItem>
+                                    <SelectItem value="6">{locale === 'ar' ? 'يونيو' : 'June'}</SelectItem>
+                                    <SelectItem value="7">{locale === 'ar' ? 'يوليو' : 'July'}</SelectItem>
+                                    <SelectItem value="8">{locale === 'ar' ? 'أغسطس' : 'August'}</SelectItem>
+                                    <SelectItem value="9">{locale === 'ar' ? 'سبتمبر' : 'September'}</SelectItem>
+                                    <SelectItem value="10">{locale === 'ar' ? 'أكتوبر' : 'October'}</SelectItem>
+                                    <SelectItem value="11">{locale === 'ar' ? 'نوفمبر' : 'November'}</SelectItem>
+                                    <SelectItem value="12">{locale === 'ar' ? 'ديسمبر' : 'December'}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Select value={birthYear} onValueChange={setBirthYear} required>
+                                  <SelectTrigger className="h-12 rounded-xl border-2 border-[#DDDDDD] bg-white/80 dark:border-[#000000] dark:bg-white/5 font-medium">
+                                    <SelectValue placeholder={locale === 'ar' ? 'سنة' : 'Year'} />
+                                  </SelectTrigger>
+                                  <SelectContent className="max-h-[300px]">
+                                    {Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i - 3).map((year) => (
+                                      <SelectItem key={year} value={String(year)}>
+                                        {year}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
                           </div>
 
                           <div className="grid gap-2">
                             <Label htmlFor="ageCategory" className="text-sm font-semibold text-[#262626] dark:text-white">
                               {dictionary.dashboard?.academyAdmin?.ageCategory ?? 'Age category'}
                             </Label>
-                            <Input
-                              id="ageCategory"
-                              value={formData.ageCategory}
-                              onChange={(e) => setFormData({ ...formData, ageCategory: e.target.value })}
-                              placeholder={dictionary.dashboard?.academyAdmin?.ageCategoryPlaceholder ?? 'e.g. U10'}
-                              required
-                              className="h-12 rounded-xl border-2 border-[#DDDDDD] bg-white/80 dark:border-[#000000] dark:bg-white/5"
-                            />
+                            <Select 
+                              value={formData.ageCategory} 
+                              onValueChange={(value) => setFormData({ ...formData, ageCategory: value })}
+                            >
+                              <SelectTrigger className="h-12 rounded-xl border-2 border-[#DDDDDD] bg-white/80 dark:border-[#000000] dark:bg-white/5 font-medium">
+                                <SelectValue placeholder={dictionary.dashboard?.academyAdmin?.ageCategoryPlaceholder ?? 'Select age category'} />
+                              </SelectTrigger>
+                              <SelectContent className="max-h-[300px]">
+                                {ageCategories.length > 0 ? (
+                                  ageCategories.map((category) => (
+                                    <SelectItem key={category} value={category}>
+                                      {category}
+                                    </SelectItem>
+                                  ))
+                                ) : (
+                                  <>
+                                    <SelectItem value="U6">U6</SelectItem>
+                                    <SelectItem value="U8">U8</SelectItem>
+                                    <SelectItem value="U10">U10</SelectItem>
+                                    <SelectItem value="U12">U12</SelectItem>
+                                    <SelectItem value="U14">U14</SelectItem>
+                                    <SelectItem value="U16">U16</SelectItem>
+                                    <SelectItem value="U18">U18</SelectItem>
+                                    <SelectItem value="U21">U21</SelectItem>
+                                  </>
+                                )}
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
 

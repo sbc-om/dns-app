@@ -243,7 +243,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
           {/* Primary Actions Group - Always visible */}
           <div className="flex items-center gap-1">
             {/* Academy Switcher - Hide icon on mobile, show on desktop */}
-            {academies.length > 0 && (
+            {user.role === 'admin' && academies.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -298,6 +298,19 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
+            )}
+
+            {/* Read-only academy label for non-admin users */}
+            {user.role !== 'admin' && academies.length > 0 && (
+              <div
+                className="h-9 sm:h-10 px-2 sm:px-3 rounded-xl border-2 border-transparent flex items-center gap-1.5 bg-black/0"
+                aria-label="Current academy"
+              >
+                <Building2 className="h-4 w-4 text-gray-700 dark:text-gray-200 shrink-0" />
+                <span className="hidden lg:inline max-w-[120px] xl:max-w-40 truncate text-sm font-semibold text-[#262626] dark:text-white">
+                  {currentAcademyName}
+                </span>
+              </div>
             )}
 
             {/* Notifications - Always visible with badge */}

@@ -15,16 +15,18 @@ export interface UsersClientProps {
   dictionary: Dictionary;
   initialUsers: User[];
   locale: Locale;
+  currentUserRole: string;
 }
 
-export function UsersClient({ dictionary, initialUsers, locale }: UsersClientProps) {
+export function UsersClient({ dictionary, initialUsers, locale, currentUserRole }: UsersClientProps) {
   const [users, setUsers] = useState<User[]>(initialUsers);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isCreatePlayerDialogOpen, setIsCreatePlayerDialogOpen] = useState(false);
+  const [isCreateCoachDialogOpen, setIsCreateCoachDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string>('all');
 
   const filterLabel = locale === 'ar' ? 'تصفية حسب الدور' : 'Filter by Role';
 
-  const roleOptions = [
+  const allRoleOptions = [
     {
       key: 'all',
       label: locale === 'ar' ? 'الكل' : 'All',
@@ -57,11 +59,16 @@ export function UsersClient({ dictionary, initialUsers, locale }: UsersClientPro
     },
     {
       key: 'kid',
-      label: locale === 'ar' ? 'طالب' : 'Student',
+      label: locale === 'ar' ? 'لاعب' : 'Player',
       count: users.filter((u) => u.role === 'kid').length,
       accentClass: 'border-red-500 text-red-700 dark:text-red-400',
     },
   ] as const;
+
+  // Filter role options based on current user role
+  const roleOptions = currentUserRole === 'manager'
+    ? allRoleOptions.filter(opt => opt.key !== 'admin' && opt.key !== 'manager')
+    : allRoleOptions;
 
   const handleUsersChange = (nextUsersFromTable: User[]) => {
     setUsers((prev) => {
@@ -153,80 +160,65 @@ export function UsersClient({ dictionary, initialUsers, locale }: UsersClientPro
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex gap-2"
         >
-          <Link href={`/${locale}/dashboard/roles`}>
+          {currentUserRole === 'manager' ? (
+            <div className="flex rounded-2xl overflow-hidden border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] shadow-lg">
+              <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} className="flex-1">
+                <Button 
+                  onClick={() => setIsCreatePlayerDialogOpen(true)}
+                  className="h-12 w-full rounded-none bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white hover:opacity-90 border-0 shadow-none font-semibold"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  {locale === 'ar' ? 'إضافة لاعب' : 'Add Player'}
+                </Button>
+              </motion.div>
+              <div className="w-px bg-[#DDDDDD] dark:bg-[#000000]" />
+              <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} className="flex-1">
+                <Button 
+                  onClick={() => setIsCreateCoachDialogOpen(true)}
+                  variant="ghost"
+                  className="h-12 w-full rounded-none bg-transparent hover:bg-gray-100 dark:hover:bg-[#1a1a1a] text-[#262626] dark:text-white border-0 shadow-none font-semibold"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  {locale === 'ar' ? 'إضافة مدرب' : 'Add Coach'}
+                </Button>
+              </motion.div>
+            </div>
+          ) : (
             <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
               <Button 
-                variant="outline"
-                className="h-11 border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
+                onClick={() => setIsCreatePlayerDialogOpen(true)}
+                className="h-12 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 text-white hover:opacity-90 border-2 border-transparent shadow-lg shadow-purple-500/30"
               >
-                <Shield className="mr-2 h-4 w-4" />
-                {dictionary.nav.roles}
+                <Plus className="mr-2 h-4 w-4" />
+                {dictionary.users.createUser}
               </Button>
             </motion.div>
-          </Link>
-          <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
-            <Button 
-              onClick={() => setIsCreateDialogOpen(true)}
-              className="h-11 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 text-white hover:opacity-90 border-2 border-transparent shadow-lg shadow-purple-500/30"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              {dictionary.users.createUser}
-            </Button>
-          </motion.div>
+          )}
         </motion.div>
       </motion.div>
 
-      {/* Animated Role Filter */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        whileHover={{ y: -2 }}
-        className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] rounded-2xl p-5 sm:p-6 shadow-lg relative overflow-hidden"
-      >
-        {/* Animated background gradient */}
-        <motion.div
-          className="absolute inset-0 bg-linear-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5"
-          animate={{
-            opacity: [0.3, 0.6, 0.3],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-        
-        <div className="relative flex flex-col sm:flex-row sm:items-center gap-4">
+      {/* Role Filter */}
+      <div className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] rounded-2xl p-5 sm:p-6 shadow-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex items-center gap-2 shrink-0">
-            <motion.div
-              whileHover={{ rotate: 360, scale: 1.1 }}
-              transition={{ duration: 0.6 }}
-              className="h-10 w-10 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-linear-to-br from-blue-500/10 to-purple-500/10 flex items-center justify-center"
-            >
+            <div className="h-10 w-10 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-gradient-to-br from-blue-500/10 to-purple-500/10 flex items-center justify-center">
               <Shield className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            </motion.div>
+            </div>
             <span className="text-base font-bold text-[#262626] dark:text-white">{filterLabel}</span>
           </div>
 
           <div className="flex flex-wrap gap-2 flex-1">
-            {roleOptions.map((opt, index) => {
+            {roleOptions.map((opt) => {
               const active = selectedRole === opt.key;
               return (
-                <motion.button
+                <button
                   key={opt.key}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05, duration: 0.3 }}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
                   onClick={() => setSelectedRole(opt.key)}
                   className={
                     "px-4 py-2.5 rounded-xl font-semibold text-sm transition-all border-2 " +
                     (active
-                      ? `bg-linear-to-br from-white to-gray-50 dark:from-[#1a1a1a] dark:to-[#0a0a0a] ${opt.accentClass} shadow-lg`
+                      ? `bg-gradient-to-br from-white to-gray-50 dark:from-[#1a1a1a] dark:to-[#0a0a0a] ${opt.accentClass} shadow-lg`
                       : "bg-white dark:bg-[#262626] text-gray-700 dark:text-gray-300 border-[#DDDDDD] dark:border-[#000000] hover:bg-gray-50 dark:hover:bg-[#1a1a1a]")
                   }
                   type="button"
@@ -244,12 +236,12 @@ export function UsersClient({ dictionary, initialUsers, locale }: UsersClientPro
                       {opt.count}
                     </span>
                   </span>
-                </motion.button>
+                </button>
               );
             })}
           </div>
         </div>
-      </motion.div>
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -266,14 +258,26 @@ export function UsersClient({ dictionary, initialUsers, locale }: UsersClientPro
       </motion.div>
 
       <CreateUserDialog
-        open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
+        open={isCreatePlayerDialogOpen}
+        onOpenChange={setIsCreatePlayerDialogOpen}
         dictionary={dictionary}
         locale={locale}
         parents={users.filter(u => u.role === 'parent')}
         onUserCreated={(newUser: User) => {
           setUsers((prev) => [...prev, newUser]);
         }}
+        fixedRole={currentUserRole === 'manager' ? 'kid' : undefined}
+      />
+      <CreateUserDialog
+        open={isCreateCoachDialogOpen}
+        onOpenChange={setIsCreateCoachDialogOpen}
+        dictionary={dictionary}
+        locale={locale}
+        parents={users.filter(u => u.role === 'parent')}
+        onUserCreated={(newUser: User) => {
+          setUsers((prev) => [...prev, newUser]);
+        }}
+        fixedRole={currentUserRole === 'manager' ? 'coach' : undefined}
       />
     </motion.div>
   );

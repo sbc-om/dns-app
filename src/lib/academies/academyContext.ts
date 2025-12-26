@@ -74,9 +74,14 @@ async function pickDefaultAcademyIdForUser(user: AuthUser): Promise<{ academyId:
   // Managers should default to an academy where they are an academy manager.
   if (user.role === 'manager') {
     const rolesByAcademy = await getUserAcademyRoles(user.id);
-    const managerAcademyId = Object.entries(rolesByAcademy).find(([, r]) => r === 'manager')?.[0];
-    const fallbackAcademyId = Object.keys(rolesByAcademy)[0];
-    const academyId = managerAcademyId || fallbackAcademyId || DEFAULT_ACADEMY_ID;
+    const managerAcademyIds = Object.entries(rolesByAcademy)
+      .filter(([, r]) => r === 'manager')
+      .map(([id]) => id)
+      .sort();
+    const fallbackAcademyIds = Object.keys(rolesByAcademy).sort();
+    // Deterministic selection: a manager is locked to the first academy where they are the manager.
+    // If data is inconsistent, fall back to the first membership academy.
+    const academyId = managerAcademyIds[0] || fallbackAcademyIds[0] || DEFAULT_ACADEMY_ID;
     await ensureLegacyUserMembership(user, academyId);
     const role = (await getUserRoleInAcademy(user.id, academyId)) || 'coach';
     return { academyId, role };
@@ -106,6 +111,24 @@ export async function requireAcademyContext(locale: string = 'en'): Promise<Acad
 
   const selected = await getSelectedAcademyIdFromCookie();
 
+  // Managers are locked to exactly one academy. They must not be able to switch academies via cookies.
+  if (user.role === 'manager') {
+    const picked = await pickDefaultAcademyIdForUser(user);
+    const academy = await findAcademyById(picked.academyId);
+    if (!academy || !academy.isActive) {
+      redirect(`/${locale}/dashboard/forbidden`);
+    }
+
+    // Ensure membership exists and confirm role.
+    await ensureLegacyUserMembership(user, picked.academyId);
+    const rolesByAcademy = await getUserAcademyRoles(user.id);
+    if (rolesByAcademy[picked.academyId] !== 'manager') {
+      redirect(`/${locale}/dashboard/forbidden`);
+    }
+
+    return { user, academyId: picked.academyId, academyRole: 'manager' };
+  }
+
   if (user.role === 'admin') {
     // If an academy is selected and exists, honor it; otherwise operate without creating one.
     if (selected) {
@@ -120,7 +143,6 @@ export async function requireAcademyContext(locale: string = 'en'): Promise<Acad
 
   if (!selected) {
     const picked = await pickDefaultAcademyIdForUser(user);
-    await setSelectedAcademyIdCookie(picked.academyId);
     return { user, academyId: picked.academyId, academyRole: picked.role };
   }
 
@@ -128,7 +150,6 @@ export async function requireAcademyContext(locale: string = 'en'): Promise<Acad
   const academy = await findAcademyById(selected);
   if (!academy || !academy.isActive) {
     const picked = await pickDefaultAcademyIdForUser(user);
-    await setSelectedAcademyIdCookie(picked.academyId);
     return { user, academyId: picked.academyId, academyRole: picked.role };
   }
 
@@ -138,13 +159,6 @@ export async function requireAcademyContext(locale: string = 'en'): Promise<Acad
   const role = await getUserRoleInAcademy(user.id, selected);
   if (!role) {
     redirect(`/${locale}/dashboard/forbidden`);
-  }
-
-  // Enforce that a "manager" user can only operate within academies where they are a manager.
-  if (user.role === 'manager' && role !== 'manager') {
-    const picked = await pickDefaultAcademyIdForUser(user);
-    await setSelectedAcademyIdCookie(picked.academyId);
-    return { user, academyId: picked.academyId, academyRole: picked.role };
   }
 
   return { user, academyId: selected, academyRole: role };
@@ -160,6 +174,23 @@ export async function getAcademyContextIfAuthenticated(): Promise<AcademyContext
   }
   const selected = await getSelectedAcademyIdFromCookie();
 
+  // Managers are locked to exactly one academy. They must not be able to switch academies via cookies.
+  if (user.role === 'manager') {
+    const picked = await pickDefaultAcademyIdForUser(user);
+    const academy = await findAcademyById(picked.academyId);
+    if (!academy || !academy.isActive) {
+      return null;
+    }
+
+    await ensureLegacyUserMembership(user, picked.academyId);
+    const rolesByAcademy = await getUserAcademyRoles(user.id);
+    if (rolesByAcademy[picked.academyId] !== 'manager') {
+      return null;
+    }
+
+    return { user, academyId: picked.academyId, academyRole: 'manager' };
+  }
+
   if (user.role === 'admin') {
     if (selected) {
       const academy = await findAcademyById(selected);
@@ -173,14 +204,12 @@ export async function getAcademyContextIfAuthenticated(): Promise<AcademyContext
 
   if (!selected) {
     const picked = await pickDefaultAcademyIdForUser(user);
-    await setSelectedAcademyIdCookie(picked.academyId);
     return { user, academyId: picked.academyId, academyRole: picked.role };
   }
 
   const academy = await findAcademyById(selected);
   if (!academy || !academy.isActive) {
     const picked = await pickDefaultAcademyIdForUser(user);
-    await setSelectedAcademyIdCookie(picked.academyId);
     return { user, academyId: picked.academyId, academyRole: picked.role };
   }
 
@@ -189,12 +218,6 @@ export async function getAcademyContextIfAuthenticated(): Promise<AcademyContext
   const role = await getUserRoleInAcademy(user.id, selected);
   if (!role) {
     return null;
-  }
-
-  if (user.role === 'manager' && role !== 'manager') {
-    const picked = await pickDefaultAcademyIdForUser(user);
-    await setSelectedAcademyIdCookie(picked.academyId);
-    return { user, academyId: picked.academyId, academyRole: picked.role };
   }
 
   return { user, academyId: selected, academyRole: role };
