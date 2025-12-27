@@ -29,8 +29,8 @@ function mapUserRoleToAcademyMemberRole(role: UserRole): AcademyMemberRole {
       return 'coach';
     case ROLES.PARENT:
       return 'parent';
-    case ROLES.KID:
-      return 'kid';
+    case ROLES.PLAYER:
+      return 'player';
     default:
       // Admin is not an academy member role.
       return 'coach';
@@ -89,9 +89,9 @@ export async function createUserAction(
       return { success: false as const, error: academyCheck.error };
     }
 
-    // Registration rules: for kid accounts, age and age category are required.
+    // Registration rules: for player accounts, age and age category are required.
     const normalizedInput: CreateUserInput = { ...input };
-    if ((normalizedInput.role ?? ROLES.KID) === ROLES.KID) {
+    if ((normalizedInput.role ?? ROLES.PLAYER) === ROLES.PLAYER) {
       if (!normalizedInput.birthDate) {
         return { success: false as const, error: 'Birth date is required for kids' };
       }
@@ -154,11 +154,11 @@ export async function updateUserAction(
       }
     }
 
-    // Registration rules: keep kid records consistent.
+    // Registration rules: keep player records consistent.
     const normalizedUpdates: UpdateUserInput = { ...input };
     const existingUser = normalizedUpdates.role === undefined ? await findUserById(id) : null;
-    const isKid = normalizedUpdates.role === ROLES.KID || (normalizedUpdates.role === undefined && existingUser?.role === ROLES.KID);
-    if (isKid && normalizedUpdates.birthDate) {
+    const isPlayer = normalizedUpdates.role === ROLES.PLAYER || (normalizedUpdates.role === undefined && existingUser?.role === ROLES.PLAYER);
+    if (isPlayer && normalizedUpdates.birthDate) {
       const dob = new Date(normalizedUpdates.birthDate);
       if (!Number.isNaN(dob.getTime())) {
         const now = new Date();
@@ -288,7 +288,7 @@ export async function updateUserProfilePictureAction(userId: string, profilePict
       return { success: false, error: 'User not found' };
     }
     
-    revalidatePath(`/dashboard/kids/${userId}`);
+    revalidatePath(`/dashboard/players/${userId}`);
     revalidatePath('/dashboard/users');
     
     return { success: true, user };
@@ -310,41 +310,41 @@ export async function getCoachesAction() {
 }
 
 /**
- * Update parent assignments for multiple kids
+ * Update parent assignments for multiple players
  */
-export async function updateKidsParentAction(
+export async function updatePlayersParentAction(
   parentId: string,
-  kidIds: string[],
+  playerIds: string[],
   options?: { locale?: string }
 ) {
   try {
     const locale = options?.locale ?? 'en';
     await requireRole([ROLES.ADMIN, ROLES.MANAGER], locale);
 
-    // Get all kids and update their parentId
+    // Get all players and update their parentId
     const { getAllUsers } = await import('@/lib/db/repositories/userRepository');
     const allUsers = await getAllUsers();
-    const allKids = allUsers.filter(u => u.role === ROLES.KID);
+    const allPlayers = allUsers.filter(u => u.role === ROLES.PLAYER);
 
-    // First, remove this parent from all kids
-    for (const kid of allKids) {
-      if (kid.parentId === parentId) {
-        await updateUser(kid.id, { parentId: '' });
+    // First, remove this parent from all players
+    for (const player of allPlayers) {
+      if (player.parentId === parentId) {
+        await updateUser(player.id, { parentId: '' });
       }
     }
 
-    // Then, assign this parent to selected kids
-    for (const kidId of kidIds) {
-      await updateUser(kidId, { parentId });
+    // Then, assign this parent to selected players
+    for (const playerId of playerIds) {
+      await updateUser(playerId, { parentId });
     }
 
     revalidatePath('/[locale]/dashboard/users', 'page');
     return { success: true as const };
   } catch (error) {
-    console.error('Update kids parent error:', error);
+    console.error('Update players parent error:', error);
     return { 
       success: false as const, 
-      error: error instanceof Error ? error.message : 'Failed to update kids parent' 
+      error: error instanceof Error ? error.message : 'Failed to update players parent' 
     };
   }
 }

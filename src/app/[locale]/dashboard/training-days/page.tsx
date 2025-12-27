@@ -25,7 +25,7 @@ export default async function TrainingDaysPage({ params }: { params: Promise<{ l
   const ids = Array.from(new Set(members.map((m) => m.userId)));
   const users = await getUsersByIds(ids);
   const groupsFromPlayers = Array.from(
-    new Set(users.filter((u) => u.role === 'kid').map((u) => (u.ageCategory || 'Unassigned').trim()))
+    new Set(users.filter((u) => u.role === 'player').map((u) => (u.ageCategory || 'Unassigned').trim()))
   ).filter(Boolean);
 
   const records = await listTrainingDaysByAcademy(ctx.academyId);

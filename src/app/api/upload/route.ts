@@ -33,10 +33,34 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create unique filename
+    const extensionFromMime = (mime: string): string => {
+      switch (mime) {
+        case 'image/jpeg':
+          return 'jpg';
+        case 'image/png':
+          return 'png';
+        case 'image/webp':
+          return 'webp';
+        case 'image/gif':
+          return 'gif';
+        default:
+          return 'bin';
+      }
+    };
+
+    const sanitizeBaseName = (name: string): string =>
+      name
+        .trim()
+        .replace(/\.[^/.]+$/, '')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-zA-Z0-9._-]/g, '')
+        .slice(0, 80) || 'image';
+
+    // Create unique filename (ensure extension matches actual MIME)
     const timestamp = Date.now();
-    const originalName = file.name.replace(/\s+/g, '-');
-    const filename = `${user.id}-${timestamp}-${originalName}`;
+    const safeBase = sanitizeBaseName(file.name);
+    const ext = extensionFromMime(file.type);
+    const filename = `${user.id}-${timestamp}-${safeBase}.${ext}`;
 
     // Ensure upload directory exists
     const uploadDir = join(process.cwd(), 'data', 'uploads', 'images');

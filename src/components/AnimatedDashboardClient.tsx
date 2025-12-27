@@ -13,7 +13,7 @@ interface AdminStats {
   totalEnrollments: number;
   paidEnrollments: number;
   totalCoaches: number;
-  totalKids: number;
+  totalPlayers: number;
 }
 
 interface AnimatedDashboardClientProps {
@@ -21,51 +21,55 @@ interface AnimatedDashboardClientProps {
   dictionary: Dictionary;
   username: string;
   roleLabel: string;
+  showHeader?: boolean;
 }
 
 export function AnimatedDashboardClient({ 
   stats, 
   dictionary,
   username,
-  roleLabel 
+  roleLabel,
+  showHeader = true,
 }: AnimatedDashboardClientProps) {
   return (
     <div className="space-y-8">
       {/* Animated Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, type: 'spring' }}
-        className="relative"
-      >
-        <div className="absolute inset-0 bg-linear-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-3xl blur-3xl" />
-        <div className="relative bg-linear-to-br from-white/80 to-white/60 dark:from-gray-900/80 dark:to-gray-800/60 backdrop-blur-xl p-8 rounded-3xl border-2 border-white/20 dark:border-white/10 shadow-2xl">
-          <motion.h1 
-            className="text-4xl md:text-5xl font-bold mb-3"
-            animate={{ 
-              backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-            }}
-            transition={{ duration: 5, repeat: Infinity }}
-            style={{
-              background: 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6)',
-              backgroundSize: '200% auto',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            {dictionary.common.welcome} {username}
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-lg font-semibold text-gray-700 dark:text-gray-300"
-          >
-            {dictionary.users.role}: <span className="text-blue-600 dark:text-blue-400">{roleLabel}</span>
-          </motion.p>
-        </div>
-      </motion.div>
+      {showHeader && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, type: 'spring' }}
+          className="relative"
+        >
+          <div className="absolute inset-0 bg-linear-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-3xl blur-3xl" />
+          <div className="relative bg-linear-to-br from-white/80 to-white/60 dark:from-gray-900/80 dark:to-gray-800/60 backdrop-blur-xl p-8 rounded-3xl border-2 border-white/20 dark:border-white/10 shadow-2xl">
+            <motion.h1
+              className="text-4xl md:text-5xl font-bold mb-3"
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              }}
+              transition={{ duration: 5, repeat: Infinity }}
+              style={{
+                background: 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6)',
+                backgroundSize: '200% auto',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              {dictionary.common.welcome} {username}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-lg font-semibold text-gray-700 dark:text-gray-300"
+            >
+              {dictionary.users.role}: <span className="text-blue-600 dark:text-blue-400">{roleLabel}</span>
+            </motion.p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -112,8 +116,8 @@ export function AnimatedDashboardClient({
         />
         
         <AnimatedStatCard
-          title={dictionary.dashboard.totalKids || 'Total Kids'}
-          value={stats.totalKids}
+          title={dictionary.dashboard.totalPlayers || 'Total Players'}
+          value={stats.totalPlayers}
           icon={User}
           gradient="bg-linear-to-br from-teal-500 to-cyan-600"
           delay={0.5}

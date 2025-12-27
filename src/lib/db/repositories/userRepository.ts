@@ -172,7 +172,7 @@ export async function createUser(input: CreateUserInput): Promise<User> {
     fullName: input.fullName,
     phoneNumber: input.phoneNumber,
     nationalId: input.nationalId,
-    role: input.role || ROLES.KID,
+    role: input.role || ROLES.PLAYER,
     parentId: input.parentId,
 
     parentContactName: input.parentContactName,
@@ -412,5 +412,5 @@ export async function getAllUsers(): Promise<User[]> {
  */
 export async function getChildrenByParentId(parentId: string): Promise<User[]> {
   const allUsers = await listUsers();
-  return allUsers.filter(user => user.parentId === parentId && user.role === ROLES.KID);
+  return allUsers.filter(user => user.parentId === parentId && user.role === ROLES.PLAYER);
 }

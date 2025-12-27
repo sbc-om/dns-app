@@ -91,9 +91,9 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
         const user = row.original;
 
         // Make user names clickable
-        if (user.role === 'kid') {
+        if (user.role === 'player') {
           return (
-            <Link href={`/${locale}/dashboard/kids/${user.id}`} className="font-semibold text-[#F2574C] hover:text-[#E8A12D] hover:underline">
+            <Link href={`/${locale}/dashboard/players/${user.id}`} className="font-semibold text-[#F2574C] hover:text-[#E8A12D] hover:underline">
               {fullName || '-'}
             </Link>
           );
@@ -262,7 +262,7 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
           dictionary={dictionary}
           locale={locale}
           parents={users.filter(u => u.role === 'parent')}
-          kids={users.filter(u => u.role === 'kid')}
+          players={users.filter(u => u.role === 'player')}
           onUserUpdated={(updatedUser: User) => {
             onUsersChange(
               users.map((u) => (u.id === updatedUser.id ? updatedUser : u))

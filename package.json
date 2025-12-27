@@ -9,6 +9,8 @@
     "lint": "eslint",
     "db:init": "tsx scripts/init-db.ts",
     "db:reset": "tsx scripts/reset-db-to-admin.ts",
+    "migrate:kid-to-player": "tsx scripts/migrate-kid-to-player.ts",
+    "db:check-migration": "tsx scripts/check-migration.ts",
     "create-admin": "tsx scripts/create-admin.ts",
     "generate-icons": "node scripts/generate-icons.js",
     "generate-favicon": "node scripts/generate-favicon.js",

@@ -117,7 +117,7 @@ export function AchievementsStatsClient({
         className="flex items-center justify-between"
       >
         <div className="flex items-center gap-4">
-          <Link href={`/${locale}/dashboard/kids/${kid.id}`}>
+          <Link href={`/${locale}/dashboard/players/${kid.id}`}>
             <Button variant="outline" size="icon" className="rounded-xl">
               <ArrowLeft className="h-4 w-4" />
             </Button>

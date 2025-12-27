@@ -1,6 +1,6 @@
 import { getDatabase, generateId } from '../lmdb';
 
-export type AcademyMemberRole = 'manager' | 'coach' | 'parent' | 'kid';
+export type AcademyMemberRole = 'manager' | 'coach' | 'parent' | 'player';
 
 export interface AcademyMembership {
   id: string;

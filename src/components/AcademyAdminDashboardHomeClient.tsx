@@ -48,6 +48,7 @@ type Props = {
   locale: Locale;
   dictionary: Dictionary;
   data: AcademyAdminDashboardData;
+  hideHero?: boolean;
 };
 
 function stageLabel(dictionary: Dictionary, stage: PlayerStageKey): string {
@@ -77,7 +78,7 @@ function formatDate(locale: Locale, iso?: string) {
   });
 }
 
-export function AcademyAdminDashboardHomeClient({ locale, dictionary, data }: Props) {
+export function AcademyAdminDashboardHomeClient({ locale, dictionary, data, hideHero = false }: Props) {
   const [stageFilter, setStageFilter] = useState<PlayerStageKey | 'all'>('all');
   const [groupFilter, setGroupFilter] = useState<string>('all');
   const [flagFilter, setFlagFilter] = useState<FilterFlag>('all');
@@ -105,60 +106,66 @@ export function AcademyAdminDashboardHomeClient({ locale, dictionary, data }: Pr
     'relative overflow-hidden rounded-3xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-white/5 backdrop-blur-xl p-6';
 
   return (
-    <div className="space-y-8">      {/* Academy Banner with Image */}
-      {(data.academyImage || data.academyName) && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="relative h-48 sm:h-64 rounded-3xl overflow-hidden border-2 border-white/10 bg-black/40"
-        >
-          {data.academyImage && (
-            <Image
-              src={data.academyImage}
-              alt={data.academyName || 'Academy'}
-              fill
-              className="object-cover"
-              priority
-            />
-          )}
-          <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-transparent" />
-          
-          <div className="absolute inset-0 flex items-end p-6 sm:p-8">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                {!data.academyImage && (
-                  <div className="p-3 bg-blue-600/20 backdrop-blur-sm rounded-2xl border border-white/10">
-                    <Building2 className="h-8 w-8 text-blue-400" />
+    <div className="space-y-8">
+      {!hideHero && (
+        <>
+          {/* Academy Banner with Image */}
+          {(data.academyImage || data.academyName) && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="relative h-48 sm:h-64 rounded-3xl overflow-hidden border-2 border-white/10 bg-black/40"
+            >
+              {data.academyImage && (
+                <Image
+                  src={data.academyImage}
+                  alt={data.academyName || 'Academy'}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              )}
+              <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-transparent" />
+
+              <div className="absolute inset-0 flex items-end p-6 sm:p-8">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    {!data.academyImage && (
+                      <div className="p-3 bg-blue-600/20 backdrop-blur-sm rounded-2xl border border-white/10">
+                        <Building2 className="h-8 w-8 text-blue-400" />
+                      </div>
+                    )}
+                    <div>
+                      <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                        {locale === 'ar' && data.academyNameAr ? data.academyNameAr : data.academyName}
+                      </h2>
+                      <p className="text-white/70 text-sm sm:text-base font-medium">
+                        {dictionary.dashboard?.academyAdmin?.homeTitle ?? 'Academy Dashboard'}
+                      </p>
+                    </div>
                   </div>
-                )}
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                    {locale === 'ar' && data.academyNameAr ? data.academyNameAr : data.academyName}
-                  </h2>
-                  <p className="text-white/70 text-sm sm:text-base font-medium">
-                    {dictionary.dashboard?.academyAdmin?.homeTitle ?? 'Academy Dashboard'}
-                  </p>
                 </div>
               </div>
-            </div>
-          </div>
-        </motion.div>
+            </motion.div>
+          )}
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, type: 'spring' }}
+            className="space-y-3"
+          >
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#262626] dark:text-white">
+              {dictionary.dashboard?.academyAdmin?.homeTitle ?? 'Academy overview'}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              {dictionary.dashboard?.academyAdmin?.homeSubtitle ??
+                'Understand academy status in 30 seconds: who needs attention and what to do next.'}
+            </p>
+          </motion.div>
+        </>
       )}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, type: 'spring' }}
-        className="space-y-3"
-      >
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#262626] dark:text-white">
-          {dictionary.dashboard?.academyAdmin?.homeTitle ?? 'Academy overview'}
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          {dictionary.dashboard?.academyAdmin?.homeSubtitle ??
-            'Understand academy status in 30 seconds: who needs attention and what to do next.'}
-        </p>
-      </motion.div>
 
       {/* Top section: summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -173,7 +180,7 @@ export function AcademyAdminDashboardHomeClient({ locale, dictionary, data }: Pr
           }}
           className={cardBase + ' text-left'}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-br from-blue-500/10 via-purple-500/10 to-transparent" />
           <div className="relative flex items-start justify-between gap-4">
             <div>
               <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">
@@ -192,7 +199,7 @@ export function AcademyAdminDashboardHomeClient({ locale, dictionary, data }: Pr
         </motion.button>
 
         <div className={cardBase}>
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-cyan-500/10 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-br from-emerald-500/10 via-cyan-500/10 to-transparent" />
           <div className="relative flex items-start justify-between gap-4">
             <div>
               <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">
@@ -246,7 +253,7 @@ export function AcademyAdminDashboardHomeClient({ locale, dictionary, data }: Pr
           }}
           className={cardBase + ' text-left'}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-br from-purple-500/10 via-pink-500/10 to-transparent" />
           <div className="relative flex items-start justify-between gap-4">
             <div>
               <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">
@@ -276,7 +283,7 @@ export function AcademyAdminDashboardHomeClient({ locale, dictionary, data }: Pr
           }}
           className={cardBase + ' text-left'}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-red-500/10 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-br from-orange-500/10 via-red-500/10 to-transparent" />
           <div className="relative flex items-start justify-between gap-4">
             <div>
               <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">
@@ -461,7 +468,7 @@ export function AcademyAdminDashboardHomeClient({ locale, dictionary, data }: Pr
                       <td className="p-4 text-right">
                         <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                           <Button asChild className="rounded-2xl">
-                            <Link href={`/${locale}/dashboard/kids/${p.userId}`}>
+                            <Link href={`/${locale}/dashboard/players/${p.userId}`}>
                               {dictionary.dashboard?.academyAdmin?.viewProfile ?? 'View profile'}
                               <ChevronRight className="h-4 w-4 ml-2" />
                             </Link>

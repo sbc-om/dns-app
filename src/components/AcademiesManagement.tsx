@@ -101,9 +101,9 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
 
   const fieldLabelClass = 'text-[#262626] dark:text-white font-semibold';
   const inputClass =
-    'h-12 bg-white dark:bg-[#111114] border-2 border-[#DDDDDD] dark:border-white/10 text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500';
+    'h-12 bg-white dark:bg-[#111114] border-2 border-[#DDDDDD] dark:border-[#000000] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500';
   const outlineButtonClass =
-    'h-10 border-2 border-[#DDDDDD] dark:border-white/10 bg-white/80 dark:bg-[#111114] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1d]';
+    'h-10 border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#111114] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1d]';
 
   const uploadCroppedImage = async (file: File, croppedImageUrl: string): Promise<string | null> => {
     try {
@@ -359,7 +359,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
   }
 
   const cardShell =
-    'bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-white/10 rounded-2xl shadow-lg relative overflow-hidden';
+    'bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] rounded-2xl shadow-lg relative overflow-hidden';
   const subtleText = 'text-gray-600 dark:text-gray-400';
 
   return (
@@ -609,7 +609,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
           }
         }}
       >
-        <DialogContent className="sm:max-w-[760px] bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-white/10">
+        <DialogContent className="sm:max-w-[760px] bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
           <DialogHeader>
             <DialogTitle className="text-xl font-black text-[#262626] dark:text-white">
               {t.createDialogTitle || 'Create academy'}
@@ -649,7 +649,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
 
             <div className="space-y-2">
               <Label className={fieldLabelClass}>{t.fieldImageUpload || 'Academy image'}</Label>
-              <div className="rounded-2xl border-2 border-[#DDDDDD] dark:border-white/10 bg-gray-50 dark:bg-[#111114] p-4">
+              <div className="rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-50 dark:bg-[#111114] p-4">
                 <ImageUpload
                   currentImage={academyForm.image || undefined}
                   onUpload={async (file, croppedImageUrl) => {
@@ -704,7 +704,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
           }
         }}
       >
-        <DialogContent className="sm:max-w-[640px] bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-white/10">
+        <DialogContent className="sm:max-w-[640px] bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
           <DialogHeader>
             <DialogTitle className="text-xl font-black text-[#262626] dark:text-white">{t.assignManagerDialogTitle || 'Assign academy manager'}</DialogTitle>
           </DialogHeader>
@@ -774,7 +774,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
           }
         }}
       >
-        <DialogContent className="sm:max-w-[760px] bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-white/10">
+        <DialogContent className="sm:max-w-[760px] bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
           <DialogHeader>
             <DialogTitle className="text-xl font-black text-[#262626] dark:text-white">{t.editDialogTitle || 'Edit academy'}</DialogTitle>
           </DialogHeader>
@@ -809,7 +809,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
 
             <div className="space-y-2">
               <Label className={fieldLabelClass}>{t.fieldImageUpload || 'Academy image'}</Label>
-              <div className="rounded-2xl border-2 border-[#DDDDDD] dark:border-white/10 bg-gray-50 dark:bg-[#111114] p-4">
+              <div className="rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-50 dark:bg-[#111114] p-4">
                 <ImageUpload
                   currentImage={editForm.image || undefined}
                   onUpload={async (file, croppedImageUrl) => {

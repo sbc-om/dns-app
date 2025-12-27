@@ -18,7 +18,7 @@ export async function createPhysicalTestAction(input: CreatePhysicalTestInput & 
     
     const test = await createPhysicalTest(input);
     
-    revalidatePath(`/${input.locale || 'en'}/dashboard/kids/${input.userId}`);
+    revalidatePath(`/${input.locale || 'en'}/dashboard/players/${input.userId}`);
     
     return { success: true, test };
   } catch (error) {
@@ -37,7 +37,7 @@ export async function updatePhysicalTestAction(id: string, input: UpdatePhysical
       return { success: false, error: 'Test not found' };
     }
     
-    revalidatePath(`/${input.locale || 'en'}/dashboard/kids/${input.userId || test.userId}`);
+    revalidatePath(`/${input.locale || 'en'}/dashboard/players/${input.userId || test.userId}`);
     
     return { success: true, test };
   } catch (error) {
@@ -56,7 +56,7 @@ export async function deletePhysicalTestAction(id: string, userId: string, local
       return { success: false, error: 'Test not found' };
     }
     
-    revalidatePath(`/${locale}/dashboard/kids/${userId}`);
+    revalidatePath(`/${locale}/dashboard/players/${userId}`);
     
     return { success: true };
   } catch (error) {

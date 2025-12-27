@@ -25,7 +25,7 @@ export async function createPlayerCardAction(input: Omit<CreatePlayerCardInput, 
     });
 
     revalidatePath('/dashboard/kids');
-    revalidatePath(`/dashboard/kids/${input.userId}`);
+    revalidatePath(`/dashboard/players/${input.userId}`);
     
     return { success: true, card };
   } catch (error) {
@@ -87,7 +87,7 @@ export async function updatePlayerCardAction(id: string, updates: Partial<Create
     }
 
     revalidatePath('/dashboard/kids');
-    revalidatePath(`/dashboard/kids/${card.userId}`);
+    revalidatePath(`/dashboard/players/${card.userId}`);
     
     return { success: true, card };
   } catch (error) {

@@ -126,7 +126,7 @@ const DEFAULT_PERMISSIONS: Record<UserRole, RolePermission['permissions']> = {
     canManageTrainingDays: false,
     canManageActivations: false,
   },
-  [ROLES.KID]: {
+  [ROLES.PLAYER]: {
     canAccessDashboard: true,
     canManageUsers: false,
     canManageRoles: false,

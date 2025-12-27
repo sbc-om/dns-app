@@ -50,8 +50,8 @@ async function ensureLegacyUserMembership(user: AuthUser, academyId: string) {
       ? 'manager'
       : user.role === 'parent'
         ? 'parent'
-        : user.role === 'kid'
-          ? 'kid'
+        : user.role === 'player'
+          ? 'player'
           : 'coach';
 
   await addUserToAcademy({

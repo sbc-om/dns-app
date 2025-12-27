@@ -31,7 +31,7 @@ export default async function UsersPage({
 
   // Filter: managers should only see parent, coach, and player roles
   if (currentUser.role === ROLES.MANAGER) {
-    users = users.filter(u => u.role === ROLES.PARENT || u.role === ROLES.COACH || u.role === ROLES.KID);
+    users = users.filter(u => u.role === ROLES.PARENT || u.role === ROLES.COACH || u.role === ROLES.PLAYER);
   }
 
   return (

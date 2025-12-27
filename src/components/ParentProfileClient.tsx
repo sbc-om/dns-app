@@ -56,12 +56,12 @@ export function ParentProfileClient({
     
     // Create child account with national ID as username
     const result = await createUserAction({
-      email: `${childData.nationalId}@kid.local`, // Using national ID as part of email
+      email: `${childData.nationalId}@player.local`, // Using national ID as part of email
       username: childData.nationalId,
       fullName: childData.fullName,
       nationalId: childData.nationalId,
       password: '11111111',
-      role: 'kid',
+      role: 'player',
       parentId: parent.id,
       birthDate: childData.birthDate,
       ageCategory: childData.ageCategory,
@@ -176,7 +176,7 @@ export function ParentProfileClient({
           </Card>
         ) : children.length === 1 ? (
           // Single Child - Large Card
-          <Link href={`/${locale}/dashboard/kids/${children[0].id}`}>
+          <Link href={`/${locale}/dashboard/players/${children[0].id}`}>
             <Card className="border-2 border-[#FF5F02] hover:shadow-2xl transition-all cursor-pointer overflow-hidden">
               <CardHeader className="bg-linear-to-r from-[#FF5F02] to-[#FF5F02]/80 text-white pb-6">
                 <div className="flex items-center justify-between">
@@ -246,7 +246,7 @@ export function ParentProfileClient({
           // Multiple Children - Grid Layout
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {children.map((child) => (
-              <Link key={child.id} href={`/${locale}/dashboard/kids/${child.id}`}>
+              <Link key={child.id} href={`/${locale}/dashboard/players/${child.id}`}>
                 <Card className="border-2 border-[#DDDDDD] dark:border-[#262626] hover:border-[#FF5F02] hover:shadow-lg transition-all cursor-pointer">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-lg font-bold text-[#262626] dark:text-white flex items-center gap-2">

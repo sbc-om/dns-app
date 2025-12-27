@@ -120,7 +120,7 @@ export async function grantPlayerBadgeAction(params: {
       },
     });
 
-    revalidatePath(`/${params.locale}/dashboard/kids/${params.userId}`);
+    revalidatePath(`/${params.locale}/dashboard/players/${params.userId}`);
     revalidatePath(`/${params.locale}/dashboard/users/${params.userId}`);
 
     return { success: true as const, profile };
@@ -155,7 +155,7 @@ export async function setPlayerIdentityAction(params: {
       identityKey: params.identityKey || undefined,
     });
 
-    revalidatePath(`/${params.locale}/dashboard/kids/${params.userId}`);
+    revalidatePath(`/${params.locale}/dashboard/players/${params.userId}`);
     revalidatePath(`/${params.locale}/dashboard/users/${params.userId}`);
 
     return { success: true as const, profile };
@@ -214,7 +214,7 @@ export async function syncPlayerProfileAfterAssessmentAction(params: {
       },
     });
 
-    revalidatePath(`/${params.locale}/dashboard/kids/${params.userId}`);
+    revalidatePath(`/${params.locale}/dashboard/players/${params.userId}`);
     revalidatePath(`/${params.locale}/dashboard/users/${params.userId}`);
 
     return { success: true as const, profile, assessment };
@@ -353,7 +353,7 @@ export async function approveStageUpgradeAction(params: {
       },
     });
 
-    revalidatePath(`/${params.locale}/dashboard/kids/${params.userId}`);
+    revalidatePath(`/${params.locale}/dashboard/players/${params.userId}`);
     revalidatePath(`/${params.locale}/dashboard/users/${params.userId}`);
 
     return { success: true as const, profile: updated };

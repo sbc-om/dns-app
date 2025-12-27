@@ -25,7 +25,7 @@ export default async function ActivationsPage({ params }: { params: Promise<{ lo
   const ids = Array.from(new Set(members.map((m) => m.userId)));
   const users = await getUsersByIds(ids);
   const players = users
-    .filter((u) => u.role === 'kid' && u.isActive)
+    .filter((u) => u.role === 'player' && u.isActive)
     .map((u) => ({
       id: u.id,
       displayName: u.fullName || u.username || u.email || u.id,

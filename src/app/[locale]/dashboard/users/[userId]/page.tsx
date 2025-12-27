@@ -39,8 +39,8 @@ export default async function UserProfilePage({
     }
   }
 
-  // If user is a kid, show kid profile
-  if (targetUser.role === 'kid') {
+  // If user is a player, show player profile
+  if (targetUser.role === 'player') {
     return (
       <div className="h-full min-h-0">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl space-y-6">
@@ -72,7 +72,7 @@ export default async function UserProfilePage({
     const memberIds = Array.from(new Set(academyMembers.map((m) => m.userId)));
     const scopedUsers = await getUsersByIds(memberIds);
     const parents = scopedUsers.filter((u) => u.role === ROLES.PARENT);
-    const kids = scopedUsers.filter((u) => u.role === ROLES.KID);
+    const players = scopedUsers.filter((u) => u.role === ROLES.PLAYER);
 
     const memberships: UserAcademyMembershipView[] = [
       {
@@ -94,7 +94,7 @@ export default async function UserProfilePage({
             memberships={memberships}
             children={children}
             parents={parents}
-            kids={kids}
+            players={players}
           />
         </div>
       </div>
@@ -109,7 +109,7 @@ export default async function UserProfilePage({
   ]);
 
   const parents = allUsers.filter((u) => u.role === ROLES.PARENT);
-  const kids = allUsers.filter((u) => u.role === ROLES.KID);
+  const players = allUsers.filter((u) => u.role === ROLES.PLAYER);
 
   const memberships: UserAcademyMembershipView[] = Object.entries(academyRoles)
     .map(([academyId, memberRole]) => {
@@ -134,7 +134,7 @@ export default async function UserProfilePage({
           memberships={memberships}
           children={children}
           parents={parents}
-          kids={kids}
+          players={players}
         />
       </div>
     </div>

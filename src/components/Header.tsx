@@ -285,7 +285,7 @@ export function Header({ dictionary, locale, user }: HeaderProps) {
                 <DropdownMenuSeparator className="bg-white/10" />
                 
                 {/* Dashboard Link */}
-                {user.role && user.role !== 'kid' && (
+                {user.role && user.role !== 'player' && (
                   <>
                     <Link href={`/${locale}/dashboard`}>
                       <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 text-white relative">

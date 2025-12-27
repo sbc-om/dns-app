@@ -8,7 +8,7 @@ export const ROLES = {
   MANAGER: 'manager',
   COACH: 'coach',
   PARENT: 'parent',
-  KID: 'kid',
+  PLAYER: 'player',
 } as const;
 
 export type UserRole = typeof ROLES[keyof typeof ROLES];
@@ -30,9 +30,9 @@ export const ROLE_LABELS = {
     en: 'Parent',
     ar: 'ولي أمر',
   },
-  [ROLES.KID]: {
-    en: 'Kid',
-    ar: 'طفل',
+  [ROLES.PLAYER]: {
+    en: 'Player',
+    ar: 'لاعب',
   },
 };
 
@@ -76,7 +76,7 @@ export const ROLE_PERMISSIONS = {
     canManageSchedules: false,
     canViewAllData: false,
   },
-  [ROLES.KID]: {
+  [ROLES.PLAYER]: {
     canAccessDashboard: true,
     canManageUsers: false,
     canManageRoles: false,
@@ -126,5 +126,5 @@ export function isParent(role: UserRole): boolean {
  * Check if role is kid
  */
 export function isKid(role: UserRole): boolean {
-  return role === ROLES.KID;
+  return role === ROLES.PLAYER;
 }

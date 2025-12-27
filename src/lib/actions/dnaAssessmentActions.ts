@@ -51,7 +51,7 @@ export async function createDnaAssessmentAction(params: CreateDnaAssessmentInput
       enteredBy: user.id,
     });
 
-    revalidatePath(`/${params.locale}/dashboard/kids/${params.playerId}`);
+    revalidatePath(`/${params.locale}/dashboard/players/${params.playerId}`);
     revalidatePath(`/${params.locale}/dashboard/users/${params.playerId}`);
 
     return { success: true as const, session };
@@ -140,7 +140,7 @@ export async function deleteDnaAssessmentAction(params: {
       return { success: false as const, error: 'Assessment not found' };
     }
 
-    revalidatePath(`/${params.locale}/dashboard/kids/${params.playerId}`);
+    revalidatePath(`/${params.locale}/dashboard/players/${params.playerId}`);
     revalidatePath(`/${params.locale}/dashboard/users/${params.playerId}`);
 
     return { success: true as const };

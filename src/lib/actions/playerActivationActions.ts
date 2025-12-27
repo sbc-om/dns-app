@@ -30,7 +30,7 @@ export async function createPlayerActivationLinkAction(params: {
     }
 
     const player = await findUserById(params.playerId);
-    if (!player || player.role !== 'kid') {
+    if (!player || player.role !== 'player') {
       return { success: false, error: 'Invalid player' };
     }
 
@@ -170,7 +170,7 @@ export async function completePaymentByTokenAction(params: {
       await addUserToAcademy({
         academyId: paid.academyId,
         userId: paid.playerId,
-        role: 'kid',
+        role: 'player',
         createdBy: 'system',
       });
     }
@@ -193,7 +193,7 @@ export async function completePaymentByTokenAction(params: {
 
     revalidatePath(`/${params.locale}/dashboard`);
     revalidatePath(`/${params.locale}/dashboard/activations`);
-    revalidatePath(`/${params.locale}/dashboard/kids/${paid.playerId}`);
+    revalidatePath(`/${params.locale}/dashboard/players/${paid.playerId}`);
 
     return { success: true, activation: activated };
   } catch (error) {

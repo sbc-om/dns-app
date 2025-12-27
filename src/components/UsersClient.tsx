@@ -63,9 +63,9 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
       count: users.filter((u) => u.role === 'parent').length,
     },
     {
-      key: 'kid',
-      label: dictionary.users.roles.kid,
-      count: users.filter((u) => u.role === 'kid').length,
+      key: 'player',
+      label: dictionary.users.roles.player,
+      count: users.filter((u) => u.role === 'player').length,
     },
   ] as const;
 
@@ -259,7 +259,7 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
         onUserCreated={(newUser: User) => {
           setUsers((prev) => [...prev, newUser]);
         }}
-        fixedRole={currentUserRole === 'manager' ? 'kid' : undefined}
+        fixedRole={currentUserRole === 'manager' ? 'player' : undefined}
       />
       <CreateUserDialog
         open={isCreateCoachDialogOpen}

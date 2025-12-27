@@ -45,7 +45,7 @@ export function CreateUserDialog({
   const [academies, setAcademies] = useState<Academy[]>([]);
   const [currentUserRole, setCurrentUserRole] = useState<UserRole | null>(null);
   const [academyId, setAcademyId] = useState<string>('');
-  const [kidParentMode, setKidParentMode] = useState<'none' | 'existing' | 'create'>('none');
+  const [playerParentMode, setPlayerParentMode] = useState<'none' | 'existing' | 'create'>('none');
   const [birthDay, setBirthDay] = useState('');
   const [birthMonth, setBirthMonth] = useState('');
   const [birthYear, setBirthYear] = useState('');
@@ -56,7 +56,7 @@ export function CreateUserDialog({
     password: '',
     fullName: '',
     phoneNumber: '',
-    role: (fixedRole || ROLES.KID) as UserRole,
+    role: (fixedRole || ROLES.PLAYER) as UserRole,
     parentId: '',
     birthDate: '',
     ageCategory: '',
@@ -108,12 +108,12 @@ export function CreateUserDialog({
     const canPickAcademy = currentUserRole === ROLES.ADMIN;
 
     // Construct birthDate from components
-    const birthDate = formData.role === ROLES.KID && birthDay && birthMonth && birthYear
+    const birthDate = formData.role === ROLES.PLAYER && birthDay && birthMonth && birthYear
       ? `${birthYear}-${birthMonth.padStart(2, '0')}-${birthDay.padStart(2, '0')}`
       : formData.birthDate;
 
     let resolvedParentId = formData.parentId;
-    if (formData.role === ROLES.KID && kidParentMode === 'create') {
+    if (formData.role === ROLES.PLAYER && playerParentMode === 'create') {
       const parentResult = await createUserAction(
         {
           email: parentFormData.email,
@@ -145,9 +145,9 @@ export function CreateUserDialog({
         fullName: formData.fullName,
         phoneNumber: formData.phoneNumber,
         role: formData.role,
-        parentId: formData.role === ROLES.KID && resolvedParentId ? resolvedParentId : undefined,
-        birthDate: formData.role === ROLES.KID ? birthDate : undefined,
-        ageCategory: formData.role === ROLES.KID ? formData.ageCategory : undefined,
+        parentId: formData.role === ROLES.PLAYER && resolvedParentId ? resolvedParentId : undefined,
+        birthDate: formData.role === ROLES.PLAYER ? birthDate : undefined,
+        ageCategory: formData.role === ROLES.PLAYER ? formData.ageCategory : undefined,
       },
       {
         locale,
@@ -164,13 +164,13 @@ export function CreateUserDialog({
         password: '',
         fullName: '',
         phoneNumber: '',
-        role: ROLES.KID,
+        role: ROLES.PLAYER,
         parentId: '',
         birthDate: '',
         ageCategory: '',
       });      setBirthDay('');
       setBirthMonth('');
-      setBirthYear('');      setKidParentMode('none');
+      setBirthYear('');      setPlayerParentMode('none');
       setParentFormData({ email: '', username: '', password: '', fullName: '', phoneNumber: '' });
     } else {
       alert(result.error || 'Failed to create user');
@@ -219,7 +219,7 @@ export function CreateUserDialog({
                       </motion.div>
                       <div>
                         <DialogTitle className="text-xl font-black tracking-tight text-[#262626] dark:text-white">
-                          {fixedRole === ROLES.KID 
+                          {fixedRole === ROLES.PLAYER 
                             ? (locale === 'ar' ? 'إضافة لاعب' : 'Add Player')
                             : fixedRole === ROLES.COACH
                             ? (locale === 'ar' ? 'إضافة مدرب' : 'Add Coach')
@@ -330,7 +330,7 @@ export function CreateUserDialog({
                               {(currentUserRole === ROLES.MANAGER
                                 ? [
                                     ['PARENT', ROLES.PARENT] as const,
-                                    ['PLAYER', ROLES.KID] as const,
+                                    ['PLAYER', ROLES.PLAYER] as const,
                                   ]
                                 : (Object.entries(ROLES) as Array<[string, UserRole]>)
                               ).map(([key, value]) => (
@@ -370,7 +370,7 @@ export function CreateUserDialog({
                       </div>
                     </div>
 
-                    {formData.role === ROLES.KID && (
+                    {formData.role === ROLES.PLAYER && (
                       <div className="rounded-2xl border border-black/10 bg-white/60 p-4 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
                         <div className="flex items-center gap-2 text-sm font-bold text-[#262626] dark:text-white mb-4">
                           <GraduationCap className="h-4 w-4" />
@@ -494,7 +494,7 @@ export function CreateUserDialog({
                             <Label className="text-sm font-semibold text-[#262626] dark:text-white">
                               {dictionary.dashboard?.academyAdmin?.parentLinking ?? 'Parent linking'}
                             </Label>
-                            <Select value={kidParentMode} onValueChange={(v) => setKidParentMode(v as any)}>
+                            <Select value={playerParentMode} onValueChange={(v) => setPlayerParentMode(v as any)}>
                               <SelectTrigger className="h-12 rounded-xl border-2 border-[#DDDDDD] bg-white/80 dark:border-[#000000] dark:bg-white/5">
                                 <SelectValue placeholder={dictionary.dashboard?.academyAdmin?.parentLinkingPlaceholder ?? 'Select'} />
                               </SelectTrigger>
@@ -508,7 +508,7 @@ export function CreateUserDialog({
                             </Select>
                           </div>
 
-                          {kidParentMode === 'existing' && parents.length > 0 && (
+                          {playerParentMode === 'existing' && parents.length > 0 && (
                             <div className="grid gap-2">
                               <Label htmlFor="parentId" className="text-sm font-semibold text-[#262626] dark:text-white">
                                 {dictionary.users.parent}
@@ -528,7 +528,7 @@ export function CreateUserDialog({
                             </div>
                           )}
 
-                          {kidParentMode === 'create' && (
+                          {playerParentMode === 'create' && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div className="grid gap-2">
                                 <Label className="text-sm font-semibold text-[#262626] dark:text-white">{dictionary.common.email}</Label>

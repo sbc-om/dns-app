@@ -623,7 +623,7 @@ export function KidProfileClient({
               {canAdmin && (
                 <Button
                   type="button"
-                  onClick={() => router.push(`/${locale}/dashboard/kids/${currentKid.id}/edit`)}
+                  onClick={() => router.push(`/${locale}/dashboard/players/${currentKid.id}/edit`)}
                   className="w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg"
                 >
                   <Edit className="h-4 w-4 me-2" />
@@ -652,7 +652,7 @@ export function KidProfileClient({
               )}
               <Button
                 type="button"
-                onClick={() => router.push(`/${locale}/dashboard/kids/${currentKid.id}/achievements`)}
+                onClick={() => router.push(`/${locale}/dashboard/players/${currentKid.id}/achievements`)}
                 className="w-full bg-linear-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white shadow-lg"
               >
                 <Trophy className="h-4 w-4 me-2" />
@@ -679,7 +679,7 @@ export function KidProfileClient({
                   <Button
                     type="button"
                     size="sm"
-                    onClick={() => router.push(`/${locale}/dashboard/kids/${currentKid.id}/edit`)}
+                    onClick={() => router.push(`/${locale}/dashboard/players/${currentKid.id}/edit`)}
                     className="bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg flex-col h-auto py-3"
                   >
                     <Edit className="h-4 w-4 mb-1" />
@@ -711,7 +711,7 @@ export function KidProfileClient({
                 <Button
                   type="button"
                   size="sm"
-                  onClick={() => router.push(`/${locale}/dashboard/kids/${currentKid.id}/achievements`)}
+                  onClick={() => router.push(`/${locale}/dashboard/players/${currentKid.id}/achievements`)}
                   className="bg-linear-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white shadow-lg flex-col h-auto py-3"
                 >
                   <Trophy className="h-4 w-4 mb-1" />

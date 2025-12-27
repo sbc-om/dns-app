@@ -61,6 +61,7 @@ export async function createAcademy(input: CreateAcademyInput, createdBy: string
     name: input.name,
     nameAr: input.nameAr,
     slug,
+    image: input.image,
     isActive: true,
     createdAt: now,
     updatedAt: now,
@@ -94,6 +95,7 @@ export async function updateAcademy(id: string, input: UpdateAcademyInput): Prom
     name: input.name ?? existing.name,
     nameAr: input.nameAr ?? existing.nameAr,
     slug: input.slug ? normalizeSlug(input.slug) : existing.slug,
+    image: input.image ?? existing.image,
     isActive: input.isActive ?? existing.isActive,
     updatedAt: new Date().toISOString(),
   };

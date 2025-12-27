@@ -60,7 +60,7 @@ export function EditKidProfileClient({
       }
 
       alert(dictionary.users?.profileUpdated || 'Profile updated successfully!');
-      router.push(`/${locale}/dashboard/kids/${kid.id}`);
+      router.push(`/${locale}/dashboard/players/${kid.id}`);
       router.refresh();
     } catch (error) {
       console.error('Update error:', error);

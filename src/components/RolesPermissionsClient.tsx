@@ -33,7 +33,7 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
   type PermissionGroup = 'core' | 'management' | 'communication';
   type PermissionGroupFilter = 'all' | PermissionGroup;
 
-  const roleOrder: UserRole[] = [ROLES.ADMIN, ROLES.MANAGER, ROLES.COACH, ROLES.PARENT, ROLES.KID];
+  const roleOrder: UserRole[] = [ROLES.ADMIN, ROLES.MANAGER, ROLES.COACH, ROLES.PARENT, ROLES.PLAYER];
 
   const [rolePermissions, setRolePermissions] = useState<RolePermission[]>(initialRolePermissions);
   const [baselineRolePermissions, setBaselineRolePermissions] = useState<RolePermission[]>(initialRolePermissions);
