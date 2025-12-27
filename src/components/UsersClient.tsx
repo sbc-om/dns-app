@@ -175,11 +175,11 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
                   <div className="flex-1 min-w-0 h-full">
                     <Select value={selectedRole} onValueChange={setSelectedRole}>
                       <SelectTrigger
-                        className="!h-full w-full rounded-none border-0 bg-transparent px-4 !py-0 text-white hover:bg-[#14141a]"
+                        className="h-full! w-full rounded-none border-0 bg-transparent px-4 py-0! text-white hover:bg-[#14141a]"
                       >
-                        <div className="flex items-center gap-2 min-w-0">
+                        <div className="flex h-full w-full items-center gap-2 min-w-0">
                           <Shield className="h-4 w-4 text-white/90 shrink-0" />
-                          <SelectValue placeholder={dictionary.users.filterByRole} />
+                          <SelectValue placeholder={dictionary.users.filterByRole} className="leading-none" />
                         </div>
                       </SelectTrigger>
                       <SelectContent align="start" className="rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">

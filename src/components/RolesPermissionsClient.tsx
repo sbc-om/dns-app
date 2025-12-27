@@ -7,7 +7,6 @@ import type { Dictionary } from '@/lib/i18n/getDictionary';
 import type { RolePermission } from '@/lib/db/repositories/rolePermissionRepository';
 import { ROLES, type UserRole } from '@/config/roles';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { updateRolePermissionsAction } from '@/lib/actions/rolePermissionActions';
@@ -15,6 +14,13 @@ import { CheckCircle2, Save, Shield, RotateCcw, Sparkles, Users } from 'lucide-r
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import type { Locale } from '@/config/i18n';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export interface RolesPermissionsClientProps {
   dictionary: Dictionary;
@@ -25,12 +31,14 @@ export interface RolesPermissionsClientProps {
 export function RolesPermissionsClient({ dictionary, initialRolePermissions, locale }: RolesPermissionsClientProps) {
   type PermissionKey = keyof RolePermission['permissions'];
   type PermissionGroup = 'core' | 'management' | 'communication';
+  type PermissionGroupFilter = 'all' | PermissionGroup;
 
   const roleOrder: UserRole[] = [ROLES.ADMIN, ROLES.MANAGER, ROLES.COACH, ROLES.PARENT, ROLES.KID];
 
   const [rolePermissions, setRolePermissions] = useState<RolePermission[]>(initialRolePermissions);
   const [baselineRolePermissions, setBaselineRolePermissions] = useState<RolePermission[]>(initialRolePermissions);
   const [activeRole, setActiveRole] = useState<UserRole>(roleOrder[0]);
+  const [activeGroup, setActiveGroup] = useState<PermissionGroupFilter>('all');
   const [isSaving, setIsSaving] = useState<UserRole | null>(null);
   const [savedRole, setSavedRole] = useState<UserRole | null>(null);
   const [query, setQuery] = useState('');
@@ -101,6 +109,13 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
   const groupTitle = (group: PermissionGroup): string => {
     const g = dictionary.roles?.permissionsEditor?.groups as Record<string, string> | undefined;
     return g?.[group] || group;
+  };
+
+  const groupFilterLabel = (group: PermissionGroupFilter): string => {
+    if (group === 'all') {
+      return dictionary.roles?.allPermissionGroups || 'All groups';
+    }
+    return groupTitle(group);
   };
 
   const baselineByRole = useMemo(() => {
@@ -216,9 +231,13 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
   const noRoleDataLabel = dictionary.roles?.permissionsEditor?.noRoleData || 'No role data.';
 
   const q = query.trim().toLowerCase();
-  const filteredCatalog = !q
+  const catalogByGroup = activeGroup === 'all'
     ? permissionsCatalog
-    : permissionsCatalog
+    : permissionsCatalog.filter((g) => g.group === activeGroup);
+
+  const filteredCatalog = !q
+    ? catalogByGroup
+    : catalogByGroup
         .map((group) => {
           const items = group.items.filter((item) => {
             const title = permissionTitle(item.key).toLowerCase();
@@ -239,13 +258,17 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
   const cardHeader = 'border-b border-[#DDDDDD] dark:border-[#000000]';
   const subtleText = 'text-gray-600 dark:text-gray-400';
 
-  const roleChipStyles: Record<UserRole, { accentBorder: string; accentText: string }> = {
-    admin: { accentBorder: 'border-violet-500', accentText: 'text-violet-700 dark:text-violet-400' },
-    manager: { accentBorder: 'border-emerald-500', accentText: 'text-emerald-700 dark:text-emerald-400' },
-    coach: { accentBorder: 'border-blue-500', accentText: 'text-blue-700 dark:text-blue-400' },
-    parent: { accentBorder: 'border-sky-500', accentText: 'text-sky-700 dark:text-sky-400' },
-    kid: { accentBorder: 'border-red-500', accentText: 'text-red-700 dark:text-red-400' },
-  };
+  const roleOptions = roleOrder.map((role) => {
+    const counts = countEnabled(role);
+    return {
+      key: role,
+      label: roleLabel(role),
+      enabled: counts.enabled,
+      total: counts.total,
+    };
+  });
+
+  const activeRoleOption = roleOptions.find((r) => r.key === activeRole) ?? roleOptions[0];
 
   return (
     <motion.div
@@ -254,66 +277,169 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
       transition={{ duration: 0.6, type: 'spring', stiffness: 240, damping: 22 }}
       className="space-y-6"
     >
-      {/* Simple Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-[#262626] dark:text-white">
-            {dictionary.roles?.title || dictionary.nav.roles}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">{subtitle}</p>
+      {/* Game-like Header (matching Users page vibe) */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+        className="space-y-4"
+      >
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+          <div className="relative">
+            <motion.div
+              className="absolute -inset-4 bg-linear-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-2xl blur-xl"
+              animate={{ opacity: [0.5, 0.8, 0.5], scale: [1, 1.05, 1] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <div className="relative">
+              <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                >
+                  <Sparkles className="h-8 w-8 text-purple-600" />
+                </motion.div>
+                {dictionary.roles?.title || dictionary.nav.roles}
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">{subtitle}</p>
+            </div>
+          </div>
+
+          <div className="w-full lg:w-auto">
+            <div className="relative overflow-hidden rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#262626]/80 backdrop-blur-xl shadow-lg">
+              <motion.div
+                className="absolute inset-0 bg-linear-to-r from-blue-600/8 via-purple-600/8 to-pink-600/8"
+                animate={{ opacity: [0.35, 0.6, 0.35] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <div className="relative p-2">
+                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border-2 border-black/60 bg-[#0b0b0f] text-white shadow-lg shadow-black/30">
+                  <div className="flex-1 min-w-0 h-full">
+                    <Select value={activeRole} onValueChange={(v) => setActiveRole(v as UserRole)}>
+                      <SelectTrigger className="h-full! w-full rounded-none border-0 bg-transparent px-4 py-0! text-white hover:bg-[#14141a]">
+                        <div className="flex h-full w-full items-center gap-2 min-w-0">
+                          <Shield className="h-4 w-4 text-white/90 shrink-0" />
+                          <SelectValue placeholder={dictionary.roles?.filterByRole || 'Filter by role'} className="leading-none" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent align="start" className="rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
+                        {roleOptions.map((opt) => {
+                          const dirty = isRoleDirty(opt.key);
+                          return (
+                            <SelectItem key={opt.key} value={opt.key}>
+                              <span className="flex w-full items-center justify-between gap-3">
+                                <span className="font-semibold">
+                                  {dirty ? '• ' : ''}
+                                  {opt.label}
+                                </span>
+                                <span className="text-xs font-bold px-2 py-0.5 rounded-full border border-border bg-muted/60">
+                                  {opt.enabled}/{opt.total}
+                                </span>
+                              </span>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="w-px bg-white/10" />
+
+                  <div className="shrink-0">
+                    <Link href={`/${locale}/dashboard/users`} className="h-full">
+                      <Button className="h-full rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]">
+                        <Users className="mr-2 h-4 w-4" />
+                        <span className="font-semibold">{dictionary.nav.users}</span>
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </motion.div>
 
-        <Link href={`/${locale}/dashboard/users`}>
-          <Button
-            variant="outline"
-            className="h-11 border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
-          >
-            <Users className="mr-2 h-4 w-4" />
-            {dictionary.nav.users}
-          </Button>
-        </Link>
-      </div>
-
-      {/* Role List */}
+      {/* Filters / Controls (like Users page) */}
       <div className={`${cardShell} p-5 sm:p-6`}>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
             <div className="h-10 w-10 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-linear-to-br from-blue-500/10 to-purple-500/10 flex items-center justify-center">
               <Shield className="h-5 w-5 text-purple-600 dark:text-purple-400" />
             </div>
-            <span className="text-base font-bold text-[#262626] dark:text-white">
-              {dictionary.roles?.roleList || dictionary.roles?.title || dictionary.nav.roles}
-            </span>
+            <div className="min-w-0">
+              <div className="text-base font-bold text-[#262626] dark:text-white">
+                {dictionary.roles?.roleList || dictionary.roles?.title || dictionary.nav.roles}
+              </div>
+              <div className={`text-sm ${subtleText} truncate`}>
+                {activeRoleOption?.label} • {activeCounts.enabled}/{activeCounts.total}
+              </div>
+            </div>
           </div>
 
-          <div className="w-full">
-            <div className="flex flex-wrap gap-2">
-              {roleOrder.map((role, index) => {
-                const active = activeRole === role;
-                const { enabled, total } = countEnabled(role);
-                const dirty = isRoleDirty(role);
-                const style = roleChipStyles[role];
+          <div className="flex flex-col lg:flex-row gap-3">
+            {/* Group select + Search (single grouped control) */}
+            <div className="flex-1 min-w-0">
+              <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]">
+                <div className="shrink-0 min-w-[200px]">
+                  <Select value={activeGroup} onValueChange={(v) => setActiveGroup(v as PermissionGroupFilter)}>
+                    <SelectTrigger className="h-full! w-full rounded-none border-0 bg-transparent px-4 py-0! text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a]">
+                      <SelectValue placeholder={dictionary.roles?.filterByGroup || 'Filter by group'} className="leading-none" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
+                      <SelectItem value="all">{groupFilterLabel('all')}</SelectItem>
+                      <SelectItem value="core">{groupFilterLabel('core')}</SelectItem>
+                      <SelectItem value="management">{groupFilterLabel('management')}</SelectItem>
+                      <SelectItem value="communication">{groupFilterLabel('communication')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                return (
-                  <button
-                    key={role}
-                    onClick={() => setActiveRole(role)}
-                    type="button"
-                    className={
-                      'px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors border-2 shrink-0 ' +
-                      (active
-                        ? `bg-linear-to-br from-white to-gray-50 dark:from-[#1a1a1a] dark:to-[#0a0a0a] ${style.accentBorder} ${style.accentText} shadow-lg`
-                        : `bg-white dark:bg-[#262626] text-gray-700 dark:text-gray-300 border-[#DDDDDD] dark:border-[#000000] hover:bg-gray-50 dark:hover:bg-[#1a1a1a]`)
-                    }
-                  >
-                    <span className="flex items-center gap-2">
-                      {dirty && <span className="h-2 w-2 rounded-full bg-orange-400" />}
-                      {roleLabel(role)}
-                    </span>
-                  </button>
-                );
-              })}
+                <div className="w-px bg-[#DDDDDD] dark:bg-[#000000]" />
+
+                <div className="flex-1 min-w-0">
+                  <Input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={searchPlaceholder}
+                    className="h-full! rounded-none border-0 bg-transparent px-4 py-0! text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-0"
+                  />
+                </div>
+              </div>
             </div>
+
+            {/* Bulk actions (equal height) */}
+            <div className="shrink-0">
+              <div className="flex h-12 items-stretch overflow-hidden rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626]">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-full rounded-none border-0 px-4 text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
+                  onClick={() => setManyForRole(activeRole, filteredKeys, true)}
+                  disabled={filteredKeys.length === 0}
+                >
+                  {enableAllLabel}
+                </Button>
+                <div className="w-px bg-[#DDDDDD] dark:bg-[#000000]" />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-full rounded-none border-0 px-4 text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
+                  onClick={() => setManyForRole(activeRole, filteredKeys, false)}
+                  disabled={filteredKeys.length === 0}
+                >
+                  {disableAllLabel}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className={`text-sm ${subtleText}`}>
+            {activeRolePermission && (
+              <span>
+                {lastUpdatedLabel}: {new Date(activeRolePermission.updatedAt).toLocaleString()}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -322,78 +448,14 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
         className={cardShell}
       >
-        <div className={`${cardHeader} p-5 sm:p-6 space-y-3`}>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <div className="text-lg sm:text-xl font-bold text-[#262626] dark:text-white">
-                {dictionary.roles?.permissions || 'Permissions'}
-              </div>
-              <div className={`mt-1 text-sm ${subtleText}`}>{roleLabel(activeRole)}</div>
-            </div>
-
-            {activeRolePermission && (
-              <div className={`text-xs ${subtleText}`}>
-                {lastUpdatedLabel}: {new Date(activeRolePermission.updatedAt).toLocaleString()}
-              </div>
-            )}
+        <div className={`${cardHeader} p-5 sm:p-6 space-y-2`}>
+          <div className="text-lg sm:text-xl font-bold text-[#262626] dark:text-white">
+            {dictionary.roles?.permissions || 'Permissions'}
           </div>
-
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-col sm:flex-row gap-2 w-full lg:max-w-[720px]">
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={searchPlaceholder}
-                className="h-11 bg-white dark:bg-[#262626] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 border-2 border-[#DDDDDD] dark:border-[#000000] focus-visible:ring-0"
-              />
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-11 border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
-                  onClick={() => setManyForRole(activeRole, filteredKeys, true)}
-                  disabled={filteredKeys.length === 0}
-                >
-                  {enableAllLabel}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-11 border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
-                  onClick={() => setManyForRole(activeRole, filteredKeys, false)}
-                  disabled={filteredKeys.length === 0}
-                >
-                  {disableAllLabel}
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                {isSavedThis && (
-                  <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm font-semibold">
-                    <CheckCircle2 className="h-4 w-4" />
-                    {savedLabel}
-                  </div>
-                )}
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-11 border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
-                onClick={() => resetRole(activeRole)}
-                disabled={!activeDirty || isSavingThis}
-              >
-                <RotateCcw className="me-2 h-4 w-4" />
-                {resetLabel}
-              </Button>
-            </div>
-          </div>
-
-          <div className={`text-sm ${subtleText}`}>{dictionary.roles?.permissionsEditor?.hint}</div>
+          <div className={`text-sm ${subtleText}`}>{roleLabel(activeRole)}</div>
         </div>
 
         <div className="grid grid-cols-12 bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000]">
@@ -461,20 +523,47 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
           </div>
         </OverlayScrollbarsComponent>
 
-        <div className="border-t-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] p-4">
-          <div className="flex justify-end">
-            <motion.div whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.98 }}>
+        {/* Bottom form actions (Save moved here) */}
+        <div className="border-t-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className={`text-sm ${subtleText}`}>
+              {activeRolePermission && (
+                <span>
+                  {lastUpdatedLabel}: {new Date(activeRolePermission.updatedAt).toLocaleString()}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              {isSavedThis && (
+                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm font-semibold">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {savedLabel}
+                </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                className="h-12 border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
+                onClick={() => resetRole(activeRole)}
+                disabled={!activeDirty || isSavingThis}
+              >
+                <RotateCcw className="me-2 h-4 w-4" />
+                {resetLabel}
+              </Button>
               <Button
                 type="button"
                 onClick={() => handleSave(activeRole)}
                 disabled={isSavingThis || !activeDirty}
-                className="h-11 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 text-white hover:opacity-90 border-2 border-transparent shadow-lg shadow-purple-500/30"
+                className="h-12 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 text-white hover:opacity-90 border-2 border-transparent shadow-lg shadow-purple-500/30"
               >
                 <Save className="me-2 h-4 w-4" />
                 {isSavingThis ? savingLabel : saveLabel}
               </Button>
-            </motion.div>
+            </div>
           </div>
+
+          <div className={`mt-3 text-sm ${subtleText}`}>{dictionary.roles?.permissionsEditor?.hint}</div>
         </div>
       </motion.div>
     </motion.div>
