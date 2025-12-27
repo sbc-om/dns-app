@@ -31,9 +31,9 @@ export default function RegisterPageClient({ dictionary, locale }: RegisterPageC
               <Image 
                 src="/logo-white.png" 
                 alt="DNA Logo" 
-                width={80} 
-                height={80}
-                className="h-20 w-20 object-contain"
+                width={96} 
+                height={96}
+                className="h-24 w-24 object-contain"
               />
             </Link>
             <div className="flex items-center justify-center gap-2 mb-2">

@@ -36,6 +36,7 @@ export interface User {
   // Extended Profile for Kids
   birthDate?: string;
   ageCategory?: string; // e.g. "U10", "U12" (academy-defined)
+  stage?: string; // DNA stage: explorer, foundation, active, competitor, champion
   ageYears?: number; // cached at registration time; optional
   gender?: 'male' | 'female';
   address?: string;

@@ -41,7 +41,7 @@ export function Footer({ dictionary, locale }: FooterProps) {
                 whileTap={{ scale: 0.96 }}
                 className="relative"
               >
-                <img src="/logo-white.png" alt="DNA Logo" className="h-12 w-auto object-contain" />
+                <img src="/logo-white.png" alt="DNA Logo" className="h-16 w-auto object-contain" />
               </motion.div>
 
               <div className="min-w-0">

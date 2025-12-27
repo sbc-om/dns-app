@@ -132,6 +132,28 @@
     /* Avoid theme-transition flashes. */
     transition: none;
   }
+  
+  /* Fix autofill styling - prevent white background */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: currentColor;
+    transition: background-color 5000s ease-in-out 0s;
+    box-shadow: inset 0 0 20px 20px transparent !important;
+  }
+  
+  /* Dark theme autofill */
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus,
+  .dark input:-webkit-autofill:active {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #ffffff;
+    transition: background-color 5000s ease-in-out 0s;
+    box-shadow: inset 0 0 20px 20px rgba(0, 0, 0, 0.3) !important;
+  }
 }
 
 /* Visual policy: disable shadows and gradients */
@@ -924,3 +946,11 @@ input[type="range"].slider::-moz-range-thumb:hover {
    ======================================== */
 
 
+*:focus {
+  outline: none !important;
+}
+
+*:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}

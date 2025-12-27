@@ -254,58 +254,29 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
       transition={{ duration: 0.6, type: 'spring', stiffness: 240, damping: 22 }}
       className="space-y-6"
     >
-      {/* Animated Header (match Users page style) */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-      >
-        <div className="relative">
-          <motion.div
-            className="absolute -inset-4 bg-linear-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-2xl blur-xl"
-            animate={{ opacity: [0.5, 0.8, 0.5], scale: [1, 1.05, 1] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <div className="relative">
-            <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-              >
-                <Sparkles className="h-8 w-8 text-purple-600" />
-              </motion.div>
-              {dictionary.roles?.title || dictionary.nav.roles}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">{subtitle}</p>
-          </div>
+      {/* Simple Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#262626] dark:text-white">
+            {dictionary.roles?.title || dictionary.nav.roles}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">{subtitle}</p>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex gap-2"
-        >
-          <Link href={`/${locale}/dashboard/users`}>
-            <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="outline"
-                className="h-11 border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
-              >
-                <Users className="mr-2 h-4 w-4" />
-                {dictionary.nav.users}
-              </Button>
-            </motion.div>
-          </Link>
-        </motion.div>
-      </motion.div>
+        <Link href={`/${locale}/dashboard/users`}>
+          <Button
+            variant="outline"
+            className="h-11 border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
+          >
+            <Users className="mr-2 h-4 w-4" />
+            {dictionary.nav.users}
+          </Button>
+        </Link>
+      </div>
 
-      {/* Role List (no animations requested) */}
+      {/* Role List */}
       <div className={`${cardShell} p-5 sm:p-6`}>
-        <div className="absolute inset-0 bg-linear-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5 opacity-50" />
-
-        <div className="relative flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex items-center gap-2 shrink-0">
             <div className="h-10 w-10 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-linear-to-br from-blue-500/10 to-purple-500/10 flex items-center justify-center">
               <Shield className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -315,15 +286,8 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
             </span>
           </div>
 
-          <OverlayScrollbarsComponent
-            className="w-full"
-            options={{
-              scrollbars: { theme: 'os-theme-dark', visibility: 'auto', autoHide: 'move', autoHideDelay: 800 },
-              overflow: { x: 'scroll', y: 'hidden' },
-            }}
-            defer
-          >
-            <div className="flex flex-nowrap gap-2 pb-1">
+          <div className="w-full">
+            <div className="flex flex-wrap gap-2">
               {roleOrder.map((role, index) => {
                 const active = activeRole === role;
                 const { enabled, total } = countEnabled(role);
@@ -345,30 +309,11 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
                     <span className="flex items-center gap-2">
                       {dirty && <span className="h-2 w-2 rounded-full bg-orange-400" />}
                       {roleLabel(role)}
-                      <span
-                        className={
-                          'px-2 py-0.5 rounded-full text-xs font-bold border ' +
-                          (active
-                            ? 'bg-transparent border-current text-current'
-                            : 'bg-gray-100 dark:bg-[#1a1a1a] border-[#DDDDDD] dark:border-[#000000] text-gray-700 dark:text-gray-300')
-                        }
-                      >
-                        {enabled}/{total}
-                      </span>
                     </span>
                   </button>
                 );
               })}
             </div>
-          </OverlayScrollbarsComponent>
-
-          <div className="shrink-0">
-            <Badge
-              variant="outline"
-              className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#1a1a1a] text-[#262626] dark:text-white"
-            >
-              {roleLabel(activeRole)}
-            </Badge>
           </div>
         </div>
       </div>
@@ -428,12 +373,6 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
 
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <Badge
-                  variant="outline"
-                  className="font-semibold border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#1a1a1a] text-[#262626] dark:text-white"
-                >
-                  {activeCounts.enabled}/{activeCounts.total}
-                </Badge>
                 {isSavedThis && (
                   <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm font-semibold">
                     <CheckCircle2 className="h-4 w-4" />
@@ -501,12 +440,6 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
                                 </div>
                               )}
                             </div>
-                            <Badge
-                              variant="outline"
-                              className="hidden lg:inline-flex shrink-0 font-mono text-[10px] border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300"
-                            >
-                              {item.key}
-                            </Badge>
                           </div>
                         </div>
                         <div className="col-span-3 px-4 py-3 flex items-center justify-end">

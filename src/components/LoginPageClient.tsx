@@ -91,18 +91,12 @@ export default function LoginPageClient({ dictionary, locale }: LoginPageClientP
           </div>
 
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.05 }}
+            transition={{ duration: 0.3 }}
             className="mx-auto w-full max-w-lg"
           >
-            <motion.div
-              whileHover={{ rotateY: 4, rotateX: 3, scale: 1.01 }}
-              transition={{ type: 'spring', stiffness: 240, damping: 18 }}
-              className="transform-3d"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              <Card className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
+            <Card className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
                 <div className="pointer-events-none absolute inset-0">
                   <motion.div
                     className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-linear-to-br from-[#FF5F02]/20 via-purple-500/10 to-transparent blur-3xl"
@@ -118,13 +112,7 @@ export default function LoginPageClient({ dictionary, locale }: LoginPageClientP
 
                 <CardHeader className="relative border-b border-white/10 px-6 py-7">
                   <div className="flex items-center gap-3">
-                    <motion.div
-                      whileHover={{ rotate: 2, scale: 1.02 }}
-                      transition={{ type: 'spring', stiffness: 320, damping: 18 }}
-                      className="h-12 w-12 rounded-2xl border border-white/10 bg-black/30 backdrop-blur-sm flex items-center justify-center"
-                    >
-                      <Image src="/logo-white.png" alt="DNA" width={34} height={34} priority />
-                    </motion.div>
+                    <Image src="/logo-white.png" alt="DNA" width={56} height={56} priority className="shrink-0" />
                     <div>
                       <CardTitle className="text-xl font-black tracking-tight text-white">
                         {dictionary.auth.loginTitle}
@@ -144,7 +132,6 @@ export default function LoginPageClient({ dictionary, locale }: LoginPageClientP
                   </Suspense>
                 </CardContent>
               </Card>
-            </motion.div>
           </motion.div>
         </motion.div>
       </div>

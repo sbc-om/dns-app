@@ -110,23 +110,6 @@ export function LoginForm({ dictionary, locale }: LoginFormProps) {
 
   return (
     <motion.form onSubmit={handleSubmit} className="space-y-5">
-      <div className="flex items-center justify-between">
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/80">
-          <ShieldCheck className="h-4 w-4" />
-          <span>{dictionary.auth?.loginSubtitle || dictionary.auth.login}</span>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: -6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="hidden sm:flex items-center gap-2 text-xs text-white/60"
-        >
-          <Sparkles className="h-4 w-4" />
-          <span>{dictionary.common?.loading ? dictionary.common.loading.replace(/\.$/, '') : 'Ready'}</span>
-        </motion.div>
-      </div>
-
       <div className="space-y-2">
         <Label htmlFor="email" className="text-sm font-semibold text-white/90">
           {dictionary.common.email}

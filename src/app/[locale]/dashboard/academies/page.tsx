@@ -13,7 +13,7 @@ export default async function AcademiesPage({
   const dictionary = await getDictionary(locale);
 
   return (
-    <div className="p-6">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       <AcademiesManagement locale={locale} dictionary={dictionary} />
     </div>
   );

@@ -177,6 +177,9 @@ export default async function DashboardPage({
       .sort((a, b) => b.count - a.count);
 
     managerDashboard = {
+      academyName: academy?.name,
+      academyNameAr: academy?.nameAr,
+      academyImage: (academy as any)?.image,
       totalPlayers: players.length,
       stageCounts,
       playersReadyForStageUpgrade,

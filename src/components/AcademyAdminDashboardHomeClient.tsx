@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import {
   Filter,
   X,
   ChevronRight,
+  Building2,
 } from 'lucide-react';
 import type { Locale } from '@/config/i18n';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
@@ -29,6 +31,9 @@ export type AcademyAdminPlayerRow = {
 };
 
 export type AcademyAdminDashboardData = {
+  academyName?: string;
+  academyNameAr?: string;
+  academyImage?: string;
   totalPlayers: number;
   stageCounts: Record<PlayerStageKey, number>;
   playersReadyForStageUpgrade: number;
@@ -100,7 +105,46 @@ export function AcademyAdminDashboardHomeClient({ locale, dictionary, data }: Pr
     'relative overflow-hidden rounded-3xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-white/5 backdrop-blur-xl p-6';
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8">      {/* Academy Banner with Image */}
+      {(data.academyImage || data.academyName) && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative h-48 sm:h-64 rounded-3xl overflow-hidden border-2 border-white/10 bg-black/40"
+        >
+          {data.academyImage && (
+            <Image
+              src={data.academyImage}
+              alt={data.academyName || 'Academy'}
+              fill
+              className="object-cover"
+              priority
+            />
+          )}
+          <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-transparent" />
+          
+          <div className="absolute inset-0 flex items-end p-6 sm:p-8">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                {!data.academyImage && (
+                  <div className="p-3 bg-blue-600/20 backdrop-blur-sm rounded-2xl border border-white/10">
+                    <Building2 className="h-8 w-8 text-blue-400" />
+                  </div>
+                )}
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    {locale === 'ar' && data.academyNameAr ? data.academyNameAr : data.academyName}
+                  </h2>
+                  <p className="text-white/70 text-sm sm:text-base font-medium">
+                    {dictionary.dashboard?.academyAdmin?.homeTitle ?? 'Academy Dashboard'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

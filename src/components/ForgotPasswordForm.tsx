@@ -46,9 +46,9 @@ export default function ForgotPasswordPageClient({ dictionary, locale }: ForgotP
               <Image 
                 src="/logo-white.png" 
                 alt="DNA Logo" 
-                width={32} 
-                height={32}
-                className="h-8 w-8"
+                width={48} 
+                height={48}
+                className="h-12 w-12"
               />
               <span className="font-bold text-xl">DNA</span>
             </Link>
@@ -79,9 +79,9 @@ export default function ForgotPasswordPageClient({ dictionary, locale }: ForgotP
             <Image 
               src="/logo-white.png" 
               alt="DNA Logo" 
-              width={32} 
-              height={32}
-              className="h-8 w-8"
+              width={48} 
+              height={48}
+              className="h-12 w-12"
             />
             <span className="font-bold text-xl">DNA</span>
           </Link>

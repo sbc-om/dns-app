@@ -62,6 +62,7 @@ export function EditUserDialog({
     parentId: user.parentId || '',
     birthDate: user.birthDate || '',
     ageCategory: user.ageCategory || '',
+    stage: user.stage || '',
   });
 
   useEffect(() => {
@@ -101,6 +102,7 @@ export function EditUserDialog({
       parentId: formData.role === ROLES.KID && formData.parentId ? formData.parentId : undefined,
       birthDate: formData.role === ROLES.KID ? formData.birthDate : undefined,
       ageCategory: formData.role === ROLES.KID ? formData.ageCategory : undefined,
+      stage: formData.role === ROLES.KID ? formData.stage : undefined,
     };
 
     if (formData.password) {
@@ -355,7 +357,26 @@ export function EditUserDialog({
                               className="h-12 rounded-xl border-2 border-[#DDDDDD] bg-white/80 dark:border-[#000000] dark:bg-white/5"
                             />
                           </div>
-                        </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="stage" className="text-sm font-semibold text-[#262626] dark:text-white">
+                              {dictionary.dashboard?.academyAdmin?.stage ?? 'Stage'}
+                            </Label>
+                            <Select 
+                              value={formData.stage || ''} 
+                              onValueChange={(value) => setFormData({ ...formData, stage: value })}
+                            >
+                              <SelectTrigger className="h-12 rounded-xl border-2 border-[#DDDDDD] bg-white/80 dark:border-[#000000] dark:bg-white/5 font-medium">
+                                <SelectValue placeholder={dictionary.dashboard?.academyAdmin?.stagePlaceholder ?? 'Select stage'} />
+                              </SelectTrigger>
+                              <SelectContent className="max-h-[300px]">
+                                <SelectItem value="explorer">Explorer – Discovery stage</SelectItem>
+                                <SelectItem value="foundation">Foundation – Building base</SelectItem>
+                                <SelectItem value="active">Active Player – Consistent & engaged</SelectItem>
+                                <SelectItem value="competitor">Competitor – Performance-driven</SelectItem>
+                                <SelectItem value="champion">Champion – High consistency & growth</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>                        </div>
                       </div>
                     )}
 

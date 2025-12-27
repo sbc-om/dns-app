@@ -7,6 +7,7 @@ export interface Academy {
   name: string;
   nameAr: string;
   slug: string;
+  image?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -17,12 +18,14 @@ export interface CreateAcademyInput {
   name: string;
   nameAr: string;
   slug?: string;
+  image?: string;
 }
 
 export interface UpdateAcademyInput {
   name?: string;
   nameAr?: string;
   slug?: string;
+  image?: string;
   isActive?: boolean;
 }
 

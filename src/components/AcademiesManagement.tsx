@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Building2, Plus, UserPlus, CheckCircle2, Edit, Trash2 } from 'lucide-react';
+import { Building2, Plus, UserPlus, CheckCircle2, Edit, Trash2, Upload, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 import {
   createAcademyAction,
   assignExistingAcademyManagerAction,
@@ -36,6 +38,7 @@ type Academy = {
   name: string;
   nameAr: string;
   slug: string;
+  image?: string;
   isActive: boolean;
 };
 
@@ -63,7 +66,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
   const [academies, setAcademies] = useState<Academy[]>([]);
   const [managersByAcademyId, setManagersByAcademyId] = useState<Record<string, AcademyManagerSummary | null>>({});
 
-  const [academyForm, setAcademyForm] = useState({ name: '', nameAr: '', slug: '' });
+  const [academyForm, setAcademyForm] = useState({ name: '', nameAr: '', slug: '', image: '' });
 
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
   const [assigning, setAssigning] = useState(false);
@@ -75,7 +78,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editingAcademyId, setEditingAcademyId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', nameAr: '', slug: '', isActive: true });
+  const [editForm, setEditForm] = useState({ name: '', nameAr: '', slug: '', image: '', isActive: true });
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -102,7 +105,6 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCreateAcademy = async () => {
@@ -117,11 +119,12 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
         name: academyForm.name.trim(),
         nameAr: academyForm.nameAr.trim(),
         slug: academyForm.slug.trim() || undefined,
+        image: academyForm.image.trim() || undefined,
       });
 
       if (result.success) {
-        toast.success('Academy created');
-        setAcademyForm({ name: '', nameAr: '', slug: '' });
+        toast.success('Academy created successfully');
+        setAcademyForm({ name: '', nameAr: '', slug: '', image: '' });
         await load();
       } else {
         toast.error(result.error || 'Failed to create academy');
@@ -152,30 +155,28 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
 
   const openAssignManager = async (academyId: string) => {
     setSelectedAcademyId(academyId);
-    const existing = managersByAcademyId[academyId];
-    setSelectedManagerUserId(existing?.userId || '');
-    setAssignDialogOpen(true);
-
     await ensureEligibleManagersLoaded();
+    setAssignDialogOpen(true);
   };
 
   const handleAssignManager = async () => {
-    if (!selectedAcademyId) return;
-
-    const userId = selectedManagerUserId.trim();
-    if (!userId) {
+    if (!selectedAcademyId || !selectedManagerUserId) {
       toast.error('Please select a user');
       return;
     }
 
     setAssigning(true);
     try {
-      const result = await assignExistingAcademyManagerAction({ academyId: selectedAcademyId, userId });
+      const result = await assignExistingAcademyManagerAction({
+        academyId: selectedAcademyId,
+        userId: selectedManagerUserId,
+      });
 
       if (result.success) {
-        toast.success('Manager assigned');
+        toast.success('Manager assigned successfully');
         setAssignDialogOpen(false);
         setSelectedAcademyId(null);
+        setSelectedManagerUserId('');
         await load();
       } else {
         toast.error(result.error || 'Failed to assign manager');
@@ -193,6 +194,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
       name: academy.name,
       nameAr: academy.nameAr,
       slug: academy.slug,
+      image: academy.image || '',
       isActive: academy.isActive,
     });
     setEditDialogOpen(true);
@@ -210,12 +212,13 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
       const result = await updateAcademyAction(editingAcademyId, {
         name: editForm.name.trim(),
         nameAr: editForm.nameAr.trim(),
-        slug: editForm.slug.trim() || undefined,
+        slug: editForm.slug.trim(),
+        image: editForm.image.trim() || undefined,
         isActive: editForm.isActive,
       });
 
       if (result.success) {
-        toast.success('Academy updated');
+        toast.success('Academy updated successfully');
         setEditDialogOpen(false);
         setEditingAcademyId(null);
         await load();
@@ -240,9 +243,8 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
     setDeleting(true);
     try {
       const result = await deleteAcademyAction(deletingAcademyId);
-
       if (result.success) {
-        toast.success('Academy deleted');
+        toast.success('Academy deleted successfully');
         setDeleteDialogOpen(false);
         setDeletingAcademyId(null);
         await load();
@@ -272,155 +274,246 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <p className="text-gray-600 dark:text-gray-400">{dictionary.common?.loading || 'Loading...'}</p>
+      <div className="flex items-center justify-center py-24">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          className="h-12 w-12 rounded-full border-4 border-blue-500/30 border-t-blue-500"
+        />
       </div>
     );
   }
 
   return (
     <>
-      <Card className="border-2 border-[#DDDDDD] dark:border-[#000000] overflow-hidden">
-        <CardHeader className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000] py-4">
-          <CardTitle className="text-xl font-bold text-[#262626] dark:text-white flex items-center gap-3">
-            <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg">
-              <Building2 className="h-5 w-5 text-[#262626] dark:text-white" />
-            </div>
-            {title}
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent className="pt-6 bg-white dark:bg-[#262626] space-y-6">
-          {/* Create academy */}
-          <div className="p-5 bg-gray-50 dark:bg-[#1a1a1a] rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label className="text-[#262626] dark:text-white font-semibold">Name (English)</Label>
-                <Input
-                  value={academyForm.name}
-                  onChange={(e) => setAcademyForm((p) => ({ ...p, name: e.target.value }))}
-                  className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-black/30 dark:focus:border-white/20"
-                  placeholder="e.g. DNA Academy Riyadh"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[#262626] dark:text-white font-semibold">Name (Arabic)</Label>
-                <Input
-                  value={academyForm.nameAr}
-                  onChange={(e) => setAcademyForm((p) => ({ ...p, nameAr: e.target.value }))}
-                  className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-black/30 dark:focus:border-white/20"
-                  placeholder="Localized name"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[#262626] dark:text-white font-semibold">Slug (optional)</Label>
-                <Input
-                  value={academyForm.slug}
-                  onChange={(e) => setAcademyForm((p) => ({ ...p, slug: e.target.value }))}
-                  className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-black/30 dark:focus:border-white/20"
-                  placeholder="e.g. riyadh"
-                />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="space-y-6"
+      >
+        {/* Header Card */}
+        <Card className="border-2 border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden">
+          <CardHeader className="border-b border-white/10 bg-white/5">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl font-black tracking-tight text-white flex items-center gap-3">
+                <motion.div
+                  whileHover={{ rotate: 5, scale: 1.05 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                  className="p-3 bg-blue-600/20 rounded-2xl"
+                >
+                  <Building2 className="h-6 w-6 text-blue-400" />
+                </motion.div>
+                {title}
+              </CardTitle>
+              <div className="text-sm text-white/60">
+                {academies.length} {academies.length === 1 ? 'Academy' : 'Academies'}
               </div>
             </div>
+          </CardHeader>
 
-            <div className="flex justify-end pt-4">
-              <Button
-                onClick={handleCreateAcademy}
-                disabled={creating}
-                className="h-12 bg-[#262626] hover:bg-black text-white active:scale-95 transition-colors"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                {creating ? (dictionary.common?.loading || 'Loading...') : 'Create Academy'}
-              </Button>
-            </div>
-          </div>
-
-          {/* List academies */}
-          <div className="space-y-3">
-            {academies.map((a) => (
-              <div
-                key={a.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-white dark:bg-[#1a1a1a] rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]"
-              >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <p className="font-bold text-[#262626] dark:text-white truncate">{a.name}</p>
-                    {a.isActive ? (
-                      <span className="text-xs font-semibold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-950/30 px-2 py-1 rounded">Active</span>
-                    ) : (
-                      <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900/30 px-2 py-1 rounded">Inactive</span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{a.nameAr}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 truncate">{a.slug}</p>
-
-                  <div className="mt-2">
-                    {managersByAcademyId[a.id] ? (
-                      <p className="text-xs text-gray-700 dark:text-gray-300 truncate">
-                        <span className="font-semibold text-gray-900 dark:text-white">Manager:</span>{' '}
-                        {managersByAcademyId[a.id]?.fullName ? `${managersByAcademyId[a.id]?.fullName} · ` : ''}
-                        {managersByAcademyId[a.id]?.email}
-                        {managersByAcademyId[a.id]?.username ? ` · ${managersByAcademyId[a.id]?.username}` : ''}
-                        {managersByAcademyId[a.id]?.role ? ` · ${managersByAcademyId[a.id]?.role}` : ''}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-gray-500 dark:text-gray-500">
-                        <span className="font-semibold text-gray-700 dark:text-gray-300">Manager:</span> Not assigned
-                      </p>
-                    )}
+          <CardContent className="p-6 space-y-6">
+            {/* Create Form */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="p-6 bg-white/5 rounded-2xl border border-white/10"
+            >
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <Plus className="h-5 w-5 text-blue-400" />
+                Create New Academy
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-white/90 font-semibold text-sm">Name (English)</Label>
+                  <Input
+                    value={academyForm.name}
+                    onChange={(e) => setAcademyForm((p) => ({ ...p, name: e.target.value }))}
+                    className="h-12 bg-black/20 border-white/10 text-white placeholder:text-white/35"
+                    placeholder="DNA Academy"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-white/90 font-semibold text-sm">Name (Arabic)</Label>
+                  <Input
+                    value={academyForm.nameAr}
+                    onChange={(e) => setAcademyForm((p) => ({ ...p, nameAr: e.target.value }))}
+                    className="h-12 bg-black/20 border-white/10 text-white placeholder:text-white/35"
+                    placeholder="أكاديمية DNA"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-white/90 font-semibold text-sm">Slug (optional)</Label>
+                  <Input
+                    value={academyForm.slug}
+                    onChange={(e) => setAcademyForm((p) => ({ ...p, slug: e.target.value }))}
+                    className="h-12 bg-black/20 border-white/10 text-white placeholder:text-white/35"
+                    placeholder="dna-riyadh"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-white/90 font-semibold text-sm">Image URL</Label>
+                  <div className="relative">
+                    <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/45" />
+                    <Input
+                      value={academyForm.image}
+                      onChange={(e) => setAcademyForm((p) => ({ ...p, image: e.target.value }))}
+                      className="h-12 pl-10 bg-black/20 border-white/10 text-white placeholder:text-white/35"
+                      placeholder="/uploads/..."
+                    />
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleSetCurrent(a.id)}
-                    className="h-10 border-2 border-[#DDDDDD] dark:border-[#000000] hover:bg-black/5 dark:hover:bg-white/5"
-                  >
-                    <CheckCircle2 className="h-4 w-4 mr-2 text-gray-700 dark:text-gray-200" />
-                    Set Current
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    onClick={() => openEditDialog(a)}
-                    className="h-10 border-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30"
-                  >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    onClick={() => openDeleteDialog(a.id)}
-                    disabled={a.id === 'default'}
-                    className="h-10 border-2 border-red-500 dark:border-red-400 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </Button>
-
-                  <Button
-                    onClick={() => void openAssignManager(a.id)}
-                    className="h-10 bg-[#262626] hover:bg-black text-white active:scale-95 transition-colors"
-                  >
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Assign Manager
-                  </Button>
-                </div>
               </div>
-            ))}
+
+              <div className="flex justify-end pt-4">
+                <Button
+                  onClick={handleCreateAcademy}
+                  disabled={creating}
+                  className="h-12 px-8 bg-blue-600 hover:bg-blue-500 text-white font-bold"
+                >
+                  <Plus className="h-5 w-5 mr-2" />
+                  {creating ? 'Creating...' : 'Create Academy'}
+                </Button>
+              </div>
+            </motion.div>
+
+            {/* Academies Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <AnimatePresence>
+                {academies.map((academy, index) => (
+                  <motion.div
+                    key={academy.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: index * 0.05 }}
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    className="group relative"
+                  >
+                    <Card className="h-full border-2 border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden hover:border-blue-500/50 transition-all">
+                      {/* Image */}
+                      <div className="relative h-48 bg-black/40 overflow-hidden">
+                        {academy.image ? (
+                          <Image
+                            src={academy.image}
+                            alt={academy.name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Building2 className="h-20 w-20 text-white/20" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
+                        
+                        {/* Status Badge */}
+                        <div className="absolute top-3 right-3">
+                          {academy.isActive ? (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="px-3 py-1 bg-green-500/90 backdrop-blur-sm rounded-full text-xs font-bold text-white flex items-center gap-1"
+                            >
+                              <CheckCircle2 className="h-3 w-3" />
+                              Active
+                            </motion.div>
+                          ) : (
+                            <div className="px-3 py-1 bg-gray-500/90 backdrop-blur-sm rounded-full text-xs font-bold text-white">
+                              Inactive
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <CardContent className="p-4 space-y-3">
+                        <div>
+                          <h3 className="font-black text-lg text-white truncate">{academy.name}</h3>
+                          <p className="text-sm text-white/60 truncate">{academy.nameAr}</p>
+                          <p className="text-xs text-white/40 truncate">{academy.slug}</p>
+                        </div>
+
+                        {/* Manager Info */}
+                        <div className="p-3 bg-black/20 rounded-xl border border-white/10">
+                          <p className="text-xs font-semibold text-white/50 mb-1">Manager</p>
+                          {managersByAcademyId[academy.id] ? (
+                            <div className="text-xs text-white/80">
+                              <p className="font-bold text-white truncate">
+                                {managersByAcademyId[academy.id]?.fullName || managersByAcademyId[academy.id]?.email}
+                              </p>
+                              <p className="text-white/60 truncate">{managersByAcademyId[academy.id]?.email}</p>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-white/40">Not assigned</p>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            onClick={() => handleSetCurrent(academy.id)}
+                            variant="outline"
+                            size="sm"
+                            className="border-white/20 bg-white/5 text-white hover:bg-white/10"
+                          >
+                            <CheckCircle2 className="h-4 w-4 mr-1" />
+                            Set Current
+                          </Button>
+                          <Button
+                            onClick={() => openAssignManager(academy.id)}
+                            variant="outline"
+                            size="sm"
+                            className="border-white/20 bg-white/5 text-white hover:bg-white/10"
+                          >
+                            <UserPlus className="h-4 w-4 mr-1" />
+                            Manager
+                          </Button>
+                          <Button
+                            onClick={() => openEditDialog(academy)}
+                            variant="outline"
+                            size="sm"
+                            className="border-blue-500/50 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                          <Button
+                            onClick={() => openDeleteDialog(academy.id)}
+                            disabled={academy.id === 'default'}
+                            variant="outline"
+                            size="sm"
+                            className="border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-30"
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            Delete
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
 
             {academies.length === 0 && (
-              <div className="text-center py-12 bg-gray-50 dark:bg-[#1a1a1a] rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700">
-                <Building2 className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" />
-                <p className="text-gray-600 dark:text-gray-400 font-medium">No academies yet</p>
-              </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-16 bg-white/5 rounded-2xl border border-dashed border-white/20"
+              >
+                <Building2 className="w-20 h-20 mx-auto text-white/20 mb-4" />
+                <p className="text-white/60 font-medium">No academies created yet</p>
+                <p className="text-white/40 text-sm mt-2">Create your first academy to get started</p>
+              </motion.div>
             )}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
 
+      {/* Assign Manager Dialog */}
       <Dialog
         open={assignDialogOpen}
         onOpenChange={(open) => {
@@ -431,56 +524,52 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
           }
         }}
       >
-        <DialogContent className="sm:max-w-[560px] bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+        <DialogContent className="sm:max-w-[520px] bg-[#0a0a0a] border-2 border-white/10">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#262626] dark:text-white">Assign Academy Manager</DialogTitle>
+            <DialogTitle className="text-xl font-black text-white">Assign Academy Manager</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-[#262626] dark:text-white font-semibold">Select a user</Label>
+              <Label className="text-white/90 font-semibold">Select a user</Label>
               <Select value={selectedManagerUserId} onValueChange={setSelectedManagerUserId}>
-                <SelectTrigger className="h-12 w-full bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-black/30 dark:focus:border-white/20">
+                <SelectTrigger className="h-12 w-full bg-black/20 border-white/10 text-white">
                   <SelectValue placeholder={eligibleManagersLoading ? 'Loading...' : 'Choose an admin/manager user'} />
                 </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                <SelectContent className="bg-[#0a0a0a] border-white/10">
                   {eligibleManagers.length === 0 ? (
                     <SelectItem value="__none" disabled>
                       {eligibleManagersLoading ? 'Loading...' : 'No eligible users found'}
                     </SelectItem>
                   ) : (
                     eligibleManagers.map((u) => (
-                      <SelectItem key={u.id} value={u.id}>
-                        {(u.fullName ? `${u.fullName} · ` : '') + u.email + (u.username ? ` · ${u.username}` : '') + (u.role ? ` · ${u.role}` : '')}
+                      <SelectItem key={u.id} value={u.id} className="text-white">
+                        {(u.fullName ? `${u.fullName} · ` : '') + u.email + (u.username ? ` · ${u.username}` : '')}
                       </SelectItem>
                     ))
                   )}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
-                Only active users with role <span className="font-semibold">admin</span> or <span className="font-semibold">manager</span> can be assigned.
+              <p className="text-xs text-white/50">
+                Only users with role <span className="font-bold text-blue-400">admin</span> or <span className="font-bold text-blue-400">manager</span> can be assigned.
               </p>
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
-              type="button"
               variant="outline"
-              onClick={() => {
-                setAssignDialogOpen(false);
-                setSelectedAcademyId(null);
-              }}
-              className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000]"
+              onClick={() => setAssignDialogOpen(false)}
+              className="border-white/20 bg-white/5 text-white hover:bg-white/10"
             >
-              {dictionary.common?.cancel || 'Cancel'}
+              Cancel
             </Button>
             <Button
               onClick={handleAssignManager}
-              disabled={assigning}
-              className="h-12 bg-[#262626] hover:bg-black text-white active:scale-95 transition-colors"
+              disabled={assigning || !selectedManagerUserId}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold"
             >
-              {assigning ? (dictionary.common?.loading || 'Loading...') : 'Assign'}
+              {assigning ? 'Assigning...' : 'Assign Manager'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -493,76 +582,84 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
           setEditDialogOpen(open);
           if (!open) {
             setEditingAcademyId(null);
-            setEditForm({ name: '', nameAr: '', slug: '', isActive: true });
+            setEditForm({ name: '', nameAr: '', slug: '', image: '', isActive: true });
           }
         }}
       >
-        <DialogContent className="sm:max-w-[560px] bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+        <DialogContent className="sm:max-w-[560px] bg-[#0a0a0a] border-2 border-white/10">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#262626] dark:text-white">Edit Academy</DialogTitle>
+            <DialogTitle className="text-xl font-black text-white">Edit Academy</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-[#262626] dark:text-white font-semibold">Name (English)</Label>
+              <Label className="text-white/90 font-semibold">Name (English)</Label>
               <Input
                 value={editForm.name}
                 onChange={(e) => setEditForm((p) => ({ ...p, name: e.target.value }))}
-                className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000]"
-                placeholder="e.g. DNA Academy Riyadh"
+                className="h-12 bg-black/20 border-white/10 text-white"
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[#262626] dark:text-white font-semibold">Name (Arabic)</Label>
+              <Label className="text-white/90 font-semibold">Name (Arabic)</Label>
               <Input
                 value={editForm.nameAr}
                 onChange={(e) => setEditForm((p) => ({ ...p, nameAr: e.target.value }))}
-                className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000]"
-                placeholder="Localized name"
+                className="h-12 bg-black/20 border-white/10 text-white"
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[#262626] dark:text-white font-semibold">Slug</Label>
+              <Label className="text-white/90 font-semibold">Slug</Label>
               <Input
                 value={editForm.slug}
                 onChange={(e) => setEditForm((p) => ({ ...p, slug: e.target.value }))}
-                className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000]"
-                placeholder="e.g. riyadh"
+                className="h-12 bg-black/20 border-white/10 text-white"
               />
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="space-y-2">
+              <Label className="text-white/90 font-semibold">Image URL</Label>
+              <div className="relative">
+                <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/45" />
+                <Input
+                  value={editForm.image}
+                  onChange={(e) => setEditForm((p) => ({ ...p, image: e.target.value }))}
+                  className="h-12 pl-10 bg-black/20 border-white/10 text-white"
+                  placeholder="/uploads/..."
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
               <input
                 type="checkbox"
                 id="editIsActive"
                 checked={editForm.isActive}
                 onChange={(e) => setEditForm((p) => ({ ...p, isActive: e.target.checked }))}
-                className="h-5 w-5 rounded border-2 border-[#DDDDDD] dark:border-[#000000]"
-                aria-label="Academy active status"
+                className="h-5 w-5 rounded"
               />
-              <Label htmlFor="editIsActive" className="text-[#262626] dark:text-white font-semibold cursor-pointer">
-                Active
+              <Label htmlFor="editIsActive" className="text-white font-semibold cursor-pointer">
+                Academy is Active
               </Label>
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
-              type="button"
               variant="outline"
               onClick={() => setEditDialogOpen(false)}
-              className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000]"
+              className="border-white/20 bg-white/5 text-white hover:bg-white/10"
             >
-              {dictionary.common?.cancel || 'Cancel'}
+              Cancel
             </Button>
             <Button
               onClick={handleUpdateAcademy}
               disabled={editing}
-              className="h-12 bg-blue-600 hover:bg-blue-700 text-white active:scale-95 transition-colors"
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold"
             >
-              {editing ? (dictionary.common?.loading || 'Loading...') : 'Update Academy'}
+              {editing ? 'Updating...' : 'Update Academy'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -578,35 +675,34 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
           }
         }}
       >
-        <DialogContent className="sm:max-w-[460px] bg-white dark:bg-[#262626] border-2 border-red-500 dark:border-red-400">
+        <DialogContent className="sm:max-w-[460px] bg-[#0a0a0a] border-2 border-red-500/50">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-red-600 dark:text-red-400">Delete Academy</DialogTitle>
+            <DialogTitle className="text-xl font-black text-red-400">Delete Academy</DialogTitle>
           </DialogHeader>
 
           <div className="py-4">
-            <p className="text-[#262626] dark:text-white">
+            <p className="text-white">
               Are you sure you want to delete this academy? This action cannot be undone.
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-sm text-white/60 mt-2">
               All associated data including memberships will remain but the academy will be permanently removed.
             </p>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
-              type="button"
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
-              className="h-12 bg-white dark:bg-[#1a1a1a] border-2 border-[#DDDDDD] dark:border-[#000000]"
+              className="border-white/20 bg-white/5 text-white hover:bg-white/10"
             >
-              {dictionary.common?.cancel || 'Cancel'}
+              Cancel
             </Button>
             <Button
               onClick={handleDeleteAcademy}
               disabled={deleting}
-              className="h-12 bg-red-600 hover:bg-red-700 text-white active:scale-95 transition-colors"
+              className="bg-red-600 hover:bg-red-500 text-white font-bold"
             >
-              {deleting ? (dictionary.common?.loading || 'Loading...') : 'Delete Academy'}
+              {deleting ? 'Deleting...' : 'Delete Academy'}
             </Button>
           </DialogFooter>
         </DialogContent>

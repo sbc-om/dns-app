@@ -89,20 +89,6 @@ const menuItems: MenuItem[] = [
     icon: MessageCircle,
   },
   {
-    key: 'courses',
-    resourceKey: 'dashboard.courses',
-    labelKey: 'courses',
-    href: '/dashboard/courses',
-    icon: BookOpen,
-  },
-  {
-    key: 'payments',
-    resourceKey: 'dashboard.payments',
-    labelKey: 'payments',
-    href: '/dashboard/payments',
-    icon: DollarSign,
-  },
-  {
     key: 'settings',
     resourceKey: 'dashboard.settings',
     labelKey: 'settings',
@@ -163,7 +149,7 @@ const SidebarContent = ({
           <img 
             src="/logo-white.png" 
             alt="DNA Logo" 
-            className="h-12 w-auto object-contain"
+            className="h-16 w-auto object-contain"
           />
         </motion.div>
         <AnimatePresence>
@@ -426,7 +412,7 @@ export function DashboardSidebar({
                     <img 
                       src="/logo-white.png" 
                       alt="DNA Logo" 
-                      className="h-10 w-auto object-contain"
+                      className="h-14 w-auto object-contain"
                     />
                   </motion.div>
                   <div>

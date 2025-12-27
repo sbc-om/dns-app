@@ -128,7 +128,7 @@ export function Header({ dictionary, locale, user }: HeaderProps) {
             <img 
               src="/logo-white.png" 
               alt="DNA Logo" 
-              className="h-14 w-auto object-contain drop-shadow-2xl"
+              className="h-18 w-auto object-contain drop-shadow-2xl"
             />
           </motion.div>
           
