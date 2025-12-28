@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Send, Users, MessageSquare, CheckCircle, XCircle, AlertCircle, Save, Trash2, Pencil, UsersIcon, Folder } from 'lucide-react';
+import { Loader2, Send, Users, MessageSquare, CheckCircle, XCircle, AlertCircle, Save, Trash2, Pencil, UsersIcon, Folder, Sparkles } from 'lucide-react';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 
 interface User {
@@ -491,71 +491,146 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, type: 'spring' }}
-      className="container mx-auto py-6 px-4 max-w-7xl"
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
     >
-      <div className="relative mb-6 overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/35">
-        <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-emerald-500/10 via-cyan-500/10 to-purple-500/10" />
-        <div className="relative flex items-center gap-3">
+      {/* Animated Header */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+        className="space-y-4"
+      >
+        <div className="relative">
           <motion.div
-            animate={{ rotate: [0, -6, 6, -6, 0] }}
-            transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2.5 }}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15"
-          >
-            <MessageSquare className="h-5 w-5 text-emerald-300" />
-          </motion.div>
-          <div className="min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white truncate">
+            className="absolute -inset-4 bg-linear-to-r from-green-600/10 via-emerald-600/10 to-cyan-600/10 rounded-2xl blur-xl"
+            animate={{
+              opacity: [0.5, 0.8, 0.5],
+              scale: [1, 1.05, 1],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+          <div className="relative">
+            <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-green-600 via-emerald-600 to-cyan-600 bg-clip-text text-transparent flex items-center gap-3">
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+              >
+                <Sparkles className="h-8 w-8 text-green-600" />
+              </motion.div>
               {t?.title || 'WhatsApp Messaging'}
             </h1>
-            <p className="mt-1 text-sm text-white/70">
-              {t?.subtitle || 'Send WhatsApp messages to selected users'}
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              {t?.subtitle || 'Send WhatsApp messages to selected users and groups'}
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Error Alert */}
       {errorMessage && (
-        <div className="mb-4 p-4 bg-red-50 dark:bg-red-950 border border-red-500 rounded-lg flex items-center gap-3">
-          <AlertCircle className="h-5 w-5 text-red-600" />
-          <p className="text-red-800 dark:text-red-200">{errorMessage}</p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="relative overflow-hidden rounded-2xl border-2 border-red-500/50 bg-red-50 dark:bg-red-950/30 p-4 shadow-lg"
+        >
+          <motion.div
+            className="absolute inset-0 bg-linear-to-r from-red-500/10 to-red-600/10"
+            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <div className="relative flex items-center gap-3">
+            <motion.div
+              animate={{ rotate: [0, -5, 5, -5, 0] }}
+              transition={{ duration: 0.5 }}
+            >
+              <AlertCircle className="h-5 w-5 text-red-600 shrink-0" />
+            </motion.div>
+            <p className="text-red-800 dark:text-red-200">{errorMessage}</p>
+          </div>
+        </motion.div>
       )}
 
       {/* Success Alert */}
       {successMessage && (
-        <div className="mb-4 p-4 bg-green-50 dark:bg-green-950 border border-green-500 rounded-lg flex items-center gap-3">
-          <CheckCircle className="h-5 w-5 text-green-600" />
-          <p className="text-green-800 dark:text-green-200">{successMessage}</p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="relative overflow-hidden rounded-2xl border-2 border-green-500/50 bg-green-50 dark:bg-green-950/30 p-4 shadow-lg"
+        >
+          <motion.div
+            className="absolute inset-0 bg-linear-to-r from-green-500/10 to-green-600/10"
+            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <div className="relative flex items-center gap-3">
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 0.5 }}
+            >
+              <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />
+            </motion.div>
+            <p className="text-green-800 dark:text-green-200">{successMessage}</p>
+          </div>
+        </motion.div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+      >
         {/* Users/Groups List */}
-        <Card className="lg:col-span-2 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg">
-          <Tabs value={currentTab} onValueChange={(v) => setCurrentTab(v as 'users' | 'groups')} className="w-full">
-            <CardHeader>
+        <motion.div
+          className="lg:col-span-2"
+        >
+          <Card className="relative overflow-hidden bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg">
+            <motion.div
+              className="absolute inset-0 bg-linear-to-br from-green-500/5 via-emerald-500/5 to-cyan-500/5"
+              animate={{ opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 3, repeat: Infinity }}
+            />
+          <Tabs value={currentTab} onValueChange={(v) => setCurrentTab(v as 'users' | 'groups')} className="w-full relative">
+            <CardHeader className="relative">
               <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-[#1a1a1a]">
                 <TabsTrigger value="users" className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   {t?.usersTab || 'Users'}
                   {currentTab === 'users' && filteredUsers.length > 0 && (
-                    <span className="text-xs">({selectedUsers.size}/{filteredUsers.length})</span>
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="text-xs font-bold px-2 py-0.5 rounded-full bg-green-500 text-white"
+                    >
+                      {selectedUsers.size}/{filteredUsers.length}
+                    </motion.span>
                   )}
                 </TabsTrigger>
                 <TabsTrigger value="groups" className="flex items-center gap-2">
                   <Folder className="h-4 w-4" />
                   {t?.groupsTab || 'Groups'}
                   {currentTab === 'groups' && groups.length > 0 && (
-                    <span className="text-xs">({groups.length})</span>
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white"
+                    >
+                      {groups.length}
+                    </motion.span>
                   )}
                 </TabsTrigger>
               </TabsList>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
             {/* Users Tab */}
             <TabsContent value="users" className="mt-0 space-y-4">
             {/* Profiles */}
@@ -803,10 +878,13 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
               </div>
             ) : (
               <div className="space-y-2 max-h-[500px] overflow-y-auto scrollbar-custom-dark pr-2">
-                {filteredUsers.map((user) => (
-                  <div
+                {filteredUsers.map((user, index) => (
+                  <motion.div
                     key={user.id}
-                    className="flex items-center space-x-3 rtl:space-x-reverse p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05, duration: 0.3 }}
+                    className="flex items-center space-x-3 rtl:space-x-reverse p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
                   >
                     <Checkbox
                       id={`user-${user.id}`}
@@ -825,7 +903,7 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
                         </span>
                       </div>
                     </Label>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             )}
@@ -1033,13 +1111,16 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
                 </div>
               ) : (
                 <div className="space-y-3 max-h-[500px] overflow-y-auto scrollbar-custom-dark pr-2">
-                  {groups.map((group) => (
-                    <div
+                  {groups.map((group, index) => (
+                    <motion.div
                       key={group.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1, duration: 0.3 }}
                       className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
                         selectedGroupId === group.id
-                          ? 'border-green-500 bg-green-50 dark:bg-green-950'
-                          : 'border-[#DDDDDD] dark:border-[#000000] hover:border-gray-400 dark:hover:border-gray-600'
+                          ? 'border-green-500 bg-green-50 dark:bg-green-950 shadow-lg shadow-green-500/20'
+                          : 'border-[#DDDDDD] dark:border-[#000000] hover:border-green-400 dark:hover:border-green-600'
                       }`}
                       onClick={() => applyGroupSelection(group.id)}
                     >
@@ -1063,10 +1144,16 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
                           </div>
                         </div>
                         {selectedGroupId === group.id && (
-                          <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />
+                          <motion.div
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ type: 'spring', stiffness: 200 }}
+                          >
+                            <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />
+                          </motion.div>
                         )}
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
@@ -1075,20 +1162,49 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
           </CardContent>
           </Tabs>
         </Card>
+        </motion.div>
 
         {/* Message Form */}
-        <Card className="lg:col-span-1 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg">
-          <CardHeader>
-            <CardTitle>{t?.message || 'Message'}</CardTitle>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="lg:col-span-1"
+        >
+          <Card className="relative overflow-hidden bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg">
+            <motion.div
+              className="absolute inset-0 bg-linear-to-br from-green-500/5 via-cyan-500/5 to-blue-500/5"
+              animate={{ opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+            />
+          <CardHeader className="relative">
+            <CardTitle className="flex items-center gap-2">
+              <motion.div
+                animate={{ rotate: [0, -10, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+              >
+                <MessageSquare className="h-5 w-5 text-green-600" />
+              </motion.div>
+              {t?.message || 'Message'}
+            </CardTitle>
             <CardDescription>
               {t?.messageHint || 'Write your message here'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 relative">
             {/* Current Selection Info */}
             {(currentTab === 'users' && selectedUsers.size > 0) || (currentTab === 'groups' && selectedGroupId) ? (
-              <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950 border-2 border-green-200 dark:border-green-800">
-                <div className="flex items-center gap-2 text-sm text-green-800 dark:text-green-200">
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="relative overflow-hidden p-3 rounded-lg bg-green-50 dark:bg-green-950 border-2 border-green-200 dark:border-green-800"
+              >
+                <motion.div
+                  className="absolute inset-0 bg-linear-to-r from-green-500/10 to-emerald-500/10"
+                  animate={{ opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                <div className="relative flex items-center gap-2 text-sm text-green-800 dark:text-green-200">
                   {currentTab === 'users' ? (
                     <>
                       <Users className="h-4 w-4" />
@@ -1103,7 +1219,7 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
                     </>
                   )}
                 </div>
-              </div>
+              </motion.div>
             ) : null}
             
             <div className="space-y-2">
@@ -1183,33 +1299,56 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
 
             {/* Send Results */}
             {sendResults && (
-              <Card className="mt-4 bg-gray-50 dark:bg-gray-800">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm">
-                    {t?.sendResults || 'Send Results'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2 text-green-600">
-                      <CheckCircle className="h-4 w-4" />
-                      {t?.success || 'Success'}
-                    </span>
-                    <span className="font-medium">{sendResults.success}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2 text-red-600">
-                      <XCircle className="h-4 w-4" />
-                      {t?.failed || 'Failed'}
-                    </span>
-                    <span className="font-medium">{sendResults.failed}</span>
-                  </div>
-                </CardContent>
-              </Card>
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 200 }}
+              >
+                <Card className="mt-4 bg-gray-50 dark:bg-gray-800 border-2 border-[#DDDDDD] dark:border-[#000000]">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <motion.div
+                        animate={{ rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 1 }}
+                      >
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                      </motion.div>
+                      {t?.sendResults || 'Send Results'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <motion.div
+                      initial={{ x: -10, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="flex items-center gap-2 text-green-600">
+                        <CheckCircle className="h-4 w-4" />
+                        {t?.success || 'Success'}
+                      </span>
+                      <span className="font-medium">{sendResults.success}</span>
+                    </motion.div>
+                    <motion.div
+                      initial={{ x: -10, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="flex items-center gap-2 text-red-600">
+                        <XCircle className="h-4 w-4" />
+                        {t?.failed || 'Failed'}
+                      </span>
+                      <span className="font-medium">{sendResults.failed}</span>
+                    </motion.div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             )}
           </CardContent>
         </Card>
-      </div>
+        </motion.div>
+      </motion.div>
     </motion.div>
   );
 }
