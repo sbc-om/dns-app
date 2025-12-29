@@ -1285,7 +1285,9 @@
     },
     "empty": {
       "noAssessments": "No assessments yet.",
-      "noCourses": "No courses."
+      "noCourses": "No courses.",
+      "noMedals": "No medals awarded yet",
+      "noMedalsSubtitle": "Keep progressing—new medals will appear here."
     },
     "hints": {
       "strengthsHint": "Top abilities based on your latest assessment.",

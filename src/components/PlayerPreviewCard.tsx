@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Calendar, IdCard, UserCircle2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
@@ -26,10 +25,9 @@ export function PlayerPreviewCard({ locale, dictionary, child, className }: Play
 
   return (
     <Link href={`/${locale}/dashboard/players/${child.id}`} className={cn('block', className)}>
-      <motion.div whileHover={{ y: -4, scale: 1.01 }} whileTap={{ scale: 0.98 }}>
+      <div>
         <Card className={cn(
           'relative overflow-hidden rounded-2xl bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] shadow-lg',
-          'transition-shadow hover:shadow-xl',
         )}>
           <div className="pointer-events-none absolute inset-0 opacity-60">
             <div className="absolute -top-24 -right-28 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl" />
@@ -100,7 +98,7 @@ export function PlayerPreviewCard({ locale, dictionary, child, className }: Play
             </div>
           </div>
         </Card>
-      </motion.div>
+      </div>
     </Link>
   );
 }

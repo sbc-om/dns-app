@@ -17,6 +17,8 @@ import {
   Activity,
   Award,
   ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
   BookOpen,
   Calendar,
   Cake,
@@ -85,6 +87,8 @@ export function KidProfileClient({
   currentUser,
   academyId,
 }: KidProfileClientProps) {
+  const NO_LEVEL_VALUE = '__none__';
+
   type StageEvaluationActionResult = Awaited<ReturnType<typeof evaluatePlayerStageAction>>;
   type StageEvaluationSuccess = Extract<StageEvaluationActionResult, { success: true }>;
   type EnrichedEnrollment = Enrollment & { course?: Course | null };
@@ -177,20 +181,7 @@ export function KidProfileClient({
   const canManage = currentUser?.role === 'admin' || currentUser?.role === 'coach' || currentUser?.role === 'manager';
   const canAdmin = currentUser?.role === 'admin' || currentUser?.role === 'manager';
 
-  const openProgramLevelDialog = async (enrollment?: PlayerProgramEnrollment) => {
-    if (!canAdmin) return;
-    const programId = enrollment?.programId ?? programEnrollments[0]?.programId ?? '';
-    if (!programId) {
-      alert(dictionary.programs?.noPlayerPrograms ?? dictionary.common.error);
-      return;
-    }
-
-    setProgramLevelDialogOpen(true);
-    setProgramLevelTargetProgramId(programId);
-    setProgramLevelSelectedId(enrollment?.currentLevelId ?? '');
-    setProgramLevelPointsDelta('');
-    setProgramLevelComment('');
-
+  const loadProgramLevelOptionsFor = async (programId: string) => {
     setLoadingProgramLevelOptions(true);
     try {
       const res = await getProgramLevelsForProgramAction({
@@ -213,6 +204,32 @@ export function KidProfileClient({
     } finally {
       setLoadingProgramLevelOptions(false);
     }
+  };
+
+  const openProgramLevelDialog = async (enrollment?: PlayerProgramEnrollment) => {
+    if (!canAdmin) return;
+    const programId = enrollment?.programId ?? programEnrollments[0]?.programId ?? '';
+    if (!programId) {
+      alert(dictionary.programs?.noPlayerPrograms ?? dictionary.common.error);
+      return;
+    }
+
+    setProgramLevelDialogOpen(true);
+    setProgramLevelTargetProgramId(programId);
+    setProgramLevelSelectedId(enrollment?.currentLevelId ?? NO_LEVEL_VALUE);
+    setProgramLevelPointsDelta('');
+    setProgramLevelComment('');
+
+    await loadProgramLevelOptionsFor(programId);
+  };
+
+  const handleProgramLevelTargetProgramChange = async (programId: string) => {
+    setProgramLevelTargetProgramId(programId);
+    const currentEnrollment = programEnrollments.find((e) => e.programId === programId);
+    setProgramLevelSelectedId(currentEnrollment?.currentLevelId ?? NO_LEVEL_VALUE);
+    setProgramLevelPointsDelta('');
+    setProgramLevelComment('');
+    await loadProgramLevelOptionsFor(programId);
   };
 
   const shiftProgramLevel = (direction: 'prev' | 'next') => {
@@ -243,7 +260,10 @@ export function KidProfileClient({
         academyId,
         programId: programLevelTargetProgramId,
         userId: kid.id,
-        nextLevelId: programLevelSelectedId ? programLevelSelectedId : null,
+        nextLevelId:
+          programLevelSelectedId && programLevelSelectedId !== NO_LEVEL_VALUE
+            ? programLevelSelectedId
+            : null,
         pointsDelta,
         comment: programLevelComment.trim() || undefined,
       });
@@ -930,9 +950,9 @@ export function KidProfileClient({
                 <Button
                   type="button"
                   onClick={() => router.push(`/${locale}/dashboard/players/${currentKid.id}/edit`)}
-                  className="w-full h-11 border-2 border-[#DDDDDD] bg-[#0b0b0f] text-white hover:bg-[#14141a] dark:border-[#000000]"
+                  className="w-full h-11 border-2 border-[#DDDDDD] bg-[#0b0b0f] text-white hover:bg-[#14141a] dark:border-[#000000] justify-start ltr:text-left rtl:text-right"
                 >
-                  <Edit className="h-4 w-4 me-2" />
+                  <Edit className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
                   Edit Profile
                 </Button>
               )}
@@ -940,9 +960,9 @@ export function KidProfileClient({
                 <Button
                   type="button"
                   onClick={() => setAssessmentDialogOpen(true)}
-                  className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
+                  className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] justify-start ltr:text-left rtl:text-right"
                 >
-                  <Plus className="h-4 w-4 me-2" />
+                  <Plus className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
                   New Assessment
                 </Button>
               )}
@@ -950,9 +970,9 @@ export function KidProfileClient({
                 <Button
                   type="button"
                   onClick={openGrantBadgeDialog}
-                  className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
+                  className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] justify-start ltr:text-left rtl:text-right"
                 >
-                  <Award className="h-4 w-4 me-2" />
+                  <Award className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
                   Grant Badge
                 </Button>
               )}
@@ -961,27 +981,27 @@ export function KidProfileClient({
                 <Button
                   type="button"
                   onClick={() => void openProgramLevelDialog()}
-                  className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
+                  className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] justify-start ltr:text-left rtl:text-right"
                 >
-                  <ArrowUpDown className="h-4 w-4 me-2" />
+                  <ArrowUpDown className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
                   {dictionary.playerProfile?.actions?.adjustProgramLevel ?? 'Adjust program level'}
                 </Button>
               )}
               <Button
                 type="button"
                 onClick={() => router.push(`/${locale}/dashboard/players/${currentKid.id}/achievements`)}
-                className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
+                className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] justify-start ltr:text-left rtl:text-right"
               >
-                <Trophy className="h-4 w-4 me-2" />
+                <Trophy className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
                 {dictionary.playerProfile?.tabs?.achievements ?? 'Achievements'}
               </Button>
               {canManage && stageEvaluation?.evaluation?.readyForStageUpgrade && (
                 <Button
                   type="button"
                   onClick={handleApproveStageUpgrade}
-                  className="w-full h-11 border-2 border-emerald-500/40 bg-emerald-600 text-white hover:bg-emerald-500"
+                  className="w-full h-11 border-2 border-emerald-500/40 bg-emerald-600 text-white hover:bg-emerald-500 justify-start ltr:text-left rtl:text-right"
                 >
-                  <Flag className="h-4 w-4 me-2" />
+                  <Flag className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
                   Approve Stage
                 </Button>
               )}
@@ -1155,34 +1175,34 @@ export function KidProfileClient({
               defer
             >
               <div className="pb-1">
-                <TabsList className="inline-flex w-max min-w-full items-center justify-start gap-1 rounded-2xl bg-white border-2 border-[#DDDDDD] p-1.5 shadow-lg dark:bg-[#262626] dark:border-[#000000]">
+                <TabsList className="inline-flex w-max min-w-full items-center justify-start gap-1 rounded-xl border-2 border-black/60 bg-[#0b0b0f] p-1 shadow-lg shadow-black/30">
                   <TabsTrigger
                     value="overview"
-                    className="gap-2 text-gray-700 hover:bg-gray-50 data-[state=active]:bg-[#0b0b0f] data-[state=active]:text-white dark:text-gray-200 dark:hover:bg-[#1a1a1a] dark:data-[state=active]:bg-[#0b0b0f]"
+                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15"
                   >
                     <Activity className="w-4 h-4" />
-                    <span className="hidden md:inline">{dictionary.playerProfile?.tabs?.overview ?? 'Overview'}</span>
+                    <span>{dictionary.playerProfile?.tabs?.overview ?? 'Overview'}</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="assessments"
-                    className="gap-2 text-gray-700 hover:bg-gray-50 data-[state=active]:bg-[#0b0b0f] data-[state=active]:text-white dark:text-gray-200 dark:hover:bg-[#1a1a1a] dark:data-[state=active]:bg-[#0b0b0f]"
+                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15"
                   >
                     <Calendar className="w-4 h-4" />
-                    <span className="hidden md:inline">{dictionary.playerProfile?.tabs?.assessments ?? 'Assessments'}</span>
+                    <span>{dictionary.playerProfile?.tabs?.assessments ?? 'Assessments'}</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="badges"
-                    className="gap-2 text-gray-700 hover:bg-gray-50 data-[state=active]:bg-[#0b0b0f] data-[state=active]:text-white dark:text-gray-200 dark:hover:bg-[#1a1a1a] dark:data-[state=active]:bg-[#0b0b0f]"
+                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15"
                   >
                     <Star className="w-4 h-4" />
-                    <span className="hidden md:inline">{dictionary.playerProfile?.tabs?.badges ?? 'Badges'}</span>
+                    <span>{dictionary.playerProfile?.tabs?.badges ?? 'Badges'}</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="achievements"
-                    className="gap-2 text-gray-700 hover:bg-gray-50 data-[state=active]:bg-[#0b0b0f] data-[state=active]:text-white dark:text-gray-200 dark:hover:bg-[#1a1a1a] dark:data-[state=active]:bg-[#0b0b0f]"
+                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15"
                   >
                     <Award className="w-4 h-4" />
-                    <span className="hidden md:inline">{dictionary.playerProfile?.tabs?.achievements ?? 'Achievements'}</span>
+                    <span>{dictionary.playerProfile?.tabs?.achievements ?? 'Achievements'}</span>
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -1195,14 +1215,14 @@ export function KidProfileClient({
             <PanelCard title={dictionary.playerProfile?.sections?.insights ?? 'Insights'} icon={Activity}>
               <div className="space-y-6">
                 {!latestAssessment ? (
-                  <div className="text-white/70">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     {dictionary.playerProfile?.empty?.noAssessments ?? 'No assessments yet.'}
                   </div>
                 ) : (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-2xl border border-white/10 bg-white/5">
-                        <div className="text-sm font-semibold text-white/85">
+                      <div className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
+                        <div className="text-sm font-semibold text-[#262626] dark:text-white">
                           {dictionary.playerProfile?.labels?.strengths ?? 'Strengths'}
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
@@ -1213,8 +1233,8 @@ export function KidProfileClient({
                           ))}
                         </div>
                       </div>
-                      <div className="p-4 rounded-2xl border border-white/10 bg-white/5">
-                        <div className="text-sm font-semibold text-white/85">
+                      <div className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
+                        <div className="text-sm font-semibold text-[#262626] dark:text-white">
                           {dictionary.playerProfile?.labels?.developmentAreas ?? 'Development areas'}
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
@@ -1228,16 +1248,16 @@ export function KidProfileClient({
                     </div>
 
                     <div>
-                      <div className="text-sm font-semibold text-white/85 mb-3">
+                      <div className="text-sm font-semibold text-[#262626] dark:text-white mb-3">
                         {dictionary.playerProfile?.labels?.latestAssessment ?? 'Latest assessment'}: {latestAssessment.sessionDate}
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {Object.entries(latestAssessment.tests).map(([k, v]) => (
                           <div
                             key={k}
-                            className="p-4 rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5"
+                            className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]"
                           >
-                            <div className="text-xs text-slate-600 dark:text-white/55">{categoryLabel(k)}</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">{categoryLabel(k)}</div>
 
                             <div className="mt-3 flex items-center justify-between gap-4">
                               <DnaCircularGauge
@@ -1248,9 +1268,9 @@ export function KidProfileClient({
                                 ariaLabel={`${categoryLabel(k)} score`}
                               />
 
-                              <div className="text-right">
-                                <div className="text-sm font-extrabold text-slate-900 dark:text-white">{v}</div>
-                                <div className="mt-0.5 text-[11px] font-semibold text-slate-600 dark:text-white/60">
+                              <div className="ltr:text-right rtl:text-left">
+                                <div className="text-sm font-extrabold text-[#262626] dark:text-white">{v}</div>
+                                <div className="mt-0.5 text-[11px] font-semibold text-gray-600 dark:text-gray-400">
                                   {dictionary.playerProfile?.labels?.rawTestValue ?? 'Raw test value'}
                                 </div>
                               </div>
@@ -1266,29 +1286,29 @@ export function KidProfileClient({
 
             <PanelCard title={dictionary.playerProfile?.sections?.status ?? 'Status'} icon={CheckCircle2}>
               <div className="space-y-4">
-                <div className="p-4 rounded-2xl border border-white/10 bg-white/5">
-                  <div className="text-xs text-white/55">{dictionary.playerProfile?.labels?.assessmentStatus ?? 'Assessment status'}</div>
-                  <div className="mt-1 text-base font-bold text-white">
+                <div className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
+                  <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.assessmentStatus ?? 'Assessment status'}</div>
+                  <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
                     {assessmentStatusLabel(profile?.assessmentStatus)}
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl border border-white/10 bg-white/5">
-                  <div className="text-xs text-white/55">{dictionary.playerProfile?.labels?.stageStart ?? 'Stage start'}</div>
-                  <div className="mt-1 text-base font-bold text-white">
+                <div className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
+                  <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.stageStart ?? 'Stage start'}</div>
+                  <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
                     {profile?.stageStartDate ? new Date(profile.stageStartDate).toLocaleDateString(locale) : '-'}
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl border border-white/10 bg-white/5">
-                  <div className="text-xs text-white/55">{dictionary.playerProfile?.labels?.lastAssessment ?? 'Last assessment'}</div>
-                  <div className="mt-1 text-base font-bold text-white">
+                <div className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
+                  <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.lastAssessment ?? 'Last assessment'}</div>
+                  <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
                     {latestAssessment ? latestAssessment.sessionDate : '-'}
                   </div>
                 </div>
 
                 {loadingProfile && (
-                  <div className="text-sm text-white/70">{dictionary.common.loading}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">{dictionary.common.loading}</div>
                 )}
                 {profileError && (
                   <div className="text-sm text-red-600">{profileError}</div>
@@ -1299,11 +1319,11 @@ export function KidProfileClient({
             <PanelCard title={dictionary.programs?.playerProgramsTitle ?? dictionary.programs?.title ?? 'Programs'} icon={BookOpen}>
               <div className="space-y-4">
                 {loadingProgramEnrollments ? (
-                  <div className="text-sm text-white/70">{dictionary.common.loading}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">{dictionary.common.loading}</div>
                 ) : programEnrollmentsError ? (
                   <div className="text-sm text-red-600">{programEnrollmentsError}</div>
                 ) : programEnrollments.length === 0 ? (
-                  <div className="text-white/70">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     {dictionary.programs?.noPlayerPrograms ?? 'No program memberships yet.'}
                   </div>
                 ) : (
@@ -1311,34 +1331,34 @@ export function KidProfileClient({
                     {programEnrollments.map((e) => (
                       <div
                         key={e.id}
-                        className="p-4 rounded-2xl border border-white/10 bg-white/5"
+                        className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                           <div className="min-w-0">
-                            <div className="font-bold text-white truncate">
+                            <div className="font-bold text-[#262626] dark:text-white truncate">
                               {e.program ? (locale === 'ar' ? e.program.nameAr : e.program.name) : e.programId}
                             </div>
                             <div className="mt-1 flex flex-wrap items-center gap-2">
                               {e.currentLevel ? (
-                                <Badge className="bg-white/10 text-white border-white/15">
+                                <Badge className="bg-gray-100 text-gray-800 border-0 dark:bg-white/10 dark:text-white dark:border-0">
                                   {dictionary.programs?.currentLevelLabel ?? 'Level'}: {locale === 'ar' ? e.currentLevel.nameAr : e.currentLevel.name}
                                 </Badge>
                               ) : (
-                                <Badge className="bg-white/10 text-white/70 border-white/10">
+                                <Badge className="bg-gray-100 text-gray-700 border-0 dark:bg-white/10 dark:text-white/70 dark:border-0">
                                   {dictionary.programs?.noLevel || 'No level'}
                                 </Badge>
                               )}
-                              <Badge className="bg-blue-600/15 text-blue-200 border-blue-600/20">
+                              <Badge className="bg-blue-50 text-blue-700 border-0 dark:bg-blue-600/15 dark:text-blue-200 dark:border-0">
                                 {dictionary.programs?.pointsLabel ?? 'Points'}: {e.pointsTotal}
                               </Badge>
-                              <Badge className="bg-white/10 text-white/70 border-white/10">
+                              <Badge className="bg-gray-100 text-gray-700 border-0 dark:bg-white/10 dark:text-white/70 dark:border-0">
                                 {dictionary.programs?.notesLabel ?? 'Notes'}: {e.coachNotes?.length ?? 0}
                               </Badge>
                             </div>
 
                             {e.coachNotes?.[0]?.comment ? (
-                              <div className="mt-2 text-sm text-white/70 line-clamp-2">
-                                <span className="font-semibold text-white/85">{dictionary.programs?.latestNoteLabel ?? 'Latest'}:</span>{' '}
+                              <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                <span className="font-semibold text-[#262626] dark:text-white">{dictionary.programs?.latestNoteLabel ?? 'Latest'}:</span>{' '}
                                 {e.coachNotes[0].comment}
                               </div>
                             ) : null}
@@ -1347,10 +1367,10 @@ export function KidProfileClient({
                           {canManage && (
                             <Button
                               variant="outline"
-                              className="border-white/20 bg-white/10 text-white hover:bg-white/15"
+                              className="border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
                               onClick={() => openProgramNoteDialog(e)}
                             >
-                              <Plus className="h-4 w-4 me-2" />
+                              <Plus className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
                               {dictionary.programs?.addNote ?? 'Add note'}
                             </Button>
                           )}
@@ -1365,131 +1385,107 @@ export function KidProfileClient({
         </TabsContent>
 
         <TabsContent value="assessments" className="mt-4">
-          <Card className="bg-white/6 border border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-[0_30px_90px_-50px_rgba(0,0,0,0.7)]">
-            <CardHeader className="bg-white/5 border-b border-white/10 flex items-center justify-center min-h-14">
-              <CardTitle className="text-white text-center">
-                {dictionary.playerProfile?.sections?.assessmentHistory ?? 'Assessment history'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              {assessments.length === 0 ? (
-                <div className="text-white/70">
-                  {dictionary.playerProfile?.empty?.noAssessments ?? 'No assessments yet.'}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {assessments.map((a) => (
-                    <motion.div
-                      key={a.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35 }}
-                      className="p-4 rounded-2xl border border-white/10 bg-white/5"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="font-bold text-white">
-                            {a.sessionDate}
-                          </div>
-                          <div className="text-sm text-white/70">
-                            {dictionary.playerProfile?.labels?.naScore ?? 'NA Score'}: <span className="font-semibold">{a.naScore}</span>
-                          </div>
+          <PanelCard
+            title={dictionary.playerProfile?.sections?.assessmentHistory ?? 'Assessment history'}
+            icon={Calendar}
+          >
+            {assessments.length === 0 ? (
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {dictionary.playerProfile?.empty?.noAssessments ?? 'No assessments yet.'}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {assessments.map((a) => (
+                  <motion.div
+                    key={a.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35 }}
+                    className="rounded-2xl border-2 border-[#DDDDDD] bg-white p-4 shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-bold text-[#262626] dark:text-white">
+                          {a.sessionDate}
                         </div>
-                        {canAdmin && (
-                          <Button
-                            variant="outline"
-                            className="border-white/20 bg-white/10 text-white hover:bg-white/15"
-                            onClick={() => handleDeleteAssessment(a.id)}
-                          >
-                            <Trash2 className="h-4 w-4 me-2" />
-                            {dictionary.common.delete}
-                          </Button>
-                        )}
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {dictionary.playerProfile?.labels?.naScore ?? 'NA Score'}: <span className="font-semibold text-[#262626] dark:text-white">{a.naScore}</span>
+                        </div>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+
+                      {canAdmin && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
+                          onClick={() => handleDeleteAssessment(a.id)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                          {dictionary.common.delete}
+                        </Button>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </PanelCard>
         </TabsContent>
 
         <TabsContent value="badges" className="mt-4">
-          <Card className="bg-white/6 border border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-[0_30px_90px_-50px_rgba(0,0,0,0.7)]">
-            <CardHeader className="bg-white/5 border-b border-white/10 flex items-center justify-center min-h-14">
-              <CardTitle className="text-white text-center">
-                {dictionary.playerProfile?.sections?.badges ?? 'Badges'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {BADGES.map((b) => {
-                  const unlocked = grantedBadgeIds.has(b.id);
-                  return (
-                    <div
-                      key={b.id}
-                      className={`p-4 rounded-xl border-2 ${
-                        unlocked
-                          ? 'border-green-300 dark:border-green-900 bg-green-50 dark:bg-green-900/10'
-                          : 'border-white/10 bg-white/5'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="font-bold text-white truncate">
-                            {t(b.nameKey)}
-                          </div>
-                          <div className="mt-1 text-sm text-white/70">
-                            {unlocked ? t(b.descriptionKey) : t(b.lockedHintKey)}
-                          </div>
+          <PanelCard title={dictionary.playerProfile?.sections?.badges ?? 'Badges'} icon={Star}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {BADGES.map((b) => {
+                const unlocked = grantedBadgeIds.has(b.id);
+                return (
+                  <div
+                    key={b.id}
+                    className={
+                      unlocked
+                        ? 'rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-4 shadow-sm dark:border-emerald-800 dark:bg-emerald-900/10'
+                        : 'rounded-2xl border-2 border-[#DDDDDD] bg-white p-4 shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]'
+                    }
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-bold text-[#262626] dark:text-white truncate">
+                          {t(b.nameKey)}
                         </div>
-                        <div>
-                          {unlocked ? (
-                            <Badge className="bg-green-600 text-white border-0">
-                              {dictionary.playerProfile?.labels?.unlocked ?? 'Unlocked'}
-                            </Badge>
-                          ) : (
-                            <Badge variant="secondary" className="bg-white/10 text-white/80 border border-white/10">
-                              {dictionary.playerProfile?.labels?.locked ?? 'Locked'}
-                            </Badge>
-                          )}
+                        <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                          {unlocked ? t(b.descriptionKey) : t(b.lockedHintKey)}
                         </div>
                       </div>
+                      <div>
+                        {unlocked ? (
+                          <Badge className="bg-emerald-600 text-white border-0">
+                            {dictionary.playerProfile?.labels?.unlocked ?? 'Unlocked'}
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="bg-gray-100 text-gray-800 border-0 dark:bg-white/10 dark:text-white/80">
+                            {dictionary.playerProfile?.labels?.locked ?? 'Locked'}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+                  </div>
+                );
+              })}
+            </div>
+          </PanelCard>
         </TabsContent>
 
         <TabsContent value="achievements" className="mt-4">
           <div className="space-y-4">
-            <Card className="bg-white/6 border border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-[0_30px_90px_-50px_rgba(0,0,0,0.7)]">
-              <CardHeader className="bg-white/5 border-b border-white/10 flex flex-col items-center justify-center text-center gap-1">
-                <CardTitle className="text-white flex items-center gap-2 justify-center">
-                  <motion.div
-                    animate={{ rotate: [0, -6, 6, -6, 0] }}
-                    transition={{ duration: 0.6 }}
-                    aria-hidden
-                  >
-                    <Award className="w-5 h-5 text-white/85" />
-                  </motion.div>
-                  <span className="tracking-tight">
-                    {dictionary.playerProfile?.achievements?.bilingualTitle ?? 'Achievements'}
-                  </span>
-                </CardTitle>
-                <p className="text-sm text-white/65">
-                  {dictionary.playerProfile?.achievements?.bilingualSubtitle ?? 'Unlocked medals earned through progress.'}
-                </p>
-              </CardHeader>
-            </Card>
+            <PanelCard
+              title={dictionary.playerProfile?.achievements?.bilingualTitle ?? (dictionary.playerProfile?.tabs?.achievements ?? 'Achievements')}
+              icon={Award}
+            >
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {dictionary.playerProfile?.achievements?.bilingualSubtitle ?? 'Unlocked medals earned through progress.'}
+              </p>
+            </PanelCard>
 
-            <StudentMedalsDisplay
-              studentId={currentKid.id}
-              hideHeader
-              locale={locale}
-            />
+            <StudentMedalsDisplay studentId={currentKid.id} hideHeader locale={locale} />
           </div>
         </TabsContent>
       </Tabs>
@@ -1540,6 +1536,154 @@ export function KidProfileClient({
             </Button>
             <Button onClick={() => void submitProgramNote()} disabled={programNoteSubmitting}>
               {programNoteSubmitting ? dictionary.common.saving : dictionary.common.save}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Program level dialog */}
+      <Dialog
+        open={programLevelDialogOpen}
+        onOpenChange={(open) => {
+          setProgramLevelDialogOpen(open);
+          if (!open) {
+            setProgramLevelTargetProgramId('');
+            setProgramLevelOptions([]);
+            setProgramLevelSelectedId(NO_LEVEL_VALUE);
+            setProgramLevelPointsDelta('');
+            setProgramLevelComment('');
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[760px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {dictionary.playerProfile?.actions?.adjustProgramLevel ?? 'Adjust program level'}
+            </DialogTitle>
+            <DialogDescription>
+              {dictionary.programs?.membersDescription ?? 'Update the current level for a program membership.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4">
+            {programEnrollments.length > 1 ? (
+              <div className="grid gap-2">
+                <Label className="text-sm font-semibold">{dictionary.programs?.selectedProgram ?? 'Selected program'}</Label>
+                <Select
+                  value={programLevelTargetProgramId}
+                  onValueChange={(v) => void handleProgramLevelTargetProgramChange(v)}
+                >
+                  <SelectTrigger className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                    <SelectValue placeholder={dictionary.programs?.selectProgramPrompt ?? 'Select a program'} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                    {programEnrollments.map((e) => (
+                      <SelectItem key={e.programId} value={e.programId} className="cursor-pointer">
+                        {e.program ? (locale === 'ar' ? e.program.nameAr : e.program.name) : e.programId}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
+
+            <div className="grid gap-2">
+              <Label className="text-sm font-semibold">{dictionary.programs?.currentLevelLabel ?? 'Level'}</Label>
+              <div className="flex items-stretch gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-12 w-12 shrink-0 rounded-xl"
+                  onClick={() => shiftProgramLevel('prev')}
+                  disabled={loadingProgramLevelOptions || programLevelOptions.length === 0}
+                  aria-label="Previous level"
+                  title="Previous"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                <div className="flex-1 min-w-0">
+                  <Select value={programLevelSelectedId} onValueChange={setProgramLevelSelectedId}>
+                    <SelectTrigger className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                      <SelectValue placeholder={dictionary.programs?.noLevel ?? 'No level'} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                      <SelectItem value={NO_LEVEL_VALUE} className="cursor-pointer">
+                        {dictionary.programs?.noLevel ?? 'No level'}
+                      </SelectItem>
+                      {[...programLevelOptions]
+                        .sort((a, b) => a.order - b.order)
+                        .map((lvl) => (
+                          <SelectItem key={lvl.id} value={lvl.id} className="cursor-pointer">
+                            <span className="flex items-center gap-2">
+                              <span
+                                className="h-2.5 w-2.5 rounded-full border border-black/20"
+                                style={{ backgroundColor: lvl.color }}
+                                aria-hidden
+                              />
+                              <span className="font-semibold">{locale === 'ar' ? lvl.nameAr : lvl.name}</span>
+                              <span className="text-xs text-muted-foreground">#{lvl.order}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+
+                  {loadingProgramLevelOptions ? (
+                    <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">{dictionary.common.loading}</div>
+                  ) : null}
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-12 w-12 shrink-0 rounded-xl"
+                  onClick={() => shiftProgramLevel('next')}
+                  disabled={loadingProgramLevelOptions || programLevelOptions.length === 0}
+                  aria-label="Next level"
+                  title="Next"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">{dictionary.programs?.pointsDeltaLabel ?? 'Points change'}</Label>
+                <Input
+                  value={programLevelPointsDelta}
+                  onChange={(e) => setProgramLevelPointsDelta(e.target.value)}
+                  inputMode="numeric"
+                  placeholder={dictionary.programs?.pointsDeltaHint ?? 'e.g. 5 or -2'}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">{dictionary.programs?.commentLabel ?? 'Comment'}</Label>
+                <Input
+                  value={programLevelComment}
+                  onChange={(e) => setProgramLevelComment(e.target.value)}
+                  placeholder={dictionary.programs?.commentHint ?? 'Short coaching note'}
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setProgramLevelDialogOpen(false)}
+              disabled={programLevelSubmitting}
+            >
+              {dictionary.common.cancel}
+            </Button>
+            <Button
+              onClick={() => void handleSaveProgramLevel()}
+              disabled={programLevelSubmitting || loadingProgramLevelOptions || !programLevelTargetProgramId}
+            >
+              <Save className="h-4 w-4 me-2" />
+              {programLevelSubmitting ? dictionary.common.saving : dictionary.common.save}
             </Button>
           </DialogFooter>
         </DialogContent>

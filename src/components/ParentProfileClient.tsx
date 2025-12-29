@@ -214,66 +214,75 @@ export function ParentProfileClient({
 
       {/* Add Child Dialog */}
       <Dialog open={addChildOpen} onOpenChange={setAddChildOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-[#262626] dark:text-white">
-            <DialogContent className="sm:max-w-[500px] bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+              {dictionary.users.addChild || 'Add Child'}
             </DialogTitle>
             <DialogDescription>
               {dictionary.users.addChildDescription || 'Add a new child for this parent. Default password is 11111111.'}
             </DialogDescription>
           </DialogHeader>
+
           <div className="space-y-4 py-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="fullName">{dictionary.common.fullName}</Label>
               <Input
                 id="fullName"
+                className={inputClass}
                 value={childData.fullName}
                 onChange={(e) => setChildData({ ...childData, fullName: e.target.value })}
                 placeholder={dictionary.users.fullNamePlaceholder || 'Enter child full name'}
               />
             </div>
-            <div>
-                    className={inputClass}
+
+            <div className="space-y-2">
               <Label htmlFor="nationalId">{dictionary.users.nationalId || 'National ID'}</Label>
               <Input
                 id="nationalId"
+                className={inputClass}
                 value={childData.nationalId}
                 onChange={(e) => setChildData({ ...childData, nationalId: e.target.value })}
                 placeholder={dictionary.users.nationalIdPlaceholder || 'Enter national ID number'}
               />
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground">
                 {dictionary.users.nationalIdNote || 'This will be used as the login username'}
-                    className={inputClass}
               </p>
             </div>
-            <div>
+
+            <div className="space-y-2">
               <Label htmlFor="birthDate">{dictionary.dashboard?.academyAdmin?.birthDate || 'Birth date'}</Label>
               <Input
                 id="birthDate"
+                className={inputClass}
                 type="date"
                 value={childData.birthDate}
                 onChange={(e) => setChildData({ ...childData, birthDate: e.target.value })}
               />
             </div>
-            <div className="bg-[#DDDDDD] dark:bg-[#262626] p-3 rounded-lg">
-                    className={inputClass}
+
+            <div className="p-3 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-50 dark:bg-[#1a1a1a]">
               <p className="text-sm font-semibold text-[#262626] dark:text-white">
-                {dictionary.users.defaultPassword || 'Default Password'}: 11111111
-                <div className="p-3 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-50 dark:bg-[#1a1a1a]">
-                  <p className={`text-sm font-semibold text-[#262626] dark:text-white`}>
+                {dictionary.users.defaultPassword || 'Default Password'}: <span className="font-extrabold">11111111</span>
+              </p>
+            </div>
           </div>
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddChildOpen(false)} disabled={loading}>
+            <Button
+              variant="outline"
+              className={outlineButtonClass}
+              onClick={() => setAddChildOpen(false)}
+              disabled={loading}
+            >
               {dictionary.common.cancel}
             </Button>
-                <Button variant="outline" onClick={() => setAddChildOpen(false)} disabled={loading} className={outlineButtonClass}>
+            <Button
               onClick={handleAddChild}
-              className="bg-[#FF5F02] hover:bg-[#262626] text-white"
+              className="h-12 bg-[#FF5F02] hover:bg-[#262626] text-white"
               disabled={loading}
             >
               {loading ? dictionary.common.loading : (dictionary.users.addChild || 'Add Child')}
-                  className="h-12 bg-[#0b0b0f] text-white hover:bg-[#14141a]"
             </Button>
           </DialogFooter>
         </DialogContent>
