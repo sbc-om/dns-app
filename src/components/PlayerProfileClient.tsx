@@ -43,8 +43,6 @@ import type { PlayerProfile } from '@/lib/db/repositories/playerProfileRepositor
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
 import {
   ensurePlayerProfileAction,
-  evaluatePlayerStageAction,
-  approveStageUpgradeAction,
   grantPlayerBadgeAction,
   syncPlayerProfileAfterAssessmentAction,
 } from '@/lib/actions/playerProfileActions';
@@ -73,8 +71,6 @@ export function KidProfileClient({
   currentUser,
   academyId,
 }: KidProfileClientProps) {
-  type StageEvaluationActionResult = Awaited<ReturnType<typeof evaluatePlayerStageAction>>;
-  type StageEvaluationSuccess = Extract<StageEvaluationActionResult, { success: true }>;
   type EnrichedEnrollment = Enrollment & { course?: Course | null };
   type AssessmentFieldKey = 'speed' | 'agility' | 'balance' | 'power' | 'reaction' | 'coordination' | 'flexibility';
   type AssessmentFormState = { sessionDate: string; notes: string } & Record<AssessmentFieldKey, string>;
@@ -91,7 +87,6 @@ export function KidProfileClient({
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
-  const [stageEvaluation, setStageEvaluation] = useState<StageEvaluationSuccess | null>(null);
   const [assessments, setAssessments] = useState<DnaAssessmentSession[]>([]);
 
   const [assessmentDialogOpen, setAssessmentDialogOpen] = useState(false);
@@ -175,18 +170,6 @@ export function KidProfileClient({
         setProfile(ensured.profile);
       }
 
-      const evalRes = await evaluatePlayerStageAction({
-        locale,
-        academyId,
-        userId: kid.id,
-      });
-
-      if (evalRes.success) {
-        setStageEvaluation(evalRes as StageEvaluationSuccess);
-      } else {
-        setStageEvaluation(null);
-      }
-
       const assRes = await getDnaAssessmentsForPlayerAction({
         locale,
         academyId,
@@ -201,7 +184,6 @@ export function KidProfileClient({
       console.error('Load player profile error:', error);
       setProfileError(dictionary.common.error);
       setProfile(null);
-      setStageEvaluation(null);
       setAssessments([]);
     } finally {
       setLoadingProfile(false);
@@ -303,7 +285,6 @@ export function KidProfileClient({
     newAssessment: dictionary.playerProfile?.actions?.newAssessment ?? 'New assessment',
     grantBadge: dictionary.playerProfile?.actions?.grantBadge ?? 'Grant badge',
     achievements: dictionary.playerProfile?.tabs?.achievements ?? 'Achievements',
-    approveStageUpgrade: dictionary.playerProfile?.actions?.approveStageUpgrade ?? 'Approve stage upgrade',
   };
 
   const scoreLabel = dictionary.playerProfile?.labels?.score ?? 'Score';
@@ -408,23 +389,6 @@ export function KidProfileClient({
     }
   };
 
-  const handleApproveStageUpgrade = async () => {
-    if (!canManage) return;
-    const confirmed = confirm(dictionary.common.confirmContinue);
-    if (!confirmed) return;
-
-    const res = await approveStageUpgradeAction({
-      locale,
-      academyId,
-      userId: kid.id,
-    });
-    if (!res.success) {
-      alert(res.error || dictionary.common.error);
-      return;
-    }
-    await loadPlayerProfile();
-  };
-
   const handleDeleteAssessment = async (assessmentId: string) => {
     if (!canAdmin) return;
     const confirmed = confirm(dictionary.common.confirmDelete);
@@ -440,28 +404,6 @@ export function KidProfileClient({
       return;
     }
     await loadPlayerProfile();
-  };
-
-  const formatPct = (value: number | undefined) => {
-    if (value === undefined || !Number.isFinite(value)) return '0%';
-    return `${Math.round(value * 100)}%`;
-  };
-
-  const stageLabel = (stageKey?: string) => {
-    switch (stageKey) {
-      case 'explorer':
-        return dictionary.playerProfile?.stages?.explorer ?? 'Explorer';
-      case 'foundation':
-        return dictionary.playerProfile?.stages?.foundation ?? 'Foundation';
-      case 'active_player':
-        return dictionary.playerProfile?.stages?.activePlayer ?? 'Active Player';
-      case 'competitor':
-        return dictionary.playerProfile?.stages?.competitor ?? 'Competitor';
-      case 'champion':
-        return dictionary.playerProfile?.stages?.champion ?? 'Champion';
-      default:
-        return dictionary.playerProfile?.stages?.explorer ?? 'Explorer';
-    }
   };
 
   const categoryLabel = (key: string) => {
@@ -486,8 +428,6 @@ export function KidProfileClient({
         return labels?.firstAssessmentCompleted ?? 'First assessment completed';
       case 'reassessment':
         return labels?.reassessment ?? 'Reassessment';
-      case 'stage_evaluation':
-        return labels?.stageEvaluation ?? 'Stage evaluation';
       case 'due_for_reassessment':
         return labels?.dueForReassessment ?? 'Due for reassessment';
       default:
@@ -600,7 +540,7 @@ export function KidProfileClient({
 
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Badge variant="secondary" className="bg-white/5 border border-white/10 text-white/90">
-                    {dictionary.playerProfile?.labels?.stage ?? 'Stage'}: {stageLabel(profile?.currentStage)}
+                    {dictionary.playerProfile?.labels?.xp ?? 'XP'}: {profile?.xpTotal ?? 0}
                   </Badge>
                   {latestAssessment && (
                     <Badge variant="secondary" className="bg-white/5 border border-white/10 text-white/90">
@@ -668,16 +608,6 @@ export function KidProfileClient({
                 <Trophy className="h-4 w-4 me-2" />
                 {actionLabel.achievements}
               </Button>
-              {canManage && stageEvaluation?.evaluation?.readyForStageUpgrade && (
-                <Button
-                  type="button"
-                  onClick={handleApproveStageUpgrade}
-                  className="w-full bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg"
-                >
-                  <Flag className="h-4 w-4 me-2" />
-                  {actionLabel.approveStageUpgrade}
-                </Button>
-              )}
             </div>
           </div>
 
@@ -729,17 +659,6 @@ export function KidProfileClient({
                     {actionLabel.achievements}
                   </span>
                 </Button>
-                {canManage && stageEvaluation?.evaluation?.readyForStageUpgrade && (
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={handleApproveStageUpgrade}
-                    className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg flex-col h-auto py-3 col-span-3"
-                  >
-                    <Flag className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">{actionLabel.approveStageUpgrade}</span>
-                  </Button>
-                )}
               </div>
             </div>
           </div>
@@ -748,36 +667,30 @@ export function KidProfileClient({
             <div className="flex items-center gap-2 mb-3">
               <Trophy className="w-4 h-4 text-white/70" />
               <div className="font-semibold text-white">
-                {dictionary.playerProfile?.labels?.progress ?? 'Stage Progress'}
+                {dictionary.playerProfile?.labels?.progress ?? 'Progress'}
               </div>
             </div>
 
             <div className="space-y-3">
-              <progress
-                value={Math.round((stageEvaluation?.evaluation?.overallProgress || 0) * 100)}
-                max={100}
-                className="w-full h-3 rounded-md overflow-hidden border border-white/10 bg-white/5"
-              />
-
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <StatTile
-                  title={dictionary.playerProfile?.labels?.daysInStage ?? 'Days in stage'}
-                  value={stageEvaluation?.evaluation?.timeInStageDays ?? 0}
-                  icon={Calendar}
-                />
-                <StatTile
-                  title={dictionary.playerProfile?.labels?.attendance ?? 'Attendance'}
-                  value={formatPct(stageEvaluation?.attendance?.attendanceRate)}
-                  icon={Activity}
-                />
-                <StatTile
-                  title={dictionary.playerProfile?.labels?.naImprovement ?? 'NA improvement'}
-                  value={formatPct(stageEvaluation?.evaluation?.naImprovementPct)}
-                  icon={Trophy}
-                />
                 <StatTile
                   title={dictionary.playerProfile?.labels?.xp ?? 'XP'}
                   value={profile?.xpTotal ?? 0}
+                  icon={Calendar}
+                />
+                <StatTile
+                  title={dictionary.playerProfile?.labels?.badges ?? 'Badges'}
+                  value={`${profile?.badges?.length ?? 0}/${BADGES.length}`}
+                  icon={Activity}
+                />
+                <StatTile
+                  title={dictionary.playerProfile?.labels?.lastAssessment ?? 'Last assessment'}
+                  value={latestAssessment ? latestAssessment.sessionDate : '-'}
+                  icon={Trophy}
+                />
+                <StatTile
+                  title={dictionary.playerProfile?.labels?.assessments ?? 'Assessments'}
+                  value={assessments.length}
                   icon={Star}
                 />
               </div>
@@ -933,13 +846,6 @@ export function KidProfileClient({
                   <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.assessmentStatus ?? 'Assessment status'}</div>
                   <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
                     {assessmentStatusLabel(profile?.assessmentStatus)}
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
-                  <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.stageStart ?? 'Stage start'}</div>
-                  <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
-                    {profile?.stageStartDate ? new Date(profile.stageStartDate).toLocaleDateString(locale) : '-'}
                   </div>
                 </div>
 

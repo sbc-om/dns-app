@@ -1,16 +1,11 @@
 import { getDatabase, generateId } from '../lmdb';
-import type { PlayerStageKey, PlayerAssessmentStatus } from '@/lib/player/stageSystem';
 import type { PlayerBadgeId } from '@/lib/player/badges';
 
-export type PlayerStageHistoryEntry = {
-  stage: PlayerStageKey;
-  startedAt: string;
-  endedAt?: string;
-  approvedBy?: string;
-  entryNaScore?: number;
-  exitNaScore?: number;
-  notes?: string;
-};
+export type PlayerAssessmentStatus =
+  | 'new'
+  | 'first_assessment_completed'
+  | 'reassessment'
+  | 'due_for_reassessment';
 
 export type PlayerBadgeGrant = {
   badgeId: PlayerBadgeId;
@@ -19,7 +14,7 @@ export type PlayerBadgeGrant = {
   notes?: string;
 };
 
-export type PlayerXpEventType = 'first_assessment' | 'reassessment' | 'badge_granted' | 'stage_upgrade';
+export type PlayerXpEventType = 'first_assessment' | 'reassessment' | 'badge_granted';
 
 export type PlayerXpEvent = {
   id: string;
@@ -34,11 +29,6 @@ export interface PlayerProfile {
   id: string;
   academyId: string;
   userId: string;
-
-  currentStage: PlayerStageKey;
-  stageStartDate: string;
-  stageEntryNaScore?: number;
-  stageHistory: PlayerStageHistoryEntry[];
 
   assessmentStatus: PlayerAssessmentStatus;
   lastAssessmentAt?: string;
@@ -83,16 +73,6 @@ export async function createDefaultPlayerProfile(params: {
     id: generateId(),
     academyId: params.academyId,
     userId: params.userId,
-
-    currentStage: 'explorer',
-    stageStartDate: now,
-    stageEntryNaScore: undefined,
-    stageHistory: [
-      {
-        stage: 'explorer',
-        startedAt: now,
-      },
-    ],
 
     assessmentStatus: 'new',
     lastAssessmentAt: undefined,

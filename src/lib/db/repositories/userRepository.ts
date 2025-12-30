@@ -48,7 +48,6 @@ export interface User {
   height?: number; // cm
   weight?: number; // kg
   country?: string; // ISO country code or name
-  dnaStage?: string; // e.g., "Bronze", "Silver", "Gold", "Platinum"
   
   createdAt: string;
   updatedAt: string;
@@ -84,7 +83,6 @@ export interface CreateUserInput {
   height?: number;
   weight?: number;
   country?: string;
-  dnaStage?: string;
 }
 
 export interface UpdateUserInput {
@@ -118,7 +116,6 @@ export interface UpdateUserInput {
   height?: number;
   weight?: number;
   country?: string;
-  dnaStage?: string;
 }
 
 const USERS_PREFIX = 'users:';
@@ -190,7 +187,6 @@ export async function createUser(input: CreateUserInput): Promise<User> {
     height: input.height,
     weight: input.weight,
     country: input.country,
-    dnaStage: input.dnaStage,
 
     createdAt: now,
     updatedAt: now,
@@ -311,7 +307,6 @@ export async function updateUser(id: string, input: UpdateUserInput): Promise<Us
     height: input.height !== undefined ? input.height : user.height,
     weight: input.weight !== undefined ? input.weight : user.weight,
     country: input.country !== undefined ? input.country : user.country,
-    dnaStage: input.dnaStage !== undefined ? input.dnaStage : user.dnaStage,
 
     updatedAt: new Date().toISOString(),
   };

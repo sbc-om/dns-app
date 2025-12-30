@@ -1,11 +1,34 @@
 import type { NextConfig } from "next";
 import withPWA from '@ducanh2912/next-pwa';
+import os from 'node:os';
 
 const lowResourceMode = process.env.LOW_RESOURCE_MODE === 'true';
 const envAllowedDevOrigins = (process.env.NEXT_ALLOWED_DEV_ORIGINS ?? '')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
+
+function getLocalDevIPv4Addresses(): string[] {
+  try {
+    const ifaces = os.networkInterfaces();
+    const addresses: string[] = [];
+
+    for (const entries of Object.values(ifaces)) {
+      if (!entries) continue;
+      for (const entry of entries) {
+        if (!entry) continue;
+        if (entry.family !== 'IPv4') continue;
+        if (entry.internal) continue;
+        if (!entry.address) continue;
+        addresses.push(entry.address);
+      }
+    }
+
+    return Array.from(new Set(addresses));
+  } catch {
+    return [];
+  }
+}
 
 // NOTE:
 // Next.js is tightening dev-mode security around cross-origin requests for /_next assets.
@@ -16,6 +39,8 @@ const allowedDevOrigins = process.env.NODE_ENV === 'development'
       'localhost',
       '127.0.0.1',
       '0.0.0.0',
+      'host.docker.internal',
+      ...getLocalDevIPv4Addresses(),
       ...envAllowedDevOrigins,
     ]
   : undefined;

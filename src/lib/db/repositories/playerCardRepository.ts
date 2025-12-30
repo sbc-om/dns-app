@@ -47,7 +47,7 @@ export interface PlayerCardData {
   
   // Card Color/Stage
   cardColor: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
-  dnaStage: string;
+  ratingTier: string;
   
   // Metadata
   createdBy: string; // Admin/Coach who created the card
@@ -215,7 +215,7 @@ function determineCardColor(overallRating: number): PlayerCardData['cardColor'] 
 /**
  * Determine DNA stage based on overall rating
  */
-function determineDNAStage(overallRating: number): string {
+function determineRatingTier(overallRating: number): string {
   if (overallRating >= 85) return 'Elite';
   if (overallRating >= 75) return 'Advanced';
   if (overallRating >= 65) return 'Intermediate';
@@ -235,7 +235,7 @@ export async function createPlayerCard(input: CreatePlayerCardInput): Promise<Pl
   const ratings = calculateRatings(input.physicalTests, input.age);
   const overallRating = calculateOverallRating(ratings);
   const cardColor = determineCardColor(overallRating);
-  const dnaStage = determineDNAStage(overallRating);
+  const ratingTier = determineRatingTier(overallRating);
   
   const playerCard: PlayerCardData = {
     id,
@@ -252,7 +252,7 @@ export async function createPlayerCard(input: CreatePlayerCardInput): Promise<Pl
     ratings,
     overallRating,
     cardColor,
-    dnaStage,
+    ratingTier,
     createdBy: input.createdBy,
     createdAt: now,
     updatedAt: now,
@@ -315,14 +315,14 @@ export async function updatePlayerCard(
   let ratings = card.ratings;
   let overallRating = card.overallRating;
   let cardColor = card.cardColor;
-  let dnaStage = card.dnaStage;
+  let ratingTier = card.ratingTier;
   
   if (updates.physicalTests) {
     const age = updates.age || card.age;
     ratings = calculateRatings(updates.physicalTests, age);
     overallRating = calculateOverallRating(ratings);
     cardColor = determineCardColor(overallRating);
-    dnaStage = determineDNAStage(overallRating);
+    ratingTier = determineRatingTier(overallRating);
   }
   
   const updatedCard: PlayerCardData = {
@@ -331,7 +331,7 @@ export async function updatePlayerCard(
     ratings,
     overallRating,
     cardColor,
-    dnaStage,
+    ratingTier,
     updatedAt: new Date().toISOString(),
   };
   

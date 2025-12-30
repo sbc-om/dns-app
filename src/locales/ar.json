@@ -1105,6 +1105,9 @@
     "editLevel": "تعديل المستوى",
     "deleteLevel": "حذف المستوى",
     "noLevels": "لا توجد مستويات بعد",
+    "journeyTitle": "رحلة البرنامج",
+    "noLevelsDefined": "لا توجد مستويات معرفة لهذا البرنامج بعد.",
+    "noLevelHistory": "لا يوجد سجل مستويات بعد.",
     "rulesTitle": "قواعد النجاح",
     "rulesHint": "حدد الشروط المطلوبة لاجتياز هذا المستوى. اترك الحقل فارغاً لتجاهل هذا الشرط.",
     "imageHint": "ارفع صورة غلاف للبرنامج (الحد الأقصى 5MB).",
@@ -1275,12 +1278,30 @@
       "selectCourse": "اختر دورة"
     },
     "actions": {
+      "stageJourney": "رحلة البرنامج",
       "editProfile": "تعديل الملف الشخصي",
       "newAssessment": "تقييم جديد",
       "grantBadge": "منح شارة",
       "adjustProgramLevel": "تعديل مستوى البرنامج",
       "approveStageUpgrade": "اعتماد ترقية المرحلة",
       "addCourse": "إضافة دورة"
+    },
+    "journey": {
+      "programTitle": "رحلة البرنامج",
+      "subtitle": "مسارك عبر مستويات البرنامج.",
+      "status": {
+        "completed": "مكتمل",
+        "inProgress": "قيد التقدم",
+        "locked": "مقفل"
+      },
+      "labels": {
+        "started": "بدأ",
+        "ended": "انتهى",
+        "progress": "التقدم"
+      },
+      "empty": {
+        "noHistory": "لا يوجد سجل مستويات بعد."
+      }
     },
     "placeholders": {
       "selectCourse": "اختر دورة",

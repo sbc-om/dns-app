@@ -1105,6 +1105,9 @@
     "editLevel": "Edit Level",
     "deleteLevel": "Delete Level",
     "noLevels": "No levels yet",
+    "journeyTitle": "Program journey",
+    "noLevelsDefined": "No levels defined for this program yet.",
+    "noLevelHistory": "No level history yet.",
     "rulesTitle": "Pass Rules",
     "rulesHint": "Set the conditions required to pass this level. Leave a field empty to ignore that rule.",
     "imageHint": "Upload a program cover image (max 5MB).",
@@ -1242,12 +1245,30 @@
       "achievements": "Achievements"
     },
     "sections": {
+      "stageJourney": "Journey",
       "insights": "Insights",
       "status": "Status",
       "assessmentHistory": "Assessment history",
       "badges": "Badges",
       "courses": "Courses",
       "medals": "Medals"
+    },
+    "journey": {
+      "programTitle": "Program journey",
+      "subtitle": "Your path through program levels.",
+      "status": {
+        "completed": "Completed",
+        "inProgress": "In progress",
+        "locked": "Locked"
+      },
+      "labels": {
+        "started": "Started",
+        "ended": "Finished",
+        "progress": "Progress"
+      },
+      "empty": {
+        "noHistory": "No level history yet."
+      }
     },
     "labels": {
       "stage": "Stage",

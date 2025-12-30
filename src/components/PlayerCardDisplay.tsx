@@ -40,7 +40,7 @@ export function PlayerCardDisplay({ card, size = 'large' }: PlayerCardDisplayPro
             {card.countryFlag && (
               <div className="w-12 h-8 bg-white/20 rounded mb-2" />
             )}
-            <div className="text-xs opacity-80">{card.dnaStage}</div>
+            <div className="text-xs opacity-80">{card.ratingTier}</div>
           </div>
         </div>
         

@@ -8,14 +8,12 @@ import { listAcademyMembers } from '@/lib/db/repositories/academyMembershipRepos
 import { getCoursesByCoachIdAndAcademyId, type Course, getCoursesByAcademyId, getAllCourses } from '@/lib/db/repositories/courseRepository';
 import { getPaidEnrollmentsByCourseIdAndAcademyId, getEnrollmentsByAcademyId, getAllEnrollments } from '@/lib/db/repositories/enrollmentRepository';
 import { ensurePlayerProfile } from '@/lib/db/repositories/playerProfileRepository';
-import { getLatestDnaAssessmentSession } from '@/lib/db/repositories/dnaAssessmentRepository';
-import { evaluateStage, daysBetween, type OrganizationType, type PlayerStageKey } from '@/lib/player/stageSystem';
-import { getAttendanceByCourse } from '@/lib/db/repositories/attendanceRepository';
 import { findAcademyById } from '@/lib/db/repositories/academyRepository';
 import { DashboardHomeClient } from '@/components/DashboardHomeClient';
 import { type AcademyAdminDashboardData, type AcademyAdminPlayerRow } from '@/components/AcademyAdminDashboardHomeClient';
 import { KidProfileClient } from '@/components/KidProfileClient';
 import { requireUserInAcademy } from '@/lib/academies/academyGuards';
+import { daysBetweenIso } from '@/lib/utils/date';
 
 export default async function DashboardPage({
   params,
@@ -95,7 +93,7 @@ export default async function DashboardPage({
     const kids = users.filter((u) => u.role === 'player' && u.isActive);
 
     const academy = await findAcademyById(ctx!.academyId);
-    const organizationType: OrganizationType = (academy as any)?.organizationType === 'school' ? 'school' : 'academy';
+    const isSchool = (academy as any)?.organizationType === 'school';
 
     // Preload player profiles.
     const profiles = await Promise.all(
@@ -106,96 +104,24 @@ export default async function DashboardPage({
     );
     const profileByUserId = new Map(profiles.map((p) => [p.userId, p.profile] as const));
 
-    // Batch attendance: scan once per course in this academy.
-    const enrollments = await getEnrollmentsByAcademyId(ctx!.academyId);
-    const kidIdSet = new Set(kids.map((k) => k.id));
-    const courseIds = new Set<string>();
-    const studentToCourseIds = new Map<string, Set<string>>();
-
-    for (const e of enrollments) {
-      if (!kidIdSet.has(e.studentId)) continue;
-      courseIds.add(e.courseId);
-      const set = studentToCourseIds.get(e.studentId) ?? new Set<string>();
-      set.add(e.courseId);
-      studentToCourseIds.set(e.studentId, set);
-    }
-
-    const attendanceByStudent = new Map<string, Array<{ sessionDate: string; present: boolean }>>();
-    const attendanceByCourse = await Promise.all(
-      Array.from(courseIds).map(async (courseId) => ({
-        courseId,
-        records: await getAttendanceByCourse(courseId),
-      }))
-    );
-    for (const { courseId, records } of attendanceByCourse) {
-      for (const r of records) {
-        // Only consider students that are enrolled in this course.
-        const allowed = studentToCourseIds.get(r.studentId);
-        if (!allowed || !allowed.has(courseId)) continue;
-        const arr = attendanceByStudent.get(r.studentId) ?? [];
-        arr.push({ sessionDate: r.sessionDate, present: r.present });
-        attendanceByStudent.set(r.studentId, arr);
-      }
-    }
-
-    const stageCounts: Record<PlayerStageKey, number> = {
-      explorer: 0,
-      foundation: 0,
-      active_player: 0,
-      competitor: 0,
-      champion: 0,
-    };
-
-    const reassessmentDays = organizationType === 'school' ? 365 : 90;
+    const reassessmentDays = isSchool ? 365 : 90;
     const nowIso = new Date().toISOString();
 
     const players: AcademyAdminPlayerRow[] = await Promise.all(
       kids.map(async (k) => {
         const profile = profileByUserId.get(k.id)!;
-        stageCounts[profile.currentStage] += 1;
-
-        const latest = await getLatestDnaAssessmentSession({ academyId: ctx!.academyId, playerId: k.id });
-        const currentNaScore = latest?.naScore;
-
-        const records = attendanceByStudent.get(k.id) ?? [];
-        const stageStartIso = profile.stageStartDate;
-        const stageStartDay = stageStartIso.slice(0, 10); // YYYY-MM-DD
-        let totalSessions = 0;
-        let presentSessions = 0;
-        for (const r of records) {
-          // attendance sessionDate is YYYY-MM-DD
-          if (r.sessionDate >= stageStartDay) {
-            totalSessions += 1;
-            if (r.present) presentSessions += 1;
-          }
-        }
-        const attendanceRate = totalSessions > 0 ? presentSessions / totalSessions : 0;
-
-        const evaluation = evaluateStage({
-          currentStage: profile.currentStage,
-          stageStartDate: profile.stageStartDate,
-          organizationType,
-          stageEntryNaScore: profile.stageEntryNaScore,
-          currentNaScore,
-          attendanceRate,
-          nowIso,
-        });
-
         const needsReassessment =
-          !profile.lastAssessmentAt || daysBetween(profile.lastAssessmentAt, nowIso) >= reassessmentDays;
+          !profile.lastAssessmentAt || daysBetweenIso(profile.lastAssessmentAt, nowIso) >= reassessmentDays;
 
         return {
           userId: k.id,
           displayName: k.fullName || k.username,
-          stage: profile.currentStage,
           lastAssessmentAt: profile.lastAssessmentAt,
-          readyForStageUpgrade: evaluation.readyForStageUpgrade,
           needsReassessment,
         };
       })
     );
 
-    const playersReadyForStageUpgrade = players.filter((p) => p.readyForStageUpgrade).length;
     const playersNeedingReassessment = players.filter((p) => p.needsReassessment).length;
 
     managerDashboard = {
@@ -203,8 +129,6 @@ export default async function DashboardPage({
       academyNameAr: academy?.nameAr,
       academyImage: (academy as any)?.image,
       totalPlayers: players.length,
-      stageCounts,
-      playersReadyForStageUpgrade,
       playersNeedingReassessment,
       players: players.sort((a, b) => a.displayName.localeCompare(b.displayName)),
     };

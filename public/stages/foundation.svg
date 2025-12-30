@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="900" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(300 170) rotate(20) scale(560 380)">
+      <stop stop-color="#ffffff" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="20"/>
+    </filter>
+  </defs>
+  <rect width="900" height="600" rx="60" fill="url(#bg)"/>
+  <rect width="900" height="600" rx="60" fill="url(#glow)"/>
+
+  <circle cx="780" cy="150" r="110" fill="#ffffff" fill-opacity="0.12" filter="url(#soft)"/>
+  <circle cx="170" cy="470" r="140" fill="#0b1220" fill-opacity="0.22" filter="url(#soft)"/>
+
+  <!-- Pillars / foundation mark -->
+  <g transform="translate(450 310)">
+    <rect x="-170" y="60" width="340" height="34" rx="17" fill="#0b1220" fill-opacity="0.18"/>
+    <rect x="-150" y="-85" width="70" height="160" rx="18" fill="#ffffff" fill-opacity="0.9"/>
+    <rect x="-35" y="-110" width="70" height="185" rx="18" fill="#ffffff" fill-opacity="0.9"/>
+    <rect x="80" y="-70" width="70" height="145" rx="18" fill="#ffffff" fill-opacity="0.9"/>
+    <rect x="-190" y="-140" width="380" height="40" rx="20" fill="#ffffff" fill-opacity="0.35"/>
+  </g>
+</svg>

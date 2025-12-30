@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="900" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#06b6d4"/>
+      <stop offset="1" stop-color="#3b82f6"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(310 170) rotate(18) scale(560 380)">
+      <stop stop-color="#ffffff" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="20"/>
+    </filter>
+  </defs>
+  <rect width="900" height="600" rx="60" fill="url(#bg)"/>
+  <rect width="900" height="600" rx="60" fill="url(#glow)"/>
+
+  <circle cx="770" cy="140" r="120" fill="#ffffff" fill-opacity="0.12" filter="url(#soft)"/>
+  <circle cx="190" cy="470" r="150" fill="#0b1220" fill-opacity="0.22" filter="url(#soft)"/>
+
+  <!-- Shield / competitor mark -->
+  <g transform="translate(450 295)">
+    <path d="M0 -170 C90 -130 140 -60 140 25 C140 150 55 210 0 235 C-55 210 -140 150 -140 25 C-140 -60 -90 -130 0 -170 Z" fill="#ffffff" fill-opacity="0.9"/>
+    <path d="M0 -125 C55 -100 90 -50 90 20 C90 110 32 155 0 175 C-32 155 -90 110 -90 20 C-90 -50 -55 -100 0 -125 Z" fill="#0b1220" fill-opacity="0.18"/>
+  </g>
+</svg>

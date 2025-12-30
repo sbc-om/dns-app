@@ -5,6 +5,7 @@ import type { AuthUser } from '@/lib/auth/auth';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
 import type { Locale } from '@/config/i18n';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,7 @@ import {
   getPlayerProgramEnrollmentsAction,
   addCoachNoteToProgramPlayerAction,
   getProgramLevelsForProgramAction,
+  getProgramLevelsForPlayerProgramAction,
   setPlayerProgramLevelAction,
 } from '@/lib/actions/programEnrollmentActions';
 import { useEffect, useMemo, useState } from 'react';
@@ -51,12 +53,10 @@ import type { Course } from '@/lib/db/repositories/courseRepository';
 import type { PlayerProfile } from '@/lib/db/repositories/playerProfileRepository';
 import type { Program } from '@/lib/db/repositories/programRepository';
 import type { ProgramLevel } from '@/lib/db/repositories/programLevelRepository';
-import type { ProgramCoachNote } from '@/lib/db/repositories/programEnrollmentRepository';
+import type { ProgramCoachNote, ProgramLevelHistoryEntry } from '@/lib/db/repositories/programEnrollmentRepository';
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
 import {
   ensurePlayerProfileAction,
-  evaluatePlayerStageAction,
-  approveStageUpgradeAction,
   grantPlayerBadgeAction,
   syncPlayerProfileAfterAssessmentAction,
 } from '@/lib/actions/playerProfileActions';
@@ -69,7 +69,7 @@ import {
 import { BADGES } from '@/lib/player/badges';
 import { calculateCategoryScores } from '@/lib/player/dnaScoring';
 import { useRouter } from 'next/navigation';
-import { DEFAULT_ACCENT_COLOR, getStageAccentColor } from '@/lib/theme/accentColors';
+import { DEFAULT_ACCENT_COLOR } from '@/lib/theme/accentColors';
 import { DnaCircularGauge } from '@/components/DnaCircularGauge';
 
 interface KidProfileClientProps {
@@ -88,9 +88,6 @@ export function KidProfileClient({
   academyId,
 }: KidProfileClientProps) {
   const NO_LEVEL_VALUE = '__none__';
-
-  type StageEvaluationActionResult = Awaited<ReturnType<typeof evaluatePlayerStageAction>>;
-  type StageEvaluationSuccess = Extract<StageEvaluationActionResult, { success: true }>;
   type EnrichedEnrollment = Enrollment & { course?: Course | null };
   type AssessmentFieldKey = 'speed' | 'agility' | 'balance' | 'power' | 'reaction' | 'coordination' | 'flexibility';
   type AssessmentFormState = { sessionDate: string; notes: string } & Record<AssessmentFieldKey, string>;
@@ -104,6 +101,7 @@ export function KidProfileClient({
     currentLevelId?: string;
     pointsTotal: number;
     coachNotes: ProgramCoachNote[];
+    levelHistory?: ProgramLevelHistoryEntry[];
     program: Program | null;
     currentLevel: ProgramLevel | null;
   };
@@ -120,18 +118,21 @@ export function KidProfileClient({
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
-  const [stageEvaluation, setStageEvaluation] = useState<StageEvaluationSuccess | null>(null);
   const [assessments, setAssessments] = useState<DnaAssessmentSession[]>([]);
 
   const [programEnrollments, setProgramEnrollments] = useState<PlayerProgramEnrollment[]>([]);
   const [loadingProgramEnrollments, setLoadingProgramEnrollments] = useState(false);
   const [programEnrollmentsError, setProgramEnrollmentsError] = useState<string | null>(null);
+  const [programLevelsByProgramId, setProgramLevelsByProgramId] = useState<Record<string, ProgramLevel[]>>({});
+
+  const totalProgramPoints = useMemo(() => {
+    return programEnrollments.reduce((sum, e) => sum + (Number.isFinite(e.pointsTotal) ? e.pointsTotal : 0), 0);
+  }, [programEnrollments]);
 
   const accentColor = useMemo(() => {
     const fromLevel = programEnrollments.find((e) => e.currentLevel?.color)?.currentLevel?.color;
-    if (fromLevel) return fromLevel;
-    return getStageAccentColor(profile?.currentStage);
-  }, [programEnrollments, profile?.currentStage]);
+    return fromLevel ?? DEFAULT_ACCENT_COLOR;
+  }, [programEnrollments]);
 
   useEffect(() => {
     document.documentElement.style.setProperty('--dna-accent', accentColor || DEFAULT_ACCENT_COLOR);
@@ -187,7 +188,6 @@ export function KidProfileClient({
     grantBadge: dictionary.playerProfile?.actions?.grantBadge ?? 'Grant badge',
     adjustProgramLevel: dictionary.playerProfile?.actions?.adjustProgramLevel ?? 'Adjust program level',
     achievements: dictionary.playerProfile?.tabs?.achievements ?? 'Achievements',
-    approveStageUpgrade: dictionary.playerProfile?.actions?.approveStageUpgrade ?? 'Approve stage upgrade',
   };
 
   const scoreLabel = dictionary.playerProfile?.labels?.score ?? 'Score';
@@ -354,18 +354,6 @@ export function KidProfileClient({
         setProfile(ensured.profile);
       }
 
-      const evalRes = await evaluatePlayerStageAction({
-        locale,
-        academyId,
-        userId: kid.id,
-      });
-
-      if (evalRes.success) {
-        setStageEvaluation(evalRes as StageEvaluationSuccess);
-      } else {
-        setStageEvaluation(null);
-      }
-
       const assRes = await getDnaAssessmentsForPlayerAction({
         locale,
         academyId,
@@ -380,7 +368,6 @@ export function KidProfileClient({
       console.error('Load player profile error:', error);
       setProfileError(dictionary.common.error);
       setProfile(null);
-      setStageEvaluation(null);
       setAssessments([]);
     } finally {
       setLoadingProfile(false);
@@ -400,19 +387,80 @@ export function KidProfileClient({
 
       if (!res.success || !res.enrollments) {
         setProgramEnrollments([]);
+        setProgramLevelsByProgramId({});
         setProgramEnrollmentsError(res.error || dictionary.common.error);
         return;
       }
 
-      setProgramEnrollments(res.enrollments as PlayerProgramEnrollment[]);
+      const enrollments = res.enrollments as PlayerProgramEnrollment[];
+      setProgramEnrollments(enrollments);
+
+      // Load levels for each program so we can render a full journey track.
+      const uniqueProgramIds = Array.from(new Set(enrollments.map((e) => e.programId).filter(Boolean)));
+      const pairs = await Promise.all(
+        uniqueProgramIds.map(async (programId) => {
+          const levelsRes = await getProgramLevelsForPlayerProgramAction({
+            locale,
+            academyId,
+            programId,
+            userId: kid.id,
+          });
+          return [programId, levelsRes.success && levelsRes.levels ? levelsRes.levels : []] as const;
+        })
+      );
+
+      const nextMap: Record<string, ProgramLevel[]> = {};
+      for (const [programId, levels] of pairs) {
+        nextMap[programId] = levels;
+      }
+      setProgramLevelsByProgramId(nextMap);
     } catch (error) {
       console.error('Load program enrollments error:', error);
       setProgramEnrollments([]);
+      setProgramLevelsByProgramId({});
       setProgramEnrollmentsError(dictionary.common.error);
     } finally {
       setLoadingProgramEnrollments(false);
     }
   }
+
+  const getProgramLevelLabel = (level: ProgramLevel) => (locale === 'ar' ? level.nameAr : level.name);
+
+  const levelJourneyLabels = {
+    title: dictionary.playerProfile?.journey?.programTitle ?? (dictionary.programs?.journeyTitle ?? 'Program journey'),
+    progress: dictionary.playerProfile?.journey?.labels?.progress ?? 'Progress',
+    statusCompleted: dictionary.playerProfile?.journey?.status?.completed ?? 'Completed',
+    statusInProgress: dictionary.playerProfile?.journey?.status?.inProgress ?? 'In progress',
+    statusLocked: dictionary.playerProfile?.journey?.status?.locked ?? 'Locked',
+    started: dictionary.playerProfile?.journey?.labels?.started ?? 'Started',
+    ended: dictionary.playerProfile?.journey?.labels?.ended ?? 'Finished',
+    noLevels: dictionary.programs?.noLevelsDefined ?? 'No levels defined for this program yet.',
+    noHistory: dictionary.programs?.noLevelHistory ?? 'No level history yet.',
+  };
+
+  const safeDaysBetween = (startIso: string, endIso: string) => {
+    const start = new Date(startIso);
+    const end = new Date(endIso);
+    const diffMs = end.getTime() - start.getTime();
+    if (!Number.isFinite(diffMs)) return 0;
+    return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+  };
+
+  const programLevelProgressPct = (params: { enrollment: PlayerProgramEnrollment; level: ProgramLevel; isCurrent: boolean }) => {
+    if (!params.isCurrent) return 100;
+
+    const history = params.enrollment.levelHistory ?? [];
+    const currentEntry = [...history].reverse().find((h) => h.levelId === params.level.id && !h.endedAt);
+    const startedAt = currentEntry?.startedAt || params.enrollment.joinedAt || new Date().toISOString();
+
+    const minDays = typeof params.level.passRules?.minDaysInLevel === 'number' && params.level.passRules.minDaysInLevel > 0
+      ? params.level.passRules.minDaysInLevel
+      : 30;
+
+    const daysInLevel = safeDaysBetween(startedAt, new Date().toISOString());
+    const pct = minDays > 0 ? Math.round((daysInLevel / minDays) * 100) : 0;
+    return Math.max(0, Math.min(100, pct));
+  };
 
   const openProgramNoteDialog = (enrollment: PlayerProgramEnrollment) => {
     setProgramNoteTarget(enrollment);
@@ -656,23 +704,6 @@ export function KidProfileClient({
     }
   };
 
-  const handleApproveStageUpgrade = async () => {
-    if (!canManage) return;
-    const confirmed = confirm(dictionary.common.confirmContinue);
-    if (!confirmed) return;
-
-    const res = await approveStageUpgradeAction({
-      locale,
-      academyId,
-      userId: kid.id,
-    });
-    if (!res.success) {
-      alert(res.error || dictionary.common.error);
-      return;
-    }
-    await loadPlayerProfile();
-  };
-
   const handleDeleteAssessment = async (assessmentId: string) => {
     if (!canAdmin) return;
     const confirmed = confirm(dictionary.common.confirmDelete);
@@ -688,28 +719,6 @@ export function KidProfileClient({
       return;
     }
     await loadPlayerProfile();
-  };
-
-  const formatPct = (value: number | undefined) => {
-    if (value === undefined || !Number.isFinite(value)) return '0%';
-    return `${Math.round(value * 100)}%`;
-  };
-
-  const stageLabel = (stageKey?: string) => {
-    switch (stageKey) {
-      case 'explorer':
-        return dictionary.playerProfile?.stages?.explorer ?? 'Explorer';
-      case 'foundation':
-        return dictionary.playerProfile?.stages?.foundation ?? 'Foundation';
-      case 'active_player':
-        return dictionary.playerProfile?.stages?.activePlayer ?? 'Active Player';
-      case 'competitor':
-        return dictionary.playerProfile?.stages?.competitor ?? 'Competitor';
-      case 'champion':
-        return dictionary.playerProfile?.stages?.champion ?? 'Champion';
-      default:
-        return dictionary.playerProfile?.stages?.explorer ?? 'Explorer';
-    }
   };
 
   const categoryLabel = (key: string) => {
@@ -735,7 +744,7 @@ export function KidProfileClient({
       case 'reassessment':
         return labels?.reassessment ?? 'Reassessment';
       case 'stage_evaluation':
-        return labels?.stageEvaluation ?? 'Stage evaluation';
+        return labels?.stageEvaluation ?? 'Progress evaluation';
       case 'due_for_reassessment':
         return labels?.dueForReassessment ?? 'Due for reassessment';
       default:
@@ -877,7 +886,10 @@ export function KidProfileClient({
                       </div>
                       <div className="mt-1 flex flex-wrap items-center gap-2">
                         <Badge className="border-2 border-[#DDDDDD] bg-white text-[#262626] font-semibold dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white">
-                          {dictionary.playerProfile?.labels?.stage ?? 'Stage'}: {stageLabel(profile?.currentStage)}
+                          {dictionary.playerProfile?.labels?.points ?? 'Total points'}: {totalProgramPoints}
+                        </Badge>
+                        <Badge className="border-2 border-[#DDDDDD] bg-white text-[#262626] font-semibold dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white">
+                          {dictionary.playerProfile?.labels?.xp ?? 'XP'}: {profile?.xpTotal ?? 0}
                         </Badge>
                         {latestAssessment ? (
                           <Badge className="border-2 border-[#DDDDDD] bg-white text-[#262626] font-semibold dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white">
@@ -894,45 +906,20 @@ export function KidProfileClient({
                     />
                   </div>
 
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    {(() => {
-                      const pct = Math.max(0, Math.min(100, Math.round((stageEvaluation?.evaluation?.overallProgress || 0) * 100)));
-                      const ringBg = `conic-gradient(${accentColor} ${pct}%, rgba(255,255,255,0.12) 0)`;
-                      return (
-                        <div className="flex items-center gap-3">
-                          <div className="h-14 w-14 rounded-full p-[3px]" style={{ background: ringBg }}>
-                            <div className="h-full w-full rounded-full bg-white border-2 border-[#DDDDDD] flex items-center justify-center dark:bg-[#0b0b0f] dark:border-[#000000]">
-                              <span className="text-xs font-extrabold text-[#262626] dark:text-white">{pct}%</span>
-                            </div>
-                          </div>
-                          <div className="min-w-0">
-                            <div className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                              {dictionary.playerProfile?.labels?.progress ?? 'Stage progress'}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="rounded-2xl border-2 border-[#DDDDDD] bg-white p-4 shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
+                      <div className="text-xs text-gray-600 dark:text-gray-400">
+                        {dictionary.playerProfile?.labels?.points ?? 'Total points'}
+                      </div>
+                      <div className="mt-1 text-xl font-extrabold text-[#262626] dark:text-white">{totalProgramPoints}</div>
+                    </div>
 
-                    {(() => {
-                      const att = stageEvaluation?.attendance?.attendanceRate;
-                      const pct = Math.max(0, Math.min(100, Math.round(((typeof att === 'number' ? att : 0) || 0) * 100)));
-                      const ringBg = `conic-gradient(${accentColor} ${pct}%, rgba(255,255,255,0.12) 0)`;
-                      return (
-                        <div className="flex items-center gap-3">
-                          <div className="h-14 w-14 rounded-full p-[3px]" style={{ background: ringBg }}>
-                            <div className="h-full w-full rounded-full bg-white border-2 border-[#DDDDDD] flex items-center justify-center dark:bg-[#0b0b0f] dark:border-[#000000]">
-                              <span className="text-xs font-extrabold text-[#262626] dark:text-white">{pct}%</span>
-                            </div>
-                          </div>
-                          <div className="min-w-0">
-                            <div className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                              {dictionary.playerProfile?.labels?.attendance ?? 'Attendance'}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
+                    <div className="rounded-2xl border-2 border-[#DDDDDD] bg-white p-4 shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
+                      <div className="text-xs text-gray-600 dark:text-gray-400">
+                        {dictionary.playerProfile?.labels?.xp ?? 'XP'}
+                      </div>
+                      <div className="mt-1 text-xl font-extrabold text-[#262626] dark:text-white">{profile?.xpTotal ?? 0}</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1006,149 +993,109 @@ export function KidProfileClient({
                 <Trophy className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
                 {actionLabel.achievements}
               </Button>
-              {canManage && stageEvaluation?.evaluation?.readyForStageUpgrade && (
-                <Button
-                  type="button"
-                  onClick={handleApproveStageUpgrade}
-                  className="w-full h-11 border-2 border-emerald-500/40 bg-emerald-600 text-white hover:bg-emerald-500 justify-start ltr:text-left rtl:text-right"
-                >
-                  <Flag className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  {actionLabel.approveStageUpgrade}
-                </Button>
-              )}
             </div>
           </div>
 
-          {/* Mobile: Action buttons below profile info */}
-          <div className="lg:hidden mt-6">
-            <div className="rounded-2xl border-2 border-[#DDDDDD] bg-white p-3 shadow-lg dark:border-[#000000] dark:bg-[#262626]">
-              <div className="grid grid-cols-4 gap-2">
+          {/* Mobile: Inline action bar (right under the profile header box) */}
+          <div className="lg:hidden mt-4">
+            <motion.div
+              initial={{ y: 12, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
+              className="rounded-2xl border-2 border-white/15 bg-white/95 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-[#0b0b0f]/95"
+            >
+              <div className="flex items-center gap-2 overflow-x-auto px-2 pt-2 pb-2">
                 {canAdmin && (
                   <Button
                     type="button"
                     size="sm"
                     onClick={() => router.push(`/${locale}/dashboard/players/${currentKid.id}/edit`)}
-                    className="border-2 border-[#DDDDDD] bg-[#0b0b0f] text-white hover:bg-[#14141a] dark:border-[#000000] flex-col h-auto py-3"
+                    className="shrink-0 h-11 rounded-xl border-2 border-[#DDDDDD] bg-[#0b0b0f] text-white hover:bg-[#14141a] dark:border-[#000000]"
                   >
-                    <Edit className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">{actionLabel.editProfile}</span>
+                    <Edit className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    <span className="text-xs font-semibold whitespace-nowrap">{actionLabel.editProfile}</span>
                   </Button>
                 )}
+
                 {canManage && (
                   <Button
                     type="button"
                     size="sm"
                     onClick={() => setAssessmentDialogOpen(true)}
-                    className="border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] flex-col h-auto py-3"
+                    className="shrink-0 h-11 rounded-xl border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
                   >
-                    <Plus className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">{actionLabel.newAssessment}</span>
+                    <Plus className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    <span className="text-xs font-semibold whitespace-nowrap">{actionLabel.newAssessment}</span>
                   </Button>
                 )}
+
                 {canManage && (
                   <Button
                     type="button"
                     size="sm"
                     onClick={openGrantBadgeDialog}
-                    className="border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] flex-col h-auto py-3"
+                    className="shrink-0 h-11 rounded-xl border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
                   >
-                    <Award className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">{actionLabel.grantBadge}</span>
+                    <Award className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    <span className="text-xs font-semibold whitespace-nowrap">{actionLabel.grantBadge}</span>
                   </Button>
                 )}
+
+                {canAdmin && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => void openProgramLevelDialog()}
+                    className="shrink-0 h-11 rounded-xl border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
+                  >
+                    <ArrowUpDown className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                    <span className="text-xs font-semibold whitespace-nowrap">{actionLabel.adjustProgramLevel}</span>
+                  </Button>
+                )}
+
                 <Button
                   type="button"
                   size="sm"
                   onClick={() => router.push(`/${locale}/dashboard/players/${currentKid.id}/achievements`)}
-                  className="border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] flex-col h-auto py-3"
+                  className="shrink-0 h-11 rounded-xl border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
                 >
-                  <Trophy className="h-4 w-4 mb-1" />
-                  <span className="text-[10px] font-semibold">
-                    {actionLabel.achievements}
-                  </span>
+                  <Trophy className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                  <span className="text-xs font-semibold whitespace-nowrap">{actionLabel.achievements}</span>
                 </Button>
-                {canManage && stageEvaluation?.evaluation?.readyForStageUpgrade && (
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={handleApproveStageUpgrade}
-                    className="border-2 border-emerald-500/40 bg-emerald-600 text-white hover:bg-emerald-500 flex-col h-auto py-3 col-span-3"
-                  >
-                    <Flag className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">{actionLabel.approveStageUpgrade}</span>
-                  </Button>
-                )}
               </div>
-            </div>
+
+            </motion.div>
           </div>
 
           <div className="mt-6">
             <div className="flex items-center gap-2 mb-3">
               <Trophy className="w-4 h-4 text-gray-700 dark:text-gray-200" />
               <div className="font-semibold text-[#262626] dark:text-white">
-                {dictionary.playerProfile?.labels?.progress ?? 'Stage Progress'}
+                {dictionary.playerProfile?.labels?.progress ?? 'Progress'}
               </div>
             </div>
 
             <div className="space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="rounded-2xl border-2 border-[#DDDDDD] bg-white p-5 shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
-                  <DnaCircularGauge
-                    value={Math.round((stageEvaluation?.evaluation?.overallProgress || 0) * 100)}
-                    max={100}
-                    size={92}
-                    strokeWidth={12}
-                    valueSuffix="%"
-                    label={dictionary.playerProfile?.labels?.progress ?? 'Stage progress'}
-                    ariaLabel="Stage progress"
-                  />
-                </div>
-
-                <div className="rounded-2xl border-2 border-[#DDDDDD] bg-white p-5 shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
-                  <DnaCircularGauge
-                    value={Math.round(((stageEvaluation?.attendance?.attendanceRate || 0) as number) * 100)}
-                    max={100}
-                    size={92}
-                    strokeWidth={12}
-                    valueSuffix="%"
-                    label={dictionary.playerProfile?.labels?.attendance ?? 'Attendance'}
-                    ariaLabel="Attendance"
-                  />
-                </div>
-
-                <div className="rounded-2xl border-2 border-[#DDDDDD] bg-white p-5 shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
-                  <DnaCircularGauge
-                    value={Math.round(((stageEvaluation?.evaluation?.naImprovementPct || 0) as number) * 100)}
-                    max={100}
-                    size={92}
-                    strokeWidth={12}
-                    valueSuffix="%"
-                    label={dictionary.playerProfile?.labels?.naImprovement ?? 'NA improvement'}
-                    ariaLabel="NA improvement"
-                  />
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <StatTile
-                  title={dictionary.playerProfile?.labels?.daysInStage ?? 'Days in stage'}
-                  value={stageEvaluation?.evaluation?.timeInStageDays ?? 0}
-                  icon={Calendar}
-                />
-                <StatTile
-                  title={dictionary.playerProfile?.labels?.attendance ?? 'Attendance'}
-                  value={formatPct(stageEvaluation?.attendance?.attendanceRate)}
-                  icon={Activity}
-                />
-                <StatTile
-                  title={dictionary.playerProfile?.labels?.naImprovement ?? 'NA improvement'}
-                  value={formatPct(stageEvaluation?.evaluation?.naImprovementPct)}
+                  title={dictionary.playerProfile?.labels?.points ?? 'Total points'}
+                  value={totalProgramPoints}
                   icon={Trophy}
                 />
                 <StatTile
                   title={dictionary.playerProfile?.labels?.xp ?? 'XP'}
                   value={profile?.xpTotal ?? 0}
                   icon={Star}
+                />
+                <StatTile
+                  title={dictionary.playerProfile?.labels?.badges ?? 'Badges'}
+                  value={`${profile?.badges?.length ?? 0}/${BADGES.length}`}
+                  icon={Award}
+                />
+                <StatTile
+                  title={dictionary.playerProfile?.labels?.lastAssessment ?? 'Last assessment'}
+                  value={latestAssessment ? latestAssessment.sessionDate : '-'}
+                  icon={Calendar}
                 />
               </div>
 
@@ -1322,13 +1269,6 @@ export function KidProfileClient({
                 </div>
 
                 <div className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
-                  <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.stageStart ?? 'Stage start'}</div>
-                  <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
-                    {profile?.stageStartDate ? new Date(profile.stageStartDate).toLocaleDateString(locale) : '-'}
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]">
                   <div className="text-xs text-gray-600 dark:text-gray-400">{dictionary.playerProfile?.labels?.lastAssessment ?? 'Last assessment'}</div>
                   <div className="mt-1 text-base font-bold text-[#262626] dark:text-white">
                     {latestAssessment ? latestAssessment.sessionDate : '-'}
@@ -1402,6 +1342,210 @@ export function KidProfileClient({
                               {dictionary.programs?.addNote ?? 'Add note'}
                             </Button>
                           )}
+                        </div>
+
+                        {/* Program level journey */}
+                        <div className="mt-4 space-y-3">
+                          {(() => {
+                            const levels = programLevelsByProgramId[e.programId] ?? [];
+                            if (levels.length === 0) {
+                              return (
+                                <div className="text-sm text-gray-600 dark:text-gray-400">{levelJourneyLabels.noLevels}</div>
+                              );
+                            }
+
+                            const currentLevelIdx = e.currentLevelId ? levels.findIndex((l) => l.id === e.currentLevelId) : -1;
+
+                            const statusFor = (lvl: ProgramLevel) => {
+                              if (e.currentLevelId && lvl.id === e.currentLevelId) return 'in_progress' as const;
+                              if (currentLevelIdx >= 0 && lvl.order < (levels[currentLevelIdx]?.order ?? 0)) return 'completed' as const;
+
+                              const history = e.levelHistory ?? [];
+                              const hasEnded = history.some((h) => h.levelId === lvl.id && Boolean(h.endedAt));
+                              if (hasEnded) return 'completed' as const;
+
+                              return 'locked' as const;
+                            };
+
+                            const imageSrcFor = (lvl: ProgramLevel) => lvl.image || '';
+
+                            return (
+                              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-linear-to-br from-black/5 via-white/5 to-black/5 p-3 dark:from-white/5 dark:via-white/5 dark:to-black/10">
+                                <div className="absolute inset-0 pointer-events-none">
+                                  <div
+                                    className="absolute -top-16 -left-16 h-48 w-48 rounded-full blur-3xl opacity-30"
+                                    style={{ backgroundColor: `${accentColor}55` }}
+                                  />
+                                  <div
+                                    className="absolute -bottom-20 -right-20 h-56 w-56 rounded-full blur-3xl opacity-20"
+                                    style={{ backgroundColor: `${accentColor}33` }}
+                                  />
+                                </div>
+
+                                <div className="relative flex items-stretch gap-3 overflow-x-auto pb-2">
+                                  {levels.map((lvl, idx) => {
+                                    const status = statusFor(lvl);
+                                    const isCurrent = status === 'in_progress';
+                                    const isCompleted = status === 'completed';
+                                    const progressPct =
+                                      status === 'completed'
+                                        ? 100
+                                        : status === 'in_progress'
+                                          ? programLevelProgressPct({ enrollment: e, level: lvl, isCurrent })
+                                          : 0;
+
+                                    const statusLabel =
+                                      status === 'completed'
+                                        ? levelJourneyLabels.statusCompleted
+                                        : status === 'in_progress'
+                                          ? levelJourneyLabels.statusInProgress
+                                          : levelJourneyLabels.statusLocked;
+
+                                    return (
+                                      <motion.div
+                                        key={lvl.id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05, duration: 0.35 }}
+                                        whileHover={{ scale: 1.02, rotateY: locale === 'ar' ? -4 : 4, rotateX: 2 }}
+                                        style={{ transformStyle: 'preserve-3d' }}
+                                        className={
+                                          isCurrent
+                                            ? 'relative w-[260px] shrink-0 rounded-2xl border border-white/20 bg-white/10 p-3 shadow-lg'
+                                            : isCompleted
+                                              ? 'relative w-[260px] shrink-0 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-3'
+                                              : 'relative w-[260px] shrink-0 rounded-2xl border border-white/10 bg-white/5 p-3 opacity-80'
+                                        }
+                                      >
+                                        {isCurrent ? (
+                                          <motion.div
+                                            className="absolute inset-0 rounded-2xl"
+                                            animate={{ opacity: [0.35, 0.6, 0.35] }}
+                                            transition={{ duration: 2.4, repeat: Infinity }}
+                                            style={{ boxShadow: `0 0 0 1px ${accentColor}55, 0 12px 40px -18px ${accentColor}88` }}
+                                            aria-hidden
+                                          />
+                                        ) : null}
+
+                                        <div className={`relative flex items-center gap-3 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
+                                          <div
+                                            className="relative h-14 w-20 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black/20"
+                                            style={{ backgroundColor: `${lvl.color}22` }}
+                                          >
+                                            {imageSrcFor(lvl) ? (
+                                              <Image
+                                                src={imageSrcFor(lvl)}
+                                                alt="Program level artwork"
+                                                fill
+                                                sizes="80px"
+                                                className="object-cover"
+                                              />
+                                            ) : (
+                                              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_60%)]" />
+                                            )}
+                                          </div>
+
+                                          <div className="min-w-0 flex-1">
+                                            <div className="flex items-center justify-between gap-2">
+                                              <div className="font-bold text-[#262626] dark:text-white truncate">
+                                                {getProgramLevelLabel(lvl)}
+                                              </div>
+                                              <Badge
+                                                variant="secondary"
+                                                className={
+                                                  isCurrent
+                                                    ? 'bg-white/10 text-white border-0 dark:bg-white/10 dark:text-white'
+                                                    : isCompleted
+                                                      ? 'bg-emerald-600/15 text-emerald-200 border-0'
+                                                      : 'bg-white/10 text-white/80 border-0'
+                                                }
+                                              >
+                                                {statusLabel}
+                                              </Badge>
+                                            </div>
+
+                                            <div className="mt-2">
+                                              <div className="flex items-center justify-between text-[11px] text-gray-600 dark:text-gray-400">
+                                                <span>{levelJourneyLabels.progress}</span>
+                                                <span className="font-semibold text-[#262626] dark:text-white">{progressPct}%</span>
+                                              </div>
+                                              <div className="mt-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+                                                <motion.div
+                                                  initial={{ width: 0 }}
+                                                  animate={{ width: `${progressPct}%` }}
+                                                  transition={{ duration: 0.6, type: 'spring', stiffness: 160, damping: 20 }}
+                                                  className="h-full rounded-full"
+                                                  style={{
+                                                    background: isCompleted
+                                                      ? 'linear-gradient(90deg, #34d399, #10b981)'
+                                                      : `linear-gradient(90deg, ${lvl.color}, #ffffff55)`,
+                                                  }}
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </motion.div>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Visited history */}
+                                <div className="mt-3">
+                                  {(e.levelHistory ?? []).length === 0 ? (
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">{levelJourneyLabels.noHistory}</div>
+                                  ) : (
+                                    <div className="grid grid-cols-1 gap-2">
+                                      {[...(e.levelHistory ?? [])]
+                                        .slice()
+                                        .sort((a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime())
+                                        .map((h, idx) => {
+                                          const lvl = levels.find((x) => x.id === h.levelId);
+                                          const label = lvl ? getProgramLevelLabel(lvl) : h.levelId;
+                                          const isCurrent = !h.endedAt && e.currentLevelId === h.levelId;
+                                          return (
+                                            <motion.div
+                                              key={`${h.levelId}-${h.startedAt}`}
+                                              initial={{ opacity: 0, y: 8 }}
+                                              animate={{ opacity: 1, y: 0 }}
+                                              transition={{ delay: idx * 0.03, duration: 0.3 }}
+                                              className={
+                                                isCurrent
+                                                  ? 'rounded-xl border border-white/15 bg-white/10 p-3'
+                                                  : 'rounded-xl border border-white/10 bg-white/5 p-3'
+                                              }
+                                            >
+                                              <div className={`flex items-start justify-between gap-3 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
+                                                <div className="min-w-0">
+                                                  <div className="font-semibold text-[#262626] dark:text-white truncate">{label}</div>
+                                                  <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                                                    <span className="font-semibold text-[#262626] dark:text-white">{levelJourneyLabels.started}:</span>{' '}
+                                                    {new Date(h.startedAt).toLocaleDateString(locale)}
+                                                    <span className="mx-2">•</span>
+                                                    <span className="font-semibold text-[#262626] dark:text-white">{levelJourneyLabels.ended}:</span>{' '}
+                                                    {h.endedAt ? new Date(h.endedAt).toLocaleDateString(locale) : '—'}
+                                                  </div>
+                                                </div>
+
+                                                <Badge
+                                                  className={
+                                                    isCurrent
+                                                      ? 'bg-white/10 text-white border border-white/15'
+                                                      : 'bg-emerald-600/15 text-emerald-200 border-0'
+                                                  }
+                                                >
+                                                  {isCurrent ? levelJourneyLabels.statusInProgress : levelJourneyLabels.statusCompleted}
+                                                </Badge>
+                                              </div>
+                                            </motion.div>
+                                          );
+                                        })}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                     ))}

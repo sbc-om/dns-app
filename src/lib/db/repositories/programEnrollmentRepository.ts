@@ -2,6 +2,15 @@ import { getDatabase, generateId } from '../lmdb';
 
 export type ProgramEnrollmentStatus = 'active' | 'paused' | 'completed';
 
+export type ProgramLevelHistoryEntry = {
+  levelId: string;
+  startedAt: string;
+  endedAt?: string;
+  setBy?: string;
+  comment?: string;
+  pointsDelta?: number;
+};
+
 export type ProgramCoachNote = {
   id: string;
   coachUserId: string;
@@ -21,6 +30,12 @@ export interface ProgramEnrollment {
 
   currentLevelId?: string;
 
+  /**
+   * Program-level journey history. This is separate from the DNA stage system.
+   * Each entry represents a period where the player was assigned to a given level.
+   */
+  levelHistory: ProgramLevelHistoryEntry[];
+
   pointsTotal: number;
   coachNotes: ProgramCoachNote[];
 
@@ -38,6 +53,7 @@ export interface CreateProgramEnrollmentInput {
 export interface UpdateProgramEnrollmentInput {
   status?: ProgramEnrollmentStatus;
   currentLevelId?: string;
+  levelHistory?: ProgramLevelHistoryEntry[];
 }
 
 const ENROLL_PREFIX = 'program_enrollment:'; // program_enrollment:{academyId}:{programId}:{userId}
@@ -46,14 +62,57 @@ function enrollmentKey(academyId: string, programId: string, userId: string) {
   return `${ENROLL_PREFIX}${academyId}:${programId}:${userId}`;
 }
 
+function normalizeEnrollment(
+  enrollment: ProgramEnrollment | any,
+  key?: string
+): ProgramEnrollment {
+  const now = new Date().toISOString();
+
+  const levelHistoryRaw = Array.isArray(enrollment?.levelHistory) ? enrollment.levelHistory : [];
+  const hasAnyHistory = levelHistoryRaw.length > 0;
+  const currentLevelId = enrollment?.currentLevelId;
+
+  // Backfill history for older records.
+  const levelHistory: ProgramLevelHistoryEntry[] = hasAnyHistory
+    ? levelHistoryRaw
+    : currentLevelId
+      ? [
+          {
+            levelId: currentLevelId,
+            startedAt: enrollment?.joinedAt || enrollment?.createdAt || now,
+          },
+        ]
+      : [];
+
+  const normalized: ProgramEnrollment = {
+    ...enrollment,
+    status: (enrollment?.status as ProgramEnrollmentStatus) || 'active',
+    joinedAt: enrollment?.joinedAt || enrollment?.createdAt || now,
+    levelHistory,
+  };
+
+  const changed =
+    normalized.status !== enrollment?.status ||
+    normalized.joinedAt !== enrollment?.joinedAt ||
+    normalized.levelHistory !== enrollment?.levelHistory;
+
+  if (changed && key) {
+    const db = getDatabase();
+    db.put(key, normalized);
+  }
+
+  return normalized;
+}
+
 export async function findProgramEnrollment(params: {
   academyId: string;
   programId: string;
   userId: string;
 }): Promise<ProgramEnrollment | null> {
   const db = getDatabase();
-  const existing = await db.get(enrollmentKey(params.academyId, params.programId, params.userId));
-  return (existing as ProgramEnrollment) || null;
+  const key = enrollmentKey(params.academyId, params.programId, params.userId);
+  const existing = await db.get(key);
+  return existing ? normalizeEnrollment(existing as ProgramEnrollment, key) : null;
 }
 
 export async function upsertProgramEnrollment(input: CreateProgramEnrollmentInput): Promise<ProgramEnrollment> {
@@ -71,10 +130,20 @@ export async function upsertProgramEnrollment(input: CreateProgramEnrollmentInpu
       ...existing,
       currentLevelId: input.currentLevelId ?? existing.currentLevelId,
       status: existing.status || 'active',
+      levelHistory: Array.isArray(existing.levelHistory)
+        ? existing.levelHistory
+        : existing.currentLevelId
+          ? [
+              {
+                levelId: existing.currentLevelId,
+                startedAt: existing.joinedAt || existing.createdAt || now,
+              },
+            ]
+          : [],
       updatedAt: now,
     };
     await db.put(enrollmentKey(input.academyId, input.programId, input.userId), updated);
-    return updated;
+    return normalizeEnrollment(updated);
   }
 
   const enrollment: ProgramEnrollment = {
@@ -85,6 +154,14 @@ export async function upsertProgramEnrollment(input: CreateProgramEnrollmentInpu
     status: 'active',
     joinedAt: now,
     currentLevelId: input.currentLevelId,
+    levelHistory: input.currentLevelId
+      ? [
+          {
+            levelId: input.currentLevelId,
+            startedAt: now,
+          },
+        ]
+      : [],
     pointsTotal: 0,
     coachNotes: [],
     createdAt: now,
@@ -92,7 +169,7 @@ export async function upsertProgramEnrollment(input: CreateProgramEnrollmentInpu
   };
 
   await db.put(enrollmentKey(input.academyId, input.programId, input.userId), enrollment);
-  return enrollment;
+  return normalizeEnrollment(enrollment);
 }
 
 export async function updateProgramEnrollment(params: {
@@ -115,7 +192,7 @@ export async function updateProgramEnrollment(params: {
   };
 
   await db.put(enrollmentKey(params.academyId, params.programId, params.userId), updated);
-  return updated;
+  return normalizeEnrollment(updated);
 }
 
 export async function removeProgramEnrollment(params: {

@@ -8,8 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Users,
-  Layers,
-  ArrowUpRight,
   RefreshCcw,
   Filter,
   X,
@@ -18,15 +16,12 @@ import {
 } from 'lucide-react';
 import type { Locale } from '@/config/i18n';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
-import type { PlayerStageKey } from '@/lib/player/stageSystem';
 
 export type AcademyAdminPlayerRow = {
   userId: string;
   displayName: string;
-  stage: PlayerStageKey;
   lastAssessmentAt?: string;
   needsReassessment: boolean;
-  readyForStageUpgrade: boolean;
 };
 
 export type AcademyAdminDashboardData = {
@@ -34,13 +29,11 @@ export type AcademyAdminDashboardData = {
   academyNameAr?: string;
   academyImage?: string;
   totalPlayers: number;
-  stageCounts: Record<PlayerStageKey, number>;
-  playersReadyForStageUpgrade: number;
   playersNeedingReassessment: number;
   players: AcademyAdminPlayerRow[];
 };
 
-type FilterFlag = 'all' | 'ready_upgrade' | 'needs_reassessment';
+type FilterFlag = 'all' | 'needs_reassessment';
 
 type Props = {
   locale: Locale;
@@ -48,22 +41,6 @@ type Props = {
   data: AcademyAdminDashboardData;
   hideHero?: boolean;
 };
-
-function stageLabel(dictionary: Dictionary, stage: PlayerStageKey): string {
-  const labels = dictionary.playerProfile?.stages;
-  switch (stage) {
-    case 'explorer':
-      return labels?.explorer ?? 'Explorer';
-    case 'foundation':
-      return labels?.foundation ?? 'Foundation';
-    case 'active_player':
-      return labels?.activePlayer ?? 'Active Player';
-    case 'competitor':
-      return labels?.competitor ?? 'Competitor';
-    case 'champion':
-      return labels?.champion ?? 'Champion';
-  }
-}
 
 function formatDate(locale: Locale, iso?: string) {
   if (!iso) return '-';
@@ -77,22 +54,18 @@ function formatDate(locale: Locale, iso?: string) {
 }
 
 export function AcademyAdminDashboardHomeClient({ locale, dictionary, data, hideHero = false }: Props) {
-  const [stageFilter, setStageFilter] = useState<PlayerStageKey | 'all'>('all');
   const [flagFilter, setFlagFilter] = useState<FilterFlag>('all');
 
   const filteredPlayers = useMemo(() => {
     return data.players.filter((p) => {
-      if (stageFilter !== 'all' && p.stage !== stageFilter) return false;
-      if (flagFilter === 'ready_upgrade' && !p.readyForStageUpgrade) return false;
       if (flagFilter === 'needs_reassessment' && !p.needsReassessment) return false;
       return true;
     });
-  }, [data.players, flagFilter, stageFilter]);
+  }, [data.players, flagFilter]);
 
-  const activeFiltersCount = (stageFilter !== 'all' ? 1 : 0) + (flagFilter !== 'all' ? 1 : 0);
+  const activeFiltersCount = flagFilter !== 'all' ? 1 : 0;
 
   const resetFilters = () => {
-    setStageFilter('all');
     setFlagFilter('all');
   };
 
@@ -169,7 +142,6 @@ export function AcademyAdminDashboardHomeClient({ locale, dictionary, data, hide
           whileTap={{ scale: 0.98 }}
           onClick={() => {
             setFlagFilter('all');
-            setStageFilter('all');
           }}
           className={cardBase + ' text-left'}
         >
@@ -191,88 +163,12 @@ export function AcademyAdminDashboardHomeClient({ locale, dictionary, data, hide
           </div>
         </motion.button>
 
-        <div className={cardBase}>
-          <div className="absolute inset-0 bg-linear-to-br from-emerald-500/10 via-cyan-500/10 to-transparent" />
-          <div className="relative flex items-start justify-between gap-4">
-            <div>
-              <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                {dictionary.dashboard?.academyAdmin?.stageDistribution ?? 'Stage distribution'}
-              </div>
-              <div className="mt-3 space-y-2">
-                {(
-                  [
-                    ['explorer', data.stageCounts.explorer],
-                    ['foundation', data.stageCounts.foundation],
-                    ['active_player', data.stageCounts.active_player],
-                    ['competitor', data.stageCounts.competitor],
-                    ['champion', data.stageCounts.champion],
-                  ] as Array<[PlayerStageKey, number]>
-                ).map(([stage, count]) => (
-                  <motion.button
-                    key={stage}
-                    type="button"
-                    whileHover={{ scale: 1.01, x: 2 }}
-                    whileTap={{ scale: 0.99 }}
-                    onClick={() => {
-                      setStageFilter(stage);
-                      setFlagFilter('all');
-                    }}
-                    className={
-                      'w-full flex items-center justify-between gap-3 rounded-2xl border px-3 py-2 text-sm ' +
-                      (stageFilter === stage
-                        ? 'border-emerald-500/60 bg-emerald-500/10'
-                        : 'border-black/10 dark:border-white/10 bg-white/60 dark:bg-white/5')
-                    }
-                  >
-                    <span className="font-semibold text-[#262626] dark:text-white">{stageLabel(dictionary, stage)}</span>
-                    <span className="font-black text-emerald-700 dark:text-emerald-300">{count}</span>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-            <div className="h-12 w-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center">
-              <Layers className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-            </div>
-          </div>
-        </div>
-
-        <motion.button
-          type="button"
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => {
-            setFlagFilter('ready_upgrade');
-            setStageFilter('all');
-          }}
-          className={cardBase + ' text-left'}
-        >
-          <div className="absolute inset-0 bg-linear-to-br from-purple-500/10 via-pink-500/10 to-transparent" />
-          <div className="relative flex items-start justify-between gap-4">
-            <div>
-              <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                {dictionary.dashboard?.academyAdmin?.readyForStageUpgrade ?? 'Players ready for stage upgrade'}
-              </div>
-              <div className="mt-2 text-3xl font-black text-[#262626] dark:text-white">
-                {data.playersReadyForStageUpgrade}
-              </div>
-            </div>
-            <div className="h-12 w-12 rounded-2xl bg-purple-500/15 border border-purple-500/20 flex items-center justify-center">
-              <ArrowUpRight className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-            </div>
-          </div>
-          <div className="relative mt-4 flex items-center gap-2 text-sm font-semibold text-purple-600 dark:text-purple-400">
-            {dictionary.dashboard?.academyAdmin?.clickToFilter ?? 'Click to filter'}
-            <ChevronRight className="h-4 w-4" />
-          </div>
-        </motion.button>
-
         <motion.button
           type="button"
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => {
             setFlagFilter('needs_reassessment');
-            setStageFilter('all');
           }}
           className={cardBase + ' text-left'}
         >
@@ -333,9 +229,6 @@ export function AcademyAdminDashboardHomeClient({ locale, dictionary, data, hide
                     {dictionary.dashboard?.academyAdmin?.colPlayer ?? 'Player'}
                   </th>
                   <th className="p-4 text-xs font-black uppercase tracking-wide text-gray-600 dark:text-gray-300">
-                    {dictionary.dashboard?.academyAdmin?.colStage ?? 'Stage'}
-                  </th>
-                  <th className="p-4 text-xs font-black uppercase tracking-wide text-gray-600 dark:text-gray-300">
                     {dictionary.dashboard?.academyAdmin?.colLastAssessment ?? 'Last assessment'}
                   </th>
                   <th className="p-4 text-xs font-black uppercase tracking-wide text-gray-600 dark:text-gray-300">
@@ -358,23 +251,15 @@ export function AcademyAdminDashboardHomeClient({ locale, dictionary, data, hide
                       <td className="p-4">
                         <div className="font-bold text-[#262626] dark:text-white">{p.displayName}</div>
                       </td>
-                      <td className="p-4">
-                        <Badge className="rounded-full" variant="outline">
-                          {stageLabel(dictionary, p.stage)}
-                        </Badge>
-                      </td>
                       <td className="p-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
                         {formatDate(locale, p.lastAssessmentAt)}
                       </td>
                       <td className="p-4">
                         <div className="flex flex-wrap gap-2">
-                          {p.readyForStageUpgrade && (
-                            <Badge className="rounded-full bg-purple-600 text-white">{dictionary.dashboard?.academyAdmin?.statusReadyUpgrade ?? 'Ready upgrade'}</Badge>
-                          )}
                           {p.needsReassessment && (
                             <Badge className="rounded-full bg-orange-600 text-white">{dictionary.dashboard?.academyAdmin?.statusNeedsReassessment ?? 'Needs reassessment'}</Badge>
                           )}
-                          {!p.readyForStageUpgrade && !p.needsReassessment && (
+                          {!p.needsReassessment && (
                             <Badge variant="secondary" className="rounded-full">{dictionary.dashboard?.academyAdmin?.statusOk ?? 'OK'}</Badge>
                           )}
                         </div>

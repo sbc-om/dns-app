@@ -16,7 +16,54 @@ import {
   appendProgramCoachNote,
   updateProgramEnrollment,
   type ProgramEnrollment,
+  type ProgramLevelHistoryEntry,
 } from '@/lib/db/repositories/programEnrollmentRepository';
+
+function computeNextLevelHistory(params: {
+  existingHistory: ProgramLevelHistoryEntry[];
+  previousLevelId?: string;
+  nextLevelId?: string;
+  actorUserId: string;
+  comment?: string;
+  pointsDelta?: number;
+  nowIso?: string;
+}): ProgramLevelHistoryEntry[] {
+  const now = params.nowIso ?? new Date().toISOString();
+  const history = Array.isArray(params.existingHistory) ? [...params.existingHistory] : [];
+
+  const prev = params.previousLevelId;
+  const next = params.nextLevelId;
+
+  // No-op if unchanged.
+  if ((prev ?? undefined) === (next ?? undefined)) return history;
+
+  // Close any currently-open entry for the previous level.
+  if (prev) {
+    for (let i = history.length - 1; i >= 0; i--) {
+      const entry = history[i];
+      if (entry?.levelId === prev && !entry.endedAt) {
+        history[i] = {
+          ...entry,
+          endedAt: now,
+        };
+        break;
+      }
+    }
+  }
+
+  // Start new entry (if we set a new level).
+  if (next) {
+    history.push({
+      levelId: next,
+      startedAt: now,
+      setBy: params.actorUserId,
+      comment: params.comment,
+      pointsDelta: params.pointsDelta,
+    });
+  }
+
+  return history;
+}
 
 async function canManageProgramsForRole(role: Parameters<typeof hasRolePermission>[0]) {
   return hasRolePermission(role, 'canManagePrograms');
@@ -250,6 +297,48 @@ export async function getProgramLevelsForProgramAction(params: {
   }
 }
 
+export async function getProgramLevelsForPlayerProgramAction(params: {
+  locale: string;
+  academyId: string;
+  programId: string;
+  userId: string;
+}) {
+  noStore();
+  try {
+    const me = await requireAuth(params.locale);
+
+    // Must be in academy (or admin)
+    const myMembership = await getAcademyMembership(params.academyId, me.id);
+    if (!myMembership && me.role !== 'admin') {
+      return { success: false as const, error: 'Unauthorized' };
+    }
+
+    // Allow: admin/manager/coach, or self (player), or parent of the player.
+    const target = await findUserById(params.userId);
+    if (!target) return { success: false as const, error: 'User not found' };
+
+    const isSelf = me.id === params.userId;
+    const isPrivileged = me.role === 'admin' || myMembership?.role === 'manager' || myMembership?.role === 'coach';
+    const isParent = me.role === 'parent' && target.parentId === me.id;
+
+    if (!isSelf && !isPrivileged && !isParent) {
+      return { success: false as const, error: 'Unauthorized' };
+    }
+
+    const program = await findProgramById(params.programId);
+    if (!program) return { success: false as const, error: 'Program not found' };
+    if (me.role !== 'admin' && program.academyId !== params.academyId) {
+      return { success: false as const, error: 'Unauthorized' };
+    }
+
+    const levels = await getProgramLevelsByProgramIdAndAcademyId(params.programId, params.academyId);
+    return { success: true as const, levels };
+  } catch (error) {
+    console.error('Error getting program levels for player:', error);
+    return { success: false as const, error: 'Failed to get levels' };
+  }
+}
+
 export async function setPlayerProgramLevelAction(params: {
   locale: string;
   academyId?: string;
@@ -289,20 +378,36 @@ export async function setPlayerProgramLevelAction(params: {
       if (me.role !== 'admin' && lvl.academyId !== academyId) return { success: false as const, error: 'Unauthorized' };
     }
 
+    const existingEnrollment = await upsertProgramEnrollment({
+      academyId,
+      programId: params.programId,
+      userId: params.userId,
+    });
+
+    const points = params.pointsDelta;
+    const userComment = (params.comment ?? '').trim();
+    const auditComment = userComment || `Manual program level set to ${nextLevelId ?? 'none'}`;
+
+    const nextHistory = computeNextLevelHistory({
+      existingHistory: existingEnrollment.levelHistory,
+      previousLevelId: existingEnrollment.currentLevelId,
+      nextLevelId,
+      actorUserId: me.id,
+      comment: auditComment,
+      pointsDelta: typeof points === 'number' && Number.isFinite(points) ? points : undefined,
+    });
+
     const updated = await updateProgramEnrollment({
       academyId,
       programId: params.programId,
       userId: params.userId,
       updates: {
         currentLevelId: nextLevelId,
+        levelHistory: nextHistory,
       },
     });
 
     if (!updated) return { success: false as const, error: 'Enrollment not found' };
-
-    const points = params.pointsDelta;
-    const userComment = (params.comment ?? '').trim();
-    const auditComment = userComment || `Manual program level set to ${nextLevelId ?? 'none'}`;
 
     const withNote = await appendProgramCoachNote({
       academyId,

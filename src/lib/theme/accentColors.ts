@@ -1,5 +1,3 @@
-import type { PlayerStageKey } from '@/lib/player/stageSystem';
-
 export const DEFAULT_ACCENT_COLOR = '#FF5F02';
 
 const DEFAULT_LEVEL_COLORS: string[] = [
@@ -35,22 +33,4 @@ export function normalizeHexColor(input: unknown): string | null {
 export function getDefaultProgramLevelColor(order: number | undefined): string {
   const idx = Math.max(0, (typeof order === 'number' && Number.isFinite(order) ? order : 1) - 1);
   return DEFAULT_LEVEL_COLORS[idx % DEFAULT_LEVEL_COLORS.length] ?? DEFAULT_ACCENT_COLOR;
-}
-
-export function getStageAccentColor(stage: PlayerStageKey | string | undefined | null): string {
-  switch (stage) {
-    case 'explorer':
-      return '#FF5F02';
-    case 'foundation':
-      return '#0A84FF';
-    case 'active_player':
-    case 'activePlayer':
-      return '#34C759';
-    case 'competitor':
-      return '#BF5AF2';
-    case 'champion':
-      return '#FFD60A';
-    default:
-      return DEFAULT_ACCENT_COLOR;
-  }
 }

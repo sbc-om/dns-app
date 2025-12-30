@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="900" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(280 180) rotate(25) scale(520 360)">
+      <stop stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="20"/>
+    </filter>
+  </defs>
+  <rect width="900" height="600" rx="60" fill="url(#bg)"/>
+  <rect width="900" height="600" rx="60" fill="url(#glow)"/>
+
+  <!-- Floating blobs -->
+  <circle cx="760" cy="120" r="95" fill="#ffffff" fill-opacity="0.12" filter="url(#soft)"/>
+  <circle cx="720" cy="480" r="130" fill="#0b1220" fill-opacity="0.22" filter="url(#soft)"/>
+
+  <!-- Badge mark -->
+  <g transform="translate(450 300)">
+    <circle r="165" fill="#0b1220" fill-opacity="0.18"/>
+    <circle r="132" fill="#ffffff" fill-opacity="0.16"/>
+
+    <!-- Simple compass/star -->
+    <path d="M0 -110 L26 -26 L110 0 L26 26 L0 110 L-26 26 L-110 0 L-26 -26 Z" fill="#ffffff" fill-opacity="0.92"/>
+    <circle r="18" fill="#0b1220" fill-opacity="0.35"/>
+  </g>
+</svg>

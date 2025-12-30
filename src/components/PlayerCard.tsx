@@ -11,24 +11,12 @@ interface PlayerCardProps {
   physicalTest?: PhysicalTest | null;
 }
 
-/**
- * Get card color based on DNA stage
- */
-function getCardColor(dnaStage?: string): string {
-  switch (dnaStage?.toLowerCase()) {
-    case 'bronze':
-      return 'from-orange-800 to-orange-600';
-    case 'silver':
-      return 'from-gray-400 to-gray-300';
-    case 'gold':
-      return 'from-yellow-500 to-yellow-400';
-    case 'platinum':
-      return 'from-purple-600 to-purple-400';
-    case 'diamond':
-      return 'from-blue-400 to-cyan-300';
-    default:
-      return 'from-gray-700 to-gray-600';
-  }
+function getCardGradientByOverall(overallRating: number): string {
+  if (overallRating >= 85) return 'from-purple-500 to-pink-500'; // diamond-ish
+  if (overallRating >= 75) return 'from-cyan-500 to-blue-500'; // platinum-ish
+  if (overallRating >= 65) return 'from-yellow-500 to-amber-500'; // gold
+  if (overallRating >= 55) return 'from-gray-300 to-gray-500'; // silver
+  return 'from-amber-800 to-amber-600'; // bronze
 }
 
 /**
@@ -57,9 +45,9 @@ function mapToCardStats(test?: PhysicalTest | null) {
 }
 
 export function PlayerCard({ player, physicalTest }: PlayerCardProps) {
-  const cardColor = getCardColor(player.dnaStage);
   const stats = mapToCardStats(physicalTest);
   const overall = physicalTest?.overallRating || 50;
+  const cardColor = getCardGradientByOverall(overall);
 
   return (
     <Card className={`relative w-full max-w-sm overflow-hidden bg-linear-to-br ${cardColor} p-1`}>
@@ -144,14 +132,6 @@ export function PlayerCard({ player, physicalTest }: PlayerCardProps) {
           </div>
         </div>
 
-        {/* DNA Stage Badge */}
-        {player.dnaStage && (
-          <div className="mt-2 text-center">
-            <Badge className="bg-white/90 text-black font-bold">
-              {player.dnaStage.toUpperCase()}
-            </Badge>
-          </div>
-        )}
       </div>
     </Card>
   );
