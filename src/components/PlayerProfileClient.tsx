@@ -298,6 +298,16 @@ export function KidProfileClient({
     setBadgeDialogOpen(true);
   };
 
+  const actionLabel = {
+    editProfile: dictionary.playerProfile?.actions?.editProfile ?? (dictionary.common.edit || 'Edit'),
+    newAssessment: dictionary.playerProfile?.actions?.newAssessment ?? 'New assessment',
+    grantBadge: dictionary.playerProfile?.actions?.grantBadge ?? 'Grant badge',
+    achievements: dictionary.playerProfile?.tabs?.achievements ?? 'Achievements',
+    approveStageUpgrade: dictionary.playerProfile?.actions?.approveStageUpgrade ?? 'Approve stage upgrade',
+  };
+
+  const scoreLabel = dictionary.playerProfile?.labels?.score ?? 'Score';
+
   const t = (path: string): string => {
     const parts = path.split('.');
     let cur: unknown = dictionary;
@@ -627,7 +637,7 @@ export function KidProfileClient({
                   className="w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg"
                 >
                   <Edit className="h-4 w-4 me-2" />
-                  Edit Profile
+                  {actionLabel.editProfile}
                 </Button>
               )}
               {canManage && (
@@ -637,7 +647,7 @@ export function KidProfileClient({
                   className="w-full bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-lg"
                 >
                   <Plus className="h-4 w-4 me-2" />
-                  New Assessment
+                  {actionLabel.newAssessment}
                 </Button>
               )}
               {canManage && (
@@ -647,7 +657,7 @@ export function KidProfileClient({
                   className="w-full bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white shadow-lg"
                 >
                   <Award className="h-4 w-4 me-2" />
-                  Grant Badge
+                  {actionLabel.grantBadge}
                 </Button>
               )}
               <Button
@@ -656,7 +666,7 @@ export function KidProfileClient({
                 className="w-full bg-linear-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white shadow-lg"
               >
                 <Trophy className="h-4 w-4 me-2" />
-                {locale === 'ar' ? 'الإنجازات والآمار' : 'Achievements'}
+                {actionLabel.achievements}
               </Button>
               {canManage && stageEvaluation?.evaluation?.readyForStageUpgrade && (
                 <Button
@@ -665,7 +675,7 @@ export function KidProfileClient({
                   className="w-full bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg"
                 >
                   <Flag className="h-4 w-4 me-2" />
-                  Approve Stage
+                  {actionLabel.approveStageUpgrade}
                 </Button>
               )}
             </div>
@@ -683,7 +693,7 @@ export function KidProfileClient({
                     className="bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg flex-col h-auto py-3"
                   >
                     <Edit className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">Edit</span>
+                    <span className="text-[10px] font-semibold">{actionLabel.editProfile}</span>
                   </Button>
                 )}
                 {canManage && (
@@ -694,7 +704,7 @@ export function KidProfileClient({
                     className="bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-lg flex-col h-auto py-3"
                   >
                     <Plus className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">Assessment</span>
+                    <span className="text-[10px] font-semibold">{actionLabel.newAssessment}</span>
                   </Button>
                 )}
                 {canManage && (
@@ -705,7 +715,7 @@ export function KidProfileClient({
                     className="bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white shadow-lg flex-col h-auto py-3"
                   >
                     <Award className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">Badge</span>
+                    <span className="text-[10px] font-semibold">{actionLabel.grantBadge}</span>
                   </Button>
                 )}
                 <Button
@@ -716,7 +726,7 @@ export function KidProfileClient({
                 >
                   <Trophy className="h-4 w-4 mb-1" />
                   <span className="text-[10px] font-semibold">
-                    {locale === 'ar' ? 'الإنجازات' : 'Achievements'}
+                    {actionLabel.achievements}
                   </span>
                 </Button>
                 {canManage && stageEvaluation?.evaluation?.readyForStageUpgrade && (
@@ -727,7 +737,7 @@ export function KidProfileClient({
                     className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg flex-col h-auto py-3 col-span-3"
                   >
                     <Flag className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">Approve Stage</span>
+                    <span className="text-[10px] font-semibold">{actionLabel.approveStageUpgrade}</span>
                   </Button>
                 )}
               </div>
@@ -973,7 +983,7 @@ export function KidProfileClient({
                           className="border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
                           onClick={() => handleDeleteAssessment(a.id)}
                         >
-                          <Trash2 className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                          <Trash2 className="h-4 w-4 me-2" />
                           {dictionary.common.delete}
                         </Button>
                       )}
@@ -1045,7 +1055,7 @@ export function KidProfileClient({
 
       {/* Assessment dialog */}
       <Dialog open={assessmentDialogOpen} onOpenChange={setAssessmentDialogOpen}>
-        <DialogContent className="sm:max-w-[760px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[760px] max-h-[90vh] overflow-y-auto text-start">
           <DialogHeader>
             <DialogTitle>{dictionary.playerProfile?.actions?.newAssessment ?? 'New Assessment'}</DialogTitle>
           </DialogHeader>
@@ -1106,7 +1116,7 @@ export function KidProfileClient({
                           </Label>
                         </div>
                         <div className="mt-2 text-xs text-white/55">
-                          Score: {Math.min(10, Math.max(1, value))}/10
+                          {scoreLabel}: {Math.min(10, Math.max(1, value))}/10
                         </div>
                       </div>
 
@@ -1179,7 +1189,7 @@ export function KidProfileClient({
 
       {/* Badge dialog */}
       <Dialog open={badgeDialogOpen} onOpenChange={setBadgeDialogOpen}>
-        <DialogContent className="sm:max-w-[520px]">
+        <DialogContent className="sm:max-w-[520px] text-start">
           <DialogHeader>
             <DialogTitle>{dictionary.playerProfile?.actions?.grantBadge ?? 'Grant Badge'}</DialogTitle>
           </DialogHeader>
@@ -1190,7 +1200,7 @@ export function KidProfileClient({
                 <SelectTrigger className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
                   <SelectValue placeholder={dictionary.playerProfile?.placeholders?.selectBadge ?? 'Choose a badge'} />
                 </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000]">
+                <SelectContent className="bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] text-start">
                   {BADGES.filter((b) => !grantedBadgeIds.has(b.id)).map((b) => (
                     <SelectItem key={b.id} value={b.id} className="cursor-pointer">
                       {t(b.nameKey)}

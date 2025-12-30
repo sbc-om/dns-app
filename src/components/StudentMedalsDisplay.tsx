@@ -19,6 +19,10 @@ interface StudentMedalsDisplayProps {
   hideHeader?: boolean;
   locale: 'en' | 'ar';
   onTotalPointsChange?: (totalPoints: number) => void;
+  variant?: 'glassy' | 'academy';
+  loadingLabel?: string;
+  emptyTitle?: string;
+  emptyDescription?: string;
 }
 
 export function StudentMedalsDisplay({
@@ -29,6 +33,10 @@ export function StudentMedalsDisplay({
   hideHeader,
   locale,
   onTotalPointsChange,
+  variant = 'glassy',
+  loadingLabel,
+  emptyTitle,
+  emptyDescription,
 }: StudentMedalsDisplayProps) {
   const [medals, setMedals] = useState<MedalDisplay[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,23 +81,33 @@ export function StudentMedalsDisplay({
     }
   };
 
-  const shellClassName =
-    'bg-white/6 border border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-[0_30px_90px_-50px_rgba(0,0,0,0.7)]';
+  const isAcademy = variant === 'academy';
 
-  const headerClassName =
-    'relative bg-white/5 border-b border-white/10 flex flex-col items-center justify-center text-center gap-1';
+  const shellClassName = isAcademy
+    ? 'overflow-hidden rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-lg dark:border-[#000000] dark:bg-[#262626]'
+    : 'bg-white/6 border border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-[0_30px_90px_-50px_rgba(0,0,0,0.7)]';
+
+  const headerClassName = isAcademy
+    ? 'bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000] flex flex-col items-center justify-center text-center gap-1'
+    : 'relative bg-white/5 border-b border-white/10 flex flex-col items-center justify-center text-center gap-1';
 
   const showHeader = !hideHeader && Boolean(title);
 
   const Title = showHeader ? (
-    <div className="flex items-center justify-center gap-2 text-white">
+    <div
+      className={
+        isAcademy
+          ? 'flex items-center justify-center gap-2 text-[#262626] dark:text-white'
+          : 'flex items-center justify-center gap-2 text-white'
+      }
+    >
       <motion.div
         animate={{ rotate: [0, -6, 6, -6, 0] }}
         transition={{ duration: 0.6 }}
         className="relative"
         aria-hidden
       >
-        <Award className="w-5 h-5 text-white/85" />
+        <Award className={isAcademy ? 'w-5 h-5 text-gray-700 dark:text-white/85' : 'w-5 h-5 text-white/85'} />
         <motion.div
           className="absolute inset-0 bg-amber-400/20 rounded-full blur-md"
           animate={{ scale: [1, 1.25, 1] }}
@@ -103,10 +121,14 @@ export function StudentMedalsDisplay({
   const Header =
     showHeader ? (
       <CardHeader className={headerClassName}>
-        <div className="absolute inset-0 bg-linear-to-r from-yellow-500/10 via-orange-500/10 to-fuchsia-500/10" />
-        <CardTitle className="relative py-4">{Title}</CardTitle>
+        {isAcademy ? null : (
+          <div className="absolute inset-0 bg-linear-to-r from-yellow-500/10 via-orange-500/10 to-fuchsia-500/10" />
+        )}
+        <CardTitle className={isAcademy ? 'py-4' : 'relative py-4'}>{Title}</CardTitle>
         {description ? (
-          <p className="relative pb-4 text-sm text-white/65">{description}</p>
+          <p className={isAcademy ? 'pb-4 text-sm text-gray-600 dark:text-gray-400' : 'relative pb-4 text-sm text-white/65'}>
+            {description}
+          </p>
         ) : null}
       </CardHeader>
     ) : null;
@@ -121,14 +143,24 @@ export function StudentMedalsDisplay({
         <Card className={shellClassName}>
           {Header}
           <CardContent className={showHeader ? 'pt-6' : 'pt-8'}>
-            <div className="flex flex-col items-center justify-center py-10 text-white/70">
+            <div
+              className={
+                isAcademy
+                  ? 'flex flex-col items-center justify-center py-10 text-gray-600 dark:text-gray-400'
+                  : 'flex flex-col items-center justify-center py-10 text-white/70'
+              }
+            >
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}
               >
-                <Sparkles className="w-8 h-8 text-white/70" />
+                <Sparkles
+                  className={
+                    isAcademy ? 'w-8 h-8 text-gray-500 dark:text-gray-400' : 'w-8 h-8 text-white/70'
+                  }
+                />
               </motion.div>
-              <div className="mt-3 text-sm">Loading…</div>
+              <div className="mt-3 text-sm">{loadingLabel ?? 'Loading...'}</div>
             </div>
           </CardContent>
         </Card>
@@ -137,6 +169,10 @@ export function StudentMedalsDisplay({
   }
 
   if (medals.length === 0) {
+    const emptyTitleText = emptyTitle ?? 'No medals awarded yet';
+    const emptyDescriptionText =
+      emptyDescription ?? 'Keep progressing—new medals will appear here.';
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -150,7 +186,11 @@ export function StudentMedalsDisplay({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="text-center py-12 rounded-2xl border border-dashed border-white/15 bg-black/20"
+              className={
+                isAcademy
+                  ? 'text-center py-12 rounded-2xl border-2 border-dashed border-[#DDDDDD] bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a]'
+                  : 'text-center py-12 rounded-2xl border border-dashed border-white/15 bg-black/20'
+              }
             >
               <motion.div
                 animate={{ y: [0, -6, 0] }}
@@ -158,11 +198,29 @@ export function StudentMedalsDisplay({
                 className="mx-auto w-fit"
                 aria-hidden
               >
-                <Award className="w-14 h-14 text-white/45" />
+                <Award
+                  className={
+                    isAcademy ? 'w-14 h-14 text-gray-400 dark:text-white/45' : 'w-14 h-14 text-white/45'
+                  }
+                />
               </motion.div>
-              <p className="mt-4 text-white/70 font-medium">No medals awarded yet</p>
-              <p className="mt-2 text-sm text-white/55">
-                Keep progressing—new medals will appear here.
+              <p
+                className={
+                  isAcademy
+                    ? 'mt-4 text-[#262626] dark:text-white font-semibold'
+                    : 'mt-4 text-white/70 font-medium'
+                }
+              >
+                {emptyTitleText}
+              </p>
+              <p
+                className={
+                  isAcademy
+                    ? 'mt-2 text-sm text-gray-600 dark:text-gray-400'
+                    : 'mt-2 text-sm text-white/55'
+                }
+              >
+                {emptyDescriptionText}
               </p>
             </motion.div>
           </CardContent>
@@ -208,10 +266,18 @@ export function StudentMedalsDisplay({
                 whileHover={{ scale: 1.02, rotateY: 4, rotateX: 3 }}
                 whileTap={{ scale: 0.98 }}
                 style={{ transformStyle: 'preserve-3d' }}
-                className="relative group rounded-2xl border border-white/10 bg-white/5 overflow-hidden"
+                className={
+                  isAcademy
+                    ? 'relative group rounded-2xl border-2 border-[#DDDDDD] bg-white overflow-hidden shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]'
+                    : 'relative group rounded-2xl border border-white/10 bg-white/5 overflow-hidden'
+                }
               >
                 <motion.div
-                  className="absolute inset-0 bg-linear-to-br from-yellow-500/15 via-orange-500/10 to-fuchsia-500/15 opacity-0 group-hover:opacity-100 blur-xl"
+                  className={
+                    isAcademy
+                      ? 'absolute inset-0 bg-linear-to-br from-yellow-500/10 via-orange-500/10 to-fuchsia-500/10 opacity-0 group-hover:opacity-100 blur-xl'
+                      : 'absolute inset-0 bg-linear-to-br from-yellow-500/15 via-orange-500/10 to-fuchsia-500/15 opacity-0 group-hover:opacity-100 blur-xl'
+                  }
                   animate={{ scale: [1, 1.06, 1] }}
                   transition={{ duration: 2.4, repeat: Infinity }}
                   aria-hidden
@@ -220,7 +286,11 @@ export function StudentMedalsDisplay({
                 <div className="relative p-4">
                   <div className="flex items-start gap-3">
                     <motion.div
-                      className="shrink-0 rounded-2xl border border-white/10 bg-black/30 px-3 py-2"
+                      className={
+                        isAcademy
+                          ? 'shrink-0 rounded-2xl border-2 border-[#DDDDDD] bg-gray-50 px-3 py-2 dark:border-[#000000] dark:bg-[#0b0b0f]'
+                          : 'shrink-0 rounded-2xl border border-white/10 bg-black/30 px-3 py-2'
+                      }
                       animate={{ y: [0, -2, 0] }}
                       transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
                       aria-hidden
@@ -230,7 +300,13 @@ export function StudentMedalsDisplay({
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
-                        <h4 className="font-bold text-white truncate">
+                        <h4
+                          className={
+                            isAcademy
+                              ? 'font-bold text-[#262626] dark:text-white truncate'
+                              : 'font-bold text-white truncate'
+                          }
+                        >
                           {locale === 'ar' ? medal.nameAr : medal.name}
                         </h4>
                         {count > 1 ? (
@@ -239,22 +315,46 @@ export function StudentMedalsDisplay({
                             animate={{ scale: 1 }}
                             className="shrink-0"
                           >
-                            <span className="inline-flex items-center justify-center px-2 py-1 rounded-full text-[11px] font-bold bg-white/10 text-white border border-white/10">
+                            <span
+                              className={
+                                isAcademy
+                                  ? 'inline-flex items-center justify-center px-2 py-1 rounded-full text-[11px] font-bold bg-gray-100 text-gray-800 border-0 dark:bg-white/10 dark:text-white'
+                                  : 'inline-flex items-center justify-center px-2 py-1 rounded-full text-[11px] font-bold bg-white/10 text-white border border-white/10'
+                              }
+                            >
                               x{count}
                             </span>
                           </motion.div>
                         ) : null}
                       </div>
 
-                      <p className="mt-1 text-xs text-white/65 line-clamp-2">
+                      <p
+                        className={
+                          isAcademy
+                            ? 'mt-1 text-xs text-gray-600 dark:text-gray-400 line-clamp-2'
+                            : 'mt-1 text-xs text-white/65 line-clamp-2'
+                        }
+                      >
                         {locale === 'ar' ? medal.descriptionAr : medal.description}
                       </p>
 
                       <div className="mt-3 flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-linear-to-r from-yellow-500/80 to-orange-600/80 px-2.5 py-1 text-[11px] font-bold text-white border border-white/10">
+                        <span
+                          className={
+                            isAcademy
+                              ? 'inline-flex items-center gap-1 rounded-full bg-linear-to-r from-yellow-500/80 to-orange-600/80 px-2.5 py-1 text-[11px] font-bold text-white border border-black/10'
+                              : 'inline-flex items-center gap-1 rounded-full bg-linear-to-r from-yellow-500/80 to-orange-600/80 px-2.5 py-1 text-[11px] font-bold text-white border border-white/10'
+                          }
+                        >
                           +{medal.points} pts
                         </span>
-                        <span className="text-[11px] text-white/55 truncate">
+                        <span
+                          className={
+                            isAcademy
+                              ? 'text-[11px] text-gray-600 dark:text-gray-400 truncate'
+                              : 'text-[11px] text-white/55 truncate'
+                          }
+                        >
                           Last awarded: {formatDate(lastAwarded)}
                         </span>
                       </div>
@@ -270,21 +370,38 @@ export function StudentMedalsDisplay({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.35 }}
-            className="mt-6 relative overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+            className={
+              isAcademy
+                ? 'mt-6 relative overflow-hidden rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]'
+                : 'mt-6 relative overflow-hidden rounded-2xl border border-white/10 bg-white/5'
+            }
           >
-            <div className="absolute inset-0 bg-linear-to-r from-yellow-500/10 via-orange-500/10 to-fuchsia-500/10" aria-hidden />
+            {isAcademy ? null : (
+              <div
+                className="absolute inset-0 bg-linear-to-r from-yellow-500/10 via-orange-500/10 to-fuchsia-500/10"
+                aria-hidden
+              />
+            )}
             <div className="relative p-5 flex items-center justify-between gap-4">
               <div className="min-w-0">
-                <div className="text-white/60 text-sm">Total Medal Points</div>
-                <div className="mt-1 text-white text-xl font-bold truncate">{totalPoints}</div>
+                <div className={isAcademy ? 'text-gray-600 dark:text-gray-400 text-sm' : 'text-white/60 text-sm'}>
+                  Total Medal Points
+                </div>
+                <div className={isAcademy ? 'mt-1 text-[#262626] dark:text-white text-xl font-bold truncate' : 'mt-1 text-white text-xl font-bold truncate'}>
+                  {totalPoints}
+                </div>
               </div>
               <motion.div
-                className="h-12 w-12 rounded-2xl border border-white/10 bg-black/25 flex items-center justify-center shrink-0"
+                className={
+                  isAcademy
+                    ? 'h-12 w-12 rounded-2xl border-2 border-[#DDDDDD] bg-gray-50 flex items-center justify-center shrink-0 dark:border-[#000000] dark:bg-[#0b0b0f]'
+                    : 'h-12 w-12 rounded-2xl border border-white/10 bg-black/25 flex items-center justify-center shrink-0'
+                }
                 animate={{ rotate: [0, -6, 6, -6, 0] }}
                 transition={{ duration: 0.7 }}
                 aria-hidden
               >
-                <Award className="h-6 w-6 text-white/85" />
+                <Award className={isAcademy ? 'h-6 w-6 text-gray-700 dark:text-white/85' : 'h-6 w-6 text-white/85'} />
               </motion.div>
             </div>
           </motion.div>

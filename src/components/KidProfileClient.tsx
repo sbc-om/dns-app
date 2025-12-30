@@ -181,6 +181,17 @@ export function KidProfileClient({
   const canManage = currentUser?.role === 'admin' || currentUser?.role === 'coach' || currentUser?.role === 'manager';
   const canAdmin = currentUser?.role === 'admin' || currentUser?.role === 'manager';
 
+  const actionLabel = {
+    editProfile: dictionary.playerProfile?.actions?.editProfile ?? (dictionary.common.edit || 'Edit'),
+    newAssessment: dictionary.playerProfile?.actions?.newAssessment ?? 'New assessment',
+    grantBadge: dictionary.playerProfile?.actions?.grantBadge ?? 'Grant badge',
+    adjustProgramLevel: dictionary.playerProfile?.actions?.adjustProgramLevel ?? 'Adjust program level',
+    achievements: dictionary.playerProfile?.tabs?.achievements ?? 'Achievements',
+    approveStageUpgrade: dictionary.playerProfile?.actions?.approveStageUpgrade ?? 'Approve stage upgrade',
+  };
+
+  const scoreLabel = dictionary.playerProfile?.labels?.score ?? 'Score';
+
   const loadProgramLevelOptionsFor = async (programId: string) => {
     setLoadingProgramLevelOptions(true);
     try {
@@ -953,7 +964,7 @@ export function KidProfileClient({
                   className="w-full h-11 border-2 border-[#DDDDDD] bg-[#0b0b0f] text-white hover:bg-[#14141a] dark:border-[#000000] justify-start ltr:text-left rtl:text-right"
                 >
                   <Edit className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  Edit Profile
+                  {actionLabel.editProfile}
                 </Button>
               )}
               {canManage && (
@@ -963,7 +974,7 @@ export function KidProfileClient({
                   className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] justify-start ltr:text-left rtl:text-right"
                 >
                   <Plus className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  New Assessment
+                  {actionLabel.newAssessment}
                 </Button>
               )}
               {canManage && (
@@ -973,7 +984,7 @@ export function KidProfileClient({
                   className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] justify-start ltr:text-left rtl:text-right"
                 >
                   <Award className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  Grant Badge
+                  {actionLabel.grantBadge}
                 </Button>
               )}
 
@@ -984,7 +995,7 @@ export function KidProfileClient({
                   className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] justify-start ltr:text-left rtl:text-right"
                 >
                   <ArrowUpDown className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  {dictionary.playerProfile?.actions?.adjustProgramLevel ?? 'Adjust program level'}
+                  {actionLabel.adjustProgramLevel}
                 </Button>
               )}
               <Button
@@ -993,7 +1004,7 @@ export function KidProfileClient({
                 className="w-full h-11 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] justify-start ltr:text-left rtl:text-right"
               >
                 <Trophy className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                {dictionary.playerProfile?.tabs?.achievements ?? 'Achievements'}
+                {actionLabel.achievements}
               </Button>
               {canManage && stageEvaluation?.evaluation?.readyForStageUpgrade && (
                 <Button
@@ -1002,7 +1013,7 @@ export function KidProfileClient({
                   className="w-full h-11 border-2 border-emerald-500/40 bg-emerald-600 text-white hover:bg-emerald-500 justify-start ltr:text-left rtl:text-right"
                 >
                   <Flag className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                  Approve Stage
+                  {actionLabel.approveStageUpgrade}
                 </Button>
               )}
             </div>
@@ -1020,7 +1031,7 @@ export function KidProfileClient({
                     className="border-2 border-[#DDDDDD] bg-[#0b0b0f] text-white hover:bg-[#14141a] dark:border-[#000000] flex-col h-auto py-3"
                   >
                     <Edit className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">Edit</span>
+                    <span className="text-[10px] font-semibold">{actionLabel.editProfile}</span>
                   </Button>
                 )}
                 {canManage && (
@@ -1031,7 +1042,7 @@ export function KidProfileClient({
                     className="border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] flex-col h-auto py-3"
                   >
                     <Plus className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">Assessment</span>
+                    <span className="text-[10px] font-semibold">{actionLabel.newAssessment}</span>
                   </Button>
                 )}
                 {canManage && (
@@ -1042,7 +1053,7 @@ export function KidProfileClient({
                     className="border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114] flex-col h-auto py-3"
                   >
                     <Award className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">Badge</span>
+                    <span className="text-[10px] font-semibold">{actionLabel.grantBadge}</span>
                   </Button>
                 )}
                 <Button
@@ -1053,7 +1064,7 @@ export function KidProfileClient({
                 >
                   <Trophy className="h-4 w-4 mb-1" />
                   <span className="text-[10px] font-semibold">
-                    {dictionary.playerProfile?.tabs?.achievements ?? 'Achievements'}
+                    {actionLabel.achievements}
                   </span>
                 </Button>
                 {canManage && stageEvaluation?.evaluation?.readyForStageUpgrade && (
@@ -1064,7 +1075,7 @@ export function KidProfileClient({
                     className="border-2 border-emerald-500/40 bg-emerald-600 text-white hover:bg-emerald-500 flex-col h-auto py-3 col-span-3"
                   >
                     <Flag className="h-4 w-4 mb-1" />
-                    <span className="text-[10px] font-semibold">Approve Stage</span>
+                    <span className="text-[10px] font-semibold">{actionLabel.approveStageUpgrade}</span>
                   </Button>
                 )}
               </div>
@@ -1155,11 +1166,12 @@ export function KidProfileClient({
       {/* Intentionally no fixed bottom action bar on mobile.
           A global mobile bottom navigation exists; keeping actions inside the header avoids overlap. */}
 
-      <Tabs defaultValue="overview" className="w-full">
+      <Tabs defaultValue="overview" className="w-full text-start">
         <div className="-mx-4 sm:mx-0">
           <div className="px-4 sm:px-0">
             <OverlayScrollbarsComponent
               className="w-full"
+              dir={locale === 'ar' ? 'rtl' : 'ltr'}
               options={{
                 scrollbars: {
                   theme: 'os-theme-dark',
@@ -1175,31 +1187,31 @@ export function KidProfileClient({
               defer
             >
               <div className="pb-1">
-                <TabsList className="inline-flex w-max min-w-full items-center justify-start gap-1 rounded-xl border-2 border-black/60 bg-[#0b0b0f] p-1 shadow-lg shadow-black/30">
+                <TabsList className="inline-flex w-max min-w-full items-center justify-start gap-1 rounded-xl border-2 border-black/60 bg-[#0b0b0f] p-1 shadow-lg shadow-black/30 rtl:flex-row-reverse rtl:justify-end">
                   <TabsTrigger
                     value="overview"
-                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15"
+                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15 rtl:flex-row-reverse"
                   >
                     <Activity className="w-4 h-4" />
                     <span>{dictionary.playerProfile?.tabs?.overview ?? 'Overview'}</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="assessments"
-                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15"
+                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15 rtl:flex-row-reverse"
                   >
                     <Calendar className="w-4 h-4" />
                     <span>{dictionary.playerProfile?.tabs?.assessments ?? 'Assessments'}</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="badges"
-                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15"
+                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15 rtl:flex-row-reverse"
                   >
                     <Star className="w-4 h-4" />
                     <span>{dictionary.playerProfile?.tabs?.badges ?? 'Badges'}</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="achievements"
-                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15"
+                    className="gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15 rtl:flex-row-reverse"
                   >
                     <Award className="w-4 h-4" />
                     <span>{dictionary.playerProfile?.tabs?.achievements ?? 'Achievements'}</span>
@@ -1268,7 +1280,7 @@ export function KidProfileClient({
                                 ariaLabel={`${categoryLabel(k)} score`}
                               />
 
-                              <div className="ltr:text-right rtl:text-left">
+                              <div className="text-start">
                                 <div className="text-sm font-extrabold text-[#262626] dark:text-white">{v}</div>
                                 <div className="mt-0.5 text-[11px] font-semibold text-gray-600 dark:text-gray-400">
                                   {dictionary.playerProfile?.labels?.rawTestValue ?? 'Raw test value'}
@@ -1752,7 +1764,7 @@ export function KidProfileClient({
                           </Label>
                         </div>
                         <div className="mt-2 text-xs text-white/55">
-                          Score: {Math.min(10, Math.max(1, value))}/10
+                          {scoreLabel}: {Math.min(10, Math.max(1, value))}/10
                         </div>
                       </div>
 

@@ -1271,11 +1271,14 @@
       "locked": "مقفلة",
       "assessmentDate": "تاريخ التقييم",
       "selectBadge": "اختر شارة",
+      "score": "الدرجة",
       "selectCourse": "اختر دورة"
     },
     "actions": {
+      "editProfile": "تعديل الملف الشخصي",
       "newAssessment": "تقييم جديد",
       "grantBadge": "منح شارة",
+      "adjustProgramLevel": "تعديل مستوى البرنامج",
       "approveStageUpgrade": "اعتماد ترقية المرحلة",
       "addCourse": "إضافة دورة"
     },

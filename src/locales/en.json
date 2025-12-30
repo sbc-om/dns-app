@@ -1271,11 +1271,14 @@
       "locked": "Locked",
       "assessmentDate": "Assessment date",
       "selectBadge": "Select badge",
+      "score": "Score",
       "selectCourse": "Select course"
     },
     "actions": {
+      "editProfile": "Edit profile",
       "newAssessment": "New assessment",
       "grantBadge": "Grant badge",
+      "adjustProgramLevel": "Adjust program level",
       "approveStageUpgrade": "Approve stage upgrade",
       "addCourse": "Add course"
     },
