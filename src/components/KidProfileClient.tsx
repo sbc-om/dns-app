@@ -873,7 +873,7 @@ export function KidProfileClient({
             >
               <div
                 className="relative overflow-hidden rounded-3xl border-2 shadow-[0_30px_90px_-50px_rgba(0,0,0,0.9)]"
-                style={{ borderColor: accentColor }}
+                style={{ borderColor: accentColor, backgroundColor: accentColor }}
               >
                 <div className="relative h-44 sm:h-52" style={{ backgroundColor: accentColor }}>
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.25),transparent_55%)]" />
@@ -906,7 +906,7 @@ export function KidProfileClient({
                   </motion.div>
                 </div>
 
-                <div className="relative bg-gray-50 dark:bg-[#0b0b0f] backdrop-blur-xl border-t-2 border-[#DDDDDD] dark:border-[#000000] p-4 sm:p-5">
+                <div className="relative bg-gray-50 dark:bg-[#0b0b0f] backdrop-blur-xl border-t-2 border-[#DDDDDD] dark:border-[#000000] p-4 sm:p-5 rounded-t-3xl">
                   <div className="relative flex flex-col items-center text-center gap-2">
                     <div
                       className="absolute right-0 top-0 h-10 w-10 rounded-2xl border-2 border-[#DDDDDD] shadow-lg dark:border-[#000000]"
@@ -937,13 +937,6 @@ export function KidProfileClient({
               </div>
 
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {currentKid.birthDate ? (
-                  <InfoChip
-                    icon={Cake}
-                    label={dictionary.playerProfile?.labels?.birthDate ?? 'Birth date'}
-                    value={new Date(currentKid.birthDate).toLocaleDateString(locale)}
-                  />
-                ) : null}
                 {currentKid.school ? (
                   <InfoChip
                     icon={School}

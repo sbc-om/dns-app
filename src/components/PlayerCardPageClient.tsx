@@ -25,10 +25,12 @@ import html2canvas from 'html2canvas';
 import toast from 'react-hot-toast';
 import {
   ArrowLeft,
+  Copy,
   Download,
   IdCard,
   Layers,
   Loader2,
+  Share2,
   ShieldCheck,
 } from 'lucide-react';
 
@@ -744,6 +746,7 @@ const ProgramLevelCard = forwardRef<
 >(function ProgramLevelCardInner(props, ref) {
   const { player, model } = props;
   const t = (props.dictionary as any).playerCardPage ?? {};
+  const tCommon = (props.dictionary as any).common ?? {};
 
   const sessionsProgress = model.requiredSessions > 0 ? clamp01(model.attendedSessions / model.requiredSessions) : 0;
   const pointsProgress = model.requiredPoints > 0 ? clamp01(model.earnedPoints / model.requiredPoints) : 0;
@@ -768,114 +771,217 @@ const ProgramLevelCard = forwardRef<
   const imageSrc = model.programImage || player.profilePicture || '';
   const imageAlt = model.programName || (player.fullName || player.username) || 'Program';
 
+  const sessionsPct = Math.round(sessionsProgress * 100);
+  const pointsPct = Math.round(pointsProgress * 100);
+
+  const copyText = async (text: string) => {
+    // Avoid relying on global `navigator` typing (can be narrowed incorrectly in some TS setups).
+    const nav = (typeof window !== 'undefined' ? window.navigator : undefined) as any;
+    if (nav?.clipboard?.writeText) {
+      await nav.clipboard.writeText(text);
+      return;
+    }
+
+    // Fallback for older browsers: temporary textarea + execCommand.
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.setAttribute('readonly', 'true');
+    el.style.position = 'fixed';
+    el.style.top = '0';
+    el.style.left = '0';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.focus();
+    el.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(el);
+    if (!ok) throw new Error('copy_failed');
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      const url = typeof window !== 'undefined' ? window.location.href : '';
+      if (!url) return;
+      await copyText(url);
+      toast.success(tCommon.copied || 'Copied');
+    } catch {
+      toast.error(tCommon.error || 'Failed');
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      const url = typeof window !== 'undefined' ? window.location.href : '';
+      if (!url) return;
+
+      // Prefer the native share sheet on mobile when available.
+      const nav = (typeof window !== 'undefined' ? window.navigator : undefined) as any;
+      if (nav?.share) {
+        await nav.share({
+          title: player.fullName || player.username || 'Player',
+          url,
+        });
+        return;
+      }
+
+      await copyText(url);
+      toast.success(tCommon.copied || 'Copied');
+    } catch {
+      toast.error(tCommon.error || 'Failed');
+    }
+  };
+
   return (
-    <div
-      ref={ref}
-      className="rounded-3xl border-2 border-[#DDDDDD] bg-white shadow-lg dark:border-[#000000] dark:bg-[#262626] overflow-hidden"
-    >
-      <div className="relative h-48 w-full overflow-hidden bg-gray-100 dark:bg-[#111114] group/card-img">
-        {imageSrc ? (
-          // Using <img> instead of next/image improves html2canvas reliability for exports.
-          <img
-            src={imageSrc}
-            alt={imageAlt}
-            crossOrigin="anonymous"
-            className="h-full w-full object-cover transition-transform group-hover/card-img:scale-105 duration-300"
-            onError={(e) => {
-              // Hide broken images without throwing.
-              (e.currentTarget as HTMLImageElement).style.display = 'none';
+    <div ref={ref} className="relative rounded-[34px] p-4 bg-linear-to-br from-[#FF3D00] via-[#FF5F02] to-[#FF9A2E] shadow-2xl shadow-orange-500/25">
+      {/* Dark cutout accent (helps emulate the reference corner notch) */}
+      <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-black/35 blur-xl" />
+
+      <div className="relative rounded-[28px] overflow-hidden">
+        {/* Portrait area */}
+        <div className="relative h-56 w-full flex items-end justify-center">
+          <div className="absolute inset-0 bg-black/15" />
+          {imageSrc ? (
+            <img
+              src={imageSrc}
+              alt={imageAlt}
+              crossOrigin="anonymous"
+              className="relative z-10 h-48 w-48 rounded-3xl object-cover shadow-2xl shadow-black/40 ring-1 ring-white/10"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="relative z-10 h-48 w-48 rounded-3xl bg-black/25 ring-1 ring-white/10" />
+          )}
+
+          {/* Subtle top vignette */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.0) 55%, rgba(0,0,0,0.55) 100%)',
             }}
           />
-        ) : null}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(180deg, rgba(0,0,0,0.0) 30%, rgba(0,0,0,0.55) 100%)',
-          }}
-        />
+        </div>
 
-        <div className="absolute left-4 right-4 bottom-3 flex items-end justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-xs text-white/80">{t.programLabel || 'Program'}</div>
-            <div className="mt-0.5 text-base font-extrabold text-white truncate">{model.programName}</div>
+        {/* Floating glass panel */}
+        <div className="absolute left-4 right-4 bottom-4 rounded-[26px] bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/40">
+          <div className="p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-lg font-extrabold text-white truncate">
+                  {player.fullName || player.username || (t.playerLabel || 'Player')}
+                </div>
+                {player.username ? (
+                  <div className="text-sm font-semibold text-[#FF5F02] truncate">@{player.username}</div>
+                ) : null}
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="h-10 w-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 grid place-items-center transition"
+                  aria-label={tCommon.share || 'Share'}
+                >
+                  <Share2 className="h-4 w-4 text-white/80" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="h-10 w-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 grid place-items-center transition"
+                  aria-label={tCommon.copy || 'Copy'}
+                >
+                  <Copy className="h-4 w-4 text-white/80" />
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-3 h-px w-full bg-white/10" />
+
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <RingStat
+                label={t.sessionsLabel || 'Sessions'}
+                value={`${sessionsPct}%`}
+                color="#FF5F02"
+                percent={sessionsPct}
+              />
+              <RingStat
+                label={t.pointsLabel || 'Points'}
+                value={`${pointsPct}%`}
+                color={safeAccent}
+                percent={pointsPct}
+              />
+            </div>
+
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 text-xs text-white/70">
+                  <Layers className="h-4 w-4 shrink-0" />
+                  <span className="font-semibold whitespace-nowrap">
+                    {t.levelLabel || 'Level'} {model.levelOrder}
+                  </span>
+                  <span className="text-white/40">•</span>
+                  <span className="truncate">{model.levelName}</span>
+                </div>
+                <div className="mt-1 text-xs text-white/60 truncate">{t.programLabel || 'Program'}: {model.programName}</div>
+              </div>
+
+              <div className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap ${statusClass}`}>{statusLabel}</div>
+            </div>
+
+            {/* Extra compact KPIs */}
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              <MiniKpiDark label={t.programPointsTotal || 'Program points'} value={`${Math.round(model.programPointsTotal)}`} />
+              <MiniKpiDark label={t.latestNaScore || 'Latest NA'} value={props.latestNaScore === null ? '—' : `${Math.round(props.latestNaScore)}`} />
+              <MiniKpiDark label={t.averageNaScore || 'Avg NA'} value={props.averageNaScore === null ? '—' : `${Math.round(props.averageNaScore)}`} />
+            </div>
           </div>
-          <div
-            className="shrink-0 h-9 w-9 rounded-xl border border-white/20"
-            style={{ backgroundColor: safeAccent }}
-            aria-hidden
-          />
-        </div>
-      </div>
-
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mb-1">
-              <Layers className="h-4 w-4 shrink-0" />
-              <span className="font-semibold text-[#262626] dark:text-white whitespace-nowrap">
-                {t.levelLabel || 'Level'} {model.levelOrder}
-              </span>
-            </div>
-            <div className="text-base font-bold text-[#262626] dark:text-white leading-snug">
-              {model.levelName}
-            </div>
-
-            <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-              {t.playerLabel || 'Player'}: <span className="font-semibold">{player.fullName || player.username}</span>
-            </div>
-          </div>
-
-          <div className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap ${statusClass}`}>{statusLabel}</div>
-        </div>
-
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <KpiBlock
-            label={t.pointsLabel || 'Points'}
-            value={`${Math.max(0, Math.round(model.earnedPoints))}`}
-            hint={
-              model.requiredPoints > 0
-                ? `${t.of || 'of'} ${Math.round(model.requiredPoints)}`
-                : t.noRequirement || 'No requirement'
-            }
-          />
-          <KpiBlock
-            label={t.sessionsLabel || 'Sessions'}
-            value={`${Math.max(0, Math.round(model.attendedSessions))}`}
-            hint={
-              model.requiredSessions > 0
-                ? `${t.of || 'of'} ${Math.round(model.requiredSessions)}`
-                : t.noRequirement || 'No requirement'
-            }
-          />
-        </div>
-
-        <div className="mt-4 space-y-3">
-          <ProgressRow
-            label={t.sessionsProgress || 'Sessions progress'}
-            progress={sessionsProgress}
-            left={`${Math.round(model.attendedSessions)}`}
-            right={model.requiredSessions > 0 ? `${Math.round(model.requiredSessions)}` : '—'}
-            color="#22c55e"
-          />
-          <ProgressRow
-            label={t.pointsProgress || 'Points progress'}
-            progress={pointsProgress}
-            left={`${Math.round(model.earnedPoints)}`}
-            right={model.requiredPoints > 0 ? `${Math.round(model.requiredPoints)}` : '—'}
-            color={safeAccent}
-          />
-        </div>
-
-        <div className="mt-4 grid grid-cols-3 gap-3">
-          <MiniKpi label={t.programPointsTotal || 'Program points'} value={`${Math.round(model.programPointsTotal)}`} />
-          <MiniKpi label={t.latestNaScore || 'Latest NA'} value={props.latestNaScore === null ? '—' : `${Math.round(props.latestNaScore)}`} />
-          <MiniKpi label={t.averageNaScore || 'Avg NA'} value={props.averageNaScore === null ? '—' : `${Math.round(props.averageNaScore)}`} />
         </div>
       </div>
     </div>
   );
 });
+
+function RingStat(props: { label: string; value: string; percent: number; color: string }) {
+  const pct = Math.max(0, Math.min(100, Math.round(props.percent)));
+  return (
+    <div className="flex items-center gap-3">
+      <div className="relative h-12 w-12">
+        <svg viewBox="0 0 36 36" className="h-12 w-12">
+          <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="rgba(255,255,255,0.12)" strokeWidth="3.2" />
+          <circle
+            cx="18"
+            cy="18"
+            r="15.915"
+            fill="transparent"
+            stroke={props.color}
+            strokeWidth="3.2"
+            strokeLinecap="round"
+            strokeDasharray={`${pct} ${100 - pct}`}
+            strokeDashoffset="25"
+          />
+        </svg>
+        <div className="absolute inset-0 grid place-items-center">
+          <div className="h-9 w-9 rounded-full bg-black/75 border border-white/10" />
+        </div>
+      </div>
+
+      <div className="min-w-0">
+        <div className="text-xs text-white/60 truncate">{props.label}</div>
+        <div className="text-base font-extrabold text-white">{props.value}</div>
+      </div>
+    </div>
+  );
+}
+
+function MiniKpiDark(props: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+      <div className="text-[10px] uppercase tracking-wider text-white/60 truncate">{props.label}</div>
+      <div className="mt-1 text-base font-extrabold text-white truncate">{props.value}</div>
+    </div>
+  );
+}
 
 function KpiBlock(props: { label: string; value: string; hint: string }) {
   return (
