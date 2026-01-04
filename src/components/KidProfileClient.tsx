@@ -35,7 +35,6 @@ import {
   Trophy,
   UserCircle,
 } from 'lucide-react';
-import { ImageUpload } from '@/components/ImageUpload';
 import { StudentMedalsDisplay } from '@/components/StudentMedalsDisplay';
 import { updateUserProfilePictureAction } from '@/lib/actions/userActions';
 import { getEnrollmentsByStudentIdAction, updateEnrollmentCourseAction, createEnrollmentAction, deleteEnrollmentAction } from '@/lib/actions/enrollmentActions';
@@ -48,7 +47,7 @@ import {
   setPlayerProgramLevelAction,
 } from '@/lib/actions/programEnrollmentActions';
 import { getProgramAttendanceSummaryForUserProgramsAction } from '@/lib/actions/programAttendanceActions';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import type { Enrollment } from '@/lib/db/repositories/enrollmentRepository';
 import type { Course } from '@/lib/db/repositories/courseRepository';
 import type { PlayerProfile } from '@/lib/db/repositories/playerProfileRepository';
@@ -317,6 +316,33 @@ export function KidProfileClient({
       alert(dictionary.common.error);
     }
   };
+
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarFileChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        alert(dictionary.common.error);
+        return;
+      }
+
+      // Preserve transparency (e.g., PNG alpha) and avoid forced cropping by using the original data URL.
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = String(reader.result || '');
+        if (!dataUrl) {
+          alert(dictionary.common.error);
+          return;
+        }
+        void handleImageUpload(file, dataUrl);
+        if (avatarFileInputRef.current) avatarFileInputRef.current.value = '';
+      };
+      reader.readAsDataURL(file);
+    },
+    [dictionary.common.error, handleImageUpload]
+  );
 
   useEffect(() => {
     loadEnrollmentAndCourses();
@@ -875,28 +901,53 @@ export function KidProfileClient({
                 className="relative overflow-hidden rounded-3xl border-2 shadow-[0_30px_90px_-50px_rgba(0,0,0,0.9)]"
                 style={{ borderColor: accentColor, backgroundColor: accentColor }}
               >
-                <div className="relative h-44 sm:h-52" style={{ backgroundColor: accentColor }}>
+                <div
+                  className="relative h-44 sm:h-52 flex items-end justify-center"
+                  style={{ backgroundColor: accentColor }}
+                >
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.25),transparent_55%)]" />
-                </div>
 
-                <div className="absolute inset-x-0 top-7 flex justify-center">
-                  <motion.div whileHover={{ scale: 1.03 }} className="relative">
+                  <motion.div whileHover={{ scale: 1.03 }} className="relative z-10">
                     {canAdmin ? (
-                      <ImageUpload
-                        onUpload={handleImageUpload}
-                        currentImage={currentKid.profilePicture}
-                        aspectRatio={1}
-                        maxSizeMB={2}
-                        shape="square"
-                        size="md"
-                        hideHint
-                        variant="minimal"
-                      />
+                      <>
+                        <input
+                          ref={avatarFileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleAvatarFileChange}
+                          aria-label="Upload profile picture"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => avatarFileInputRef.current?.click()}
+                          className="relative h-28 w-28 sm:h-32 sm:w-32 rounded-3xl bg-transparent focus:outline-none"
+                          aria-label="Change profile picture"
+                        >
+                          {currentKid.profilePicture ? (
+                            <img
+                              src={currentKid.profilePicture}
+                              alt={currentKid.fullName || currentKid.username}
+                              className="h-full w-full rounded-3xl object-contain bg-transparent drop-shadow-[0_24px_55px_rgba(0,0,0,0.45)]"
+                            />
+                          ) : (
+                            <div className="h-full w-full rounded-3xl bg-black/20 border border-black/25 flex items-center justify-center shadow-2xl">
+                              <UserCircle className="h-14 w-14 text-white/90" />
+                            </div>
+                          )}
+
+                          <div className="absolute inset-0 rounded-3xl bg-black/35 opacity-0 hover:opacity-100 transition-opacity grid place-items-center">
+                            <div className="h-10 w-10 rounded-2xl bg-white/10 border border-white/15 grid place-items-center">
+                              <Edit className="h-5 w-5 text-white" />
+                            </div>
+                          </div>
+                        </button>
+                      </>
                     ) : currentKid.profilePicture ? (
                       <img
                         src={currentKid.profilePicture}
                         alt={currentKid.fullName || currentKid.username}
-                        className="h-28 w-28 sm:h-32 sm:w-32 rounded-3xl object-cover border border-black/25 shadow-2xl"
+                        className="h-28 w-28 sm:h-32 sm:w-32 rounded-3xl object-contain bg-transparent drop-shadow-[0_24px_55px_rgba(0,0,0,0.45)]"
                       />
                     ) : (
                       <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-3xl bg-black/25 border border-black/25 flex items-center justify-center shadow-2xl">
