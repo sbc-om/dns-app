@@ -707,7 +707,7 @@
           "description": "Achievements, stages, and medals create content rooted in real experience, not promotional messages or broad promises.",
           "results": ["Clear differentiation based on story, not ads"]
         },
-        "brandinglegacy": {
+        "brandingLegacy": {
           "title": "Academy Name Reinforcement",
           "description": "When medals are displayed in the athlete's room, the academy's name remains present in the memory of the child and the family."
         }
@@ -731,6 +731,11 @@
           "type3": "Leadership teams focused on long-term value"
         },
         "cta": "Request Partnership Overview"
+      },
+      "programs": {
+        "title": "Our Programs",
+        "subtitle": "Discover tailored training programs designed to unlock natural abilities and build champions",
+        "learnMore": "Learn more"
       }
     },
     "about": {
@@ -746,7 +751,15 @@
       },
       "team": {
         "title": "Discover Team",
-        "location": "Kingdom of Saudi Arabia"
+        "location": "Kingdom of Saudi Arabia",
+        "members": {
+          "mohannadSulimani": {
+            "name": "Mohannad Sulimani"
+          },
+          "talalNaji": {
+            "name": "Talal Naji"
+          }
+        }
       },
       "system": {
         "title": "The System",

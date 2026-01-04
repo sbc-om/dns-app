@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +23,19 @@ interface AboutPageClientProps {
 
 export default function AboutPageClient({ dictionary, locale, user }: AboutPageClientProps) {
   const d = dictionary.pages.about;
+
+  const teamMembers = [
+    {
+      key: 'mohannadSulimani' as const,
+      imageSrc: '/mohannad-sulimani.jpg',
+      name: d.team.members.mohannadSulimani.name,
+    },
+    {
+      key: 'talalNaji' as const,
+      imageSrc: '/talal-naji.jpg',
+      name: d.team.members.talalNaji.name,
+    },
+  ];
 
   const systemCards = [
     {
@@ -163,46 +177,97 @@ export default function AboutPageClient({ dictionary, locale, user }: AboutPageC
           </div>
         </section>
 
-        {/* Mission & Team */}
+        {/* Mission */}
         <section className="px-4 py-12">
-          <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+          <div className="mx-auto max-w-6xl space-y-8">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.6 }}
             >
-              <Card className="relative h-full overflow-hidden border border-white/10 bg-white/5 backdrop-blur-xl rounded-3xl">
+              <Card className="relative overflow-hidden border border-white/10 bg-white/5 backdrop-blur-xl rounded-3xl">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(236,72,153,0.10),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(96,165,250,0.12),transparent_55%)]" />
                 <CardHeader className="relative">
                   <CardTitle className="text-2xl md:text-3xl font-black text-white">
                     {d.mission.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="relative text-gray-300 leading-relaxed">
+                <CardContent className="relative text-gray-300 leading-relaxed text-lg">
                   {d.mission.description}
                 </CardContent>
               </Card>
             </motion.div>
 
+            {/* Team */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.6, delay: 0.05 }}
             >
-              <Card className="relative h-full overflow-hidden border border-white/10 bg-white/5 backdrop-blur-xl rounded-3xl group">
+              <Card className="relative overflow-hidden border border-white/10 bg-white/5 backdrop-blur-xl rounded-3xl group">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(34,197,94,0.10),transparent_55%),radial-gradient(circle_at_70%_70%,rgba(59,130,246,0.12),transparent_55%)]" />
-                <CardContent className="relative h-full flex flex-col items-center justify-center p-10 space-y-6">
+                <CardContent className="relative p-8 md:p-10">
                   <motion.div
-                    animate={{ y: [0, -8, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                    className="flex flex-col items-center gap-3"
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.25 }}
+                    transition={{ duration: 0.6 }}
+                    className="flex flex-col items-center text-center gap-3"
                   >
-                    <MapPin className="h-14 w-14 text-green-400" />
-                    <div className="text-xl font-black text-white text-center">{d.team.title}</div>
-                    <div className="text-base text-gray-400 text-center">{d.team.location}</div>
+                    <motion.div
+                      animate={{ rotate: [0, -6, 6, -6, 0] }}
+                      transition={{ duration: 2.8, repeat: Infinity, repeatDelay: 2.4 }}
+                      className="inline-flex"
+                    >
+                      <Users className="h-12 w-12 text-green-400" />
+                    </motion.div>
+                    <div className="text-2xl font-black text-white">{d.team.title}</div>
                   </motion.div>
+
+                  <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    {teamMembers.map((member, index) => (
+                      <motion.div
+                        key={member.key}
+                        initial={{ opacity: 0, y: 18 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.25 }}
+                        transition={{ duration: 0.55, delay: index * 0.08 }}
+                        whileHover={{ scale: 1.03, rotateY: index === 0 ? 4 : -4, rotateX: 3 }}
+                        whileTap={{ scale: 0.98 }}
+                        style={{ transformStyle: 'preserve-3d' }}
+                        className="relative group/member"
+                      >
+                        {/* Glow */}
+                        <motion.div
+                          className="pointer-events-none absolute -inset-1 rounded-3xl bg-gradient-to-br from-blue-500/25 via-purple-500/15 to-green-500/20 blur-xl opacity-0 group-hover/member:opacity-100 transition-opacity"
+                          animate={{ scale: [1, 1.06, 1] }}
+                          transition={{ duration: 3.5, repeat: Infinity }}
+                        />
+
+                        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/20 backdrop-blur-xl">
+                          <div className="relative aspect-square">
+                            <Image
+                              src={member.imageSrc}
+                              alt={member.name}
+                              fill
+                              sizes="(max-width: 768px) 50vw, 240px"
+                              className="object-cover"
+                              priority={false}
+                            />
+                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+                          </div>
+
+                          <div className="p-4">
+                            <div className="text-sm sm:text-base font-extrabold text-white text-center">
+                              {member.name}
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>

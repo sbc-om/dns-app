@@ -722,9 +722,9 @@ export default function ProgramsManagementClient({ locale, dict }: ProgramsManag
                         : '')
                     }
                   >
-                    <div className="relative h-44 bg-gray-100 dark:bg-black/40 overflow-hidden">
+                    <div className="relative h-56 bg-gray-100 dark:bg-black/40 overflow-hidden">
                       {p.image ? (
-                        <img src={p.image} alt={programName || 'Program'} className="absolute inset-0 h-full w-full object-cover" />
+                        <img src={p.image} alt={programName || 'Program'} className="absolute inset-0 h-full w-full object-cover transition-transform hover:scale-105 duration-300" />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <Layers className="h-16 w-16 text-gray-300 dark:text-white/20" />
@@ -949,9 +949,9 @@ export default function ProgramsManagementClient({ locale, dict }: ProgramsManag
                             style={{ transformStyle: 'preserve-3d' }}
                           >
                             <Card className={`${cardShell} overflow-hidden`}>
-                              <div className="relative h-40 bg-gray-100 dark:bg-black/40 overflow-hidden">
+                              <div className="relative h-52 bg-gray-100 dark:bg-black/40 overflow-hidden">
                                 {lvl.image ? (
-                                  <img src={lvl.image} alt={levelName || 'Level'} className="absolute inset-0 h-full w-full object-cover" />
+                                  <img src={lvl.image} alt={levelName || 'Level'} className="absolute inset-0 h-full w-full object-cover transition-transform hover:scale-105 duration-300" />
                                 ) : (
                                   <div className="absolute inset-0 flex items-center justify-center">
                                     <ShieldCheck className="h-16 w-16 text-gray-300 dark:text-white/20" />

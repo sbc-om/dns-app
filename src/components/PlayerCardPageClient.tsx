@@ -773,14 +773,14 @@ const ProgramLevelCard = forwardRef<
       ref={ref}
       className="rounded-3xl border-2 border-[#DDDDDD] bg-white shadow-lg dark:border-[#000000] dark:bg-[#262626] overflow-hidden"
     >
-      <div className="relative h-36 w-full overflow-hidden bg-gray-100 dark:bg-[#111114]">
+      <div className="relative h-48 w-full overflow-hidden bg-gray-100 dark:bg-[#111114] group/card-img">
         {imageSrc ? (
           // Using <img> instead of next/image improves html2canvas reliability for exports.
           <img
             src={imageSrc}
             alt={imageAlt}
             crossOrigin="anonymous"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform group-hover/card-img:scale-105 duration-300"
             onError={(e) => {
               // Hide broken images without throwing.
               (e.currentTarget as HTMLImageElement).style.display = 'none';
@@ -810,22 +810,23 @@ const ProgramLevelCard = forwardRef<
 
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-              <Layers className="h-4 w-4" />
-              <span className="font-semibold text-[#262626] dark:text-white">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mb-1">
+              <Layers className="h-4 w-4 shrink-0" />
+              <span className="font-semibold text-[#262626] dark:text-white whitespace-nowrap">
                 {t.levelLabel || 'Level'} {model.levelOrder}
               </span>
-              <span className="text-gray-400 dark:text-gray-500">•</span>
-              <span className="truncate">{model.levelName}</span>
+            </div>
+            <div className="text-base font-bold text-[#262626] dark:text-white leading-snug">
+              {model.levelName}
             </div>
 
-            <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 truncate">
+            <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
               {t.playerLabel || 'Player'}: <span className="font-semibold">{player.fullName || player.username}</span>
             </div>
           </div>
 
-          <div className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold ${statusClass}`}>{statusLabel}</div>
+          <div className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap ${statusClass}`}>{statusLabel}</div>
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3">

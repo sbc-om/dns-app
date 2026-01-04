@@ -108,11 +108,13 @@ export function ProgramsSlider({ dictionary, locale, programs }: ProgramsSliderP
                       <Card className="relative h-full flex flex-col bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/25 transition-colors overflow-hidden rounded-3xl">
                         <CardContent className="p-0 flex flex-col h-full">
                           {/* Image */}
-                          <div className="h-48 sm:h-52 relative overflow-hidden">
+                          <div className="h-64 sm:h-72 relative overflow-hidden">
                             <motion.img
                               src={program.image}
                               alt={program.title}
                               className="w-full h-full object-cover"
+                              whileHover={{ scale: 1.05 }}
+                              transition={{ duration: 0.3 }}
                             />
                             {/* Gradient overlay */}
                             <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

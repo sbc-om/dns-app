@@ -55,116 +55,26 @@ export default function NewHomePage({ dictionary, locale, user }: NewHomePagePro
       <Header dictionary={dictionary} locale={locale} user={user} />
 
       <main className="overflow-hidden">
-        {/* Hero Section */}
-        <section className="relative px-4 pt-24 pb-20 overflow-hidden">
-          {/* Animated Background */}
+        {/* Hero Section - Large Logo Only */}
+        <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
+          {/* Simple Dark Background */}
           <div className="pointer-events-none absolute inset-0 -z-10">
             <div className="absolute inset-0 bg-black" />
-            <motion.div
-              className="absolute -top-48 -left-48 h-[600px] w-[600px] rounded-full bg-blue-500/20 blur-3xl"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <motion.div
-              className="absolute -bottom-48 -right-48 h-[600px] w-[600px] rounded-full bg-purple-500/20 blur-3xl"
-              animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.5, 0.3] }}
-              transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-size-[28px_28px]" />
-            
-            {/* Floating particles */}
-            {particles.map((particle) => (
-              <motion.div
-                key={particle.id}
-                className="absolute w-2 h-2 rounded-full bg-white/20"
-                style={{ left: particle.left, top: particle.top }}
-                animate={{
-                  y: [-20, 20],
-                  opacity: [0.2, 0.5, 0.2],
-                }}
-                transition={{
-                  duration: particle.duration,
-                  repeat: Infinity,
-                  delay: particle.delay,
-                  ease: 'easeInOut',
-                }}
-              />
-            ))}
           </div>
 
-          <div className="mx-auto max-w-6xl text-center">
+          <div className="mx-auto w-full flex items-center justify-center py-12 sm:py-16 md:py-20">
+            {/* DNA Logo - Very Large & Responsive */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, type: 'spring', stiffness: 200 }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur-xl mb-6"
+              transition={{ duration: 0.8, type: 'spring', stiffness: 100 }}
+              className="flex justify-center items-center w-full max-w-[95vw] sm:max-w-[85vw] md:max-w-[75vw] lg:max-w-[1000px]"
             >
-              <motion.div
-                animate={{ rotate: [0, -10, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-              >
-                <Sparkles className="h-5 w-5 text-blue-400" />
-              </motion.div>
-              <span className="text-sm font-bold text-white/90">{d.hero.badge}</span>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight"
-            >
-              <span className="bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                {d.hero.title}
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="mt-6 text-lg md:text-xl text-gray-300 mx-auto max-w-3xl leading-relaxed"
-            >
-              {d.hero.subtitle}
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
-            >
-              <Link href={`/${locale}/contact`}>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button size="lg" className="relative overflow-hidden bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold px-8 py-6 rounded-2xl shadow-lg shadow-blue-500/30 group">
-                    <motion.div
-                      className="absolute inset-0 bg-linear-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                    <span className="relative flex items-center gap-2">
-                      {d.hero.cta}
-                      <ArrowRight className="h-5 w-5" />
-                    </span>
-                  </Button>
-                </motion.div>
-              </Link>
-
-              {!user && (
-                <Link href={`/${locale}/auth/login`}>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button size="lg" variant="outline" className="border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold px-8 py-6 rounded-2xl backdrop-blur-xl">
-                      {d.hero.loginCta}
-                    </Button>
-                  </motion.div>
-                </Link>
-              )}
+              <img
+                src="/DNA-Logo-w.svg"
+                alt="DNA"
+                className="w-full h-auto object-contain"
+              />
             </motion.div>
           </div>
         </section>
@@ -353,7 +263,7 @@ export default function NewHomePage({ dictionary, locale, user }: NewHomePagePro
                 { ...d.valueForInstitutions.continuity, icon: TrendingUp, color: 'blue' },
                 { ...d.valueForInstitutions.progressClarity, icon: BarChart3, color: 'purple' },
                 { ...d.valueForInstitutions.storytelling, icon: Star, color: 'pink' },
-                { ...d.valueForInstitutions.brandinglegacy, icon: Award, color: 'yellow' },
+                { ...d.valueForInstitutions.brandingLegacy, icon: Award, color: 'yellow' },
               ].map((value, index) => (
                 <motion.div
                   key={index}

@@ -11,6 +11,7 @@ export type DnaCircularGaugeProps = {
   strokeWidth?: number;
   label?: string;
   valueSuffix?: string;
+  showMaxValue?: boolean;
   accentColor?: string;
   trackColor?: string;
   className?: string;
@@ -26,6 +27,7 @@ export function DnaCircularGauge({
   strokeWidth = 8,
   label,
   valueSuffix,
+  showMaxValue = true,
   accentColor,
   trackColor,
   className,
@@ -78,9 +80,11 @@ export function DnaCircularGauge({
         <div className="absolute inset-0 grid place-items-center">
           <div className="text-center">
             <div className="text-sm font-extrabold text-slate-900 dark:text-white leading-none">{displayValue}</div>
-            <div className="text-[10px] font-semibold text-slate-600 dark:text-white/60 leading-none">
-              /{safeMax}
-            </div>
+            {showMaxValue ? (
+              <div className="text-[10px] font-semibold text-slate-600 dark:text-white/60 leading-none">
+                /{safeMax}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

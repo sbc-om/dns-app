@@ -1274,20 +1274,21 @@ export function KidProfileClient({
                       <div className="text-sm font-semibold text-[#262626] dark:text-white mb-3">
                         {dictionary.playerProfile?.labels?.latestAssessment ?? 'Latest assessment'}: {latestAssessment.sessionDate}
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-3">
                         {Object.entries(latestAssessment.tests).map(([k, v]) => (
                           <div
                             key={k}
-                            className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]"
+                            className="p-3 sm:p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]"
                           >
                             <div className="text-xs text-gray-600 dark:text-gray-400">{categoryLabel(k)}</div>
 
-                            <div className="mt-3 flex items-center justify-between gap-4">
+                            <div className="mt-3 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                               <DnaCircularGauge
                                 value={Math.round(insights?.scores?.[k] ?? 0)}
                                 max={100}
-                                size={72}
-                                strokeWidth={10}
+                                size={64}
+                                strokeWidth={6}
+                                className="shrink-0"
                                 ariaLabel={`${categoryLabel(k)} score`}
                               />
 
@@ -1462,10 +1463,10 @@ export function KidProfileClient({
                                         style={{ transformStyle: 'preserve-3d' }}
                                         className={
                                           isCurrent
-                                            ? 'relative w-[260px] shrink-0 rounded-2xl border border-white/20 bg-white/10 p-3 shadow-lg'
+                                            ? 'relative w-[300px] shrink-0 rounded-2xl border border-white/20 bg-white/10 p-4 shadow-lg'
                                             : isCompleted
-                                              ? 'relative w-[260px] shrink-0 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-3'
-                                              : 'relative w-[260px] shrink-0 rounded-2xl border border-white/10 bg-white/5 p-3 opacity-80'
+                                              ? 'relative w-[300px] shrink-0 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4'
+                                              : 'relative w-[300px] shrink-0 rounded-2xl border border-white/10 bg-white/5 p-4 opacity-80'
                                         }
                                       >
                                         {isCurrent ? (
@@ -1478,9 +1479,9 @@ export function KidProfileClient({
                                           />
                                         ) : null}
 
-                                        <div className={`relative flex items-center gap-3 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
+                                        <div className={`relative flex items-start gap-4 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
                                           <div
-                                            className="relative h-14 w-20 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black/20"
+                                            className="relative h-32 w-32 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-black/20 group/img shadow-lg"
                                             style={{ backgroundColor: `${lvl.color}22` }}
                                           >
                                             {imageSrcFor(lvl) ? (
@@ -1488,8 +1489,8 @@ export function KidProfileClient({
                                                 src={imageSrcFor(lvl)}
                                                 alt="Program level artwork"
                                                 fill
-                                                sizes="80px"
-                                                className="object-cover"
+                                                sizes="128px"
+                                                className="object-cover transition-transform group-hover/img:scale-105 duration-300"
                                               />
                                             ) : (
                                               <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_60%)]" />
@@ -1497,18 +1498,18 @@ export function KidProfileClient({
                                           </div>
 
                                           <div className="min-w-0 flex-1">
-                                            <div className="flex items-center justify-between gap-2">
-                                              <div className="font-bold text-[#262626] dark:text-white truncate">
+                                            <div className="flex flex-col gap-2">
+                                              <div className="font-bold text-sm text-[#262626] dark:text-white leading-snug">
                                                 {getProgramLevelLabel(lvl)}
                                               </div>
                                               <Badge
                                                 variant="secondary"
                                                 className={
                                                   isCurrent
-                                                    ? 'bg-white/10 text-white border-0 dark:bg-white/10 dark:text-white'
+                                                    ? 'bg-white/10 text-white border-0 dark:bg-white/10 dark:text-white w-fit'
                                                     : isCompleted
-                                                      ? 'bg-emerald-600/15 text-emerald-200 border-0'
-                                                      : 'bg-white/10 text-white/80 border-0'
+                                                      ? 'bg-emerald-600/15 text-emerald-200 border-0 w-fit'
+                                                      : 'bg-white/10 text-white/80 border-0 w-fit'
                                                 }
                                               >
                                                 {statusLabel}

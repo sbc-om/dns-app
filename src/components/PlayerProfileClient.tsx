@@ -54,6 +54,7 @@ import {
 } from '@/lib/actions/dnaAssessmentActions';
 import { BADGES } from '@/lib/player/badges';
 import { calculateCategoryScores } from '@/lib/player/dnaScoring';
+import { DnaCircularGauge } from '@/components/DnaCircularGauge';
 import { useRouter } from 'next/navigation';
 
 interface KidProfileClientProps {
@@ -818,17 +819,30 @@ export function KidProfileClient({
                       <div className="text-sm font-semibold text-[#262626] dark:text-white mb-3">
                         {dictionary.playerProfile?.labels?.latestAssessment ?? 'Latest assessment'}: {latestAssessment.sessionDate}
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-3">
                         {Object.entries(latestAssessment.tests).map(([k, v]) => (
                           <div
                             key={k}
-                            className="p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]"
+                            className="p-3 sm:p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]"
                           >
                             <div className="text-xs text-gray-600 dark:text-gray-400">{categoryLabel(k)}</div>
-                            <div className="mt-2 flex items-end justify-between gap-3">
-                              <div className="text-lg font-bold text-[#262626] dark:text-white">{v}</div>
-                              <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">
-                                {Math.round(insights?.scores?.[k] ?? 0)}/100
+
+                            <div className="mt-3 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                              <DnaCircularGauge
+                                value={Math.round(insights?.scores?.[k] ?? 0)}
+                                max={100}
+                                showMaxValue={false}
+                                size={64}
+                                strokeWidth={6}
+                                className="shrink-0"
+                                ariaLabel={`${categoryLabel(k)} score`}
+                              />
+
+                              <div className="text-start">
+                                <div className="text-sm font-extrabold text-[#262626] dark:text-white">{v}</div>
+                                <div className="mt-0.5 text-[11px] font-semibold text-gray-600 dark:text-gray-400">
+                                  {dictionary.playerProfile?.labels?.rawTestValue ?? 'Raw test value'}
+                                </div>
                               </div>
                             </div>
                           </div>
