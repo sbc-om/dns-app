@@ -43,6 +43,15 @@ export function DnaCircularGauge({
   const circumference = 2 * Math.PI * r;
   const dashOffset = circumference * (1 - ratio);
 
+  // Framer Motion compares prop objects; keep these stable to avoid re-animating
+  // the gauge when unrelated state changes cause a rerender.
+  const motionInitial = React.useMemo(() => ({ strokeDashoffset: circumference }), [circumference]);
+  const motionAnimate = React.useMemo(() => ({ strokeDashoffset: dashOffset }), [dashOffset]);
+  const motionTransition = React.useMemo(
+    () => ({ type: 'spring' as const, stiffness: 180, damping: 24 }),
+    []
+  );
+
   const stroke = accentColor ?? 'var(--dna-accent)';
   const track = trackColor ?? 'rgba(148, 163, 184, 0.35)';
 
@@ -70,9 +79,9 @@ export function DnaCircularGauge({
             strokeWidth={strokeWidth}
             strokeLinecap="round"
             strokeDasharray={circumference}
-            initial={{ strokeDashoffset: circumference }}
-            animate={{ strokeDashoffset: dashOffset }}
-            transition={{ type: 'spring', stiffness: 180, damping: 24 }}
+            initial={motionInitial}
+            animate={motionAnimate}
+            transition={motionTransition}
             style={{ transformOrigin: '50% 50%', transform: 'rotate(-90deg)' }}
           />
         </svg>

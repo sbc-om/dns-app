@@ -133,6 +133,10 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    /* Prevent layout shift when dialogs lock scrolling (stable scrollbar gutter). */
+    scrollbar-gutter: stable;
+  }
   body {
     @apply bg-background text-foreground;
     /* Avoid theme-transition flashes. */
@@ -567,6 +571,11 @@
   html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
+    /*
+      Prevent layout shift when scroll is locked (e.g. Radix Dialog adds/removes
+      the page scrollbar). This avoids the sideways "jump" when opening modals.
+    */
+    scrollbar-gutter: stable;
   }
   
   /* Optimize for touch devices */

@@ -59,6 +59,78 @@ import { calculateCategoryScores } from '@/lib/player/dnaScoring';
 import { DnaCircularGauge } from '@/components/DnaCircularGauge';
 import { useRouter } from 'next/navigation';
 
+const TOP_RIGHT_NOTCH_MASK_STYLE: React.CSSProperties = {
+  // Real concave corner cutout (profile header top-right corner).
+  WebkitMaskImage:
+    'radial-gradient(circle 78px at calc(100% - 16px) 16px, transparent 0 70px, #000 72px)',
+  maskImage:
+    'radial-gradient(circle 78px at calc(100% - 16px) 16px, transparent 0 70px, #000 72px)',
+  WebkitMaskRepeat: 'no-repeat',
+  maskRepeat: 'no-repeat',
+  WebkitMaskSize: '100% 100%',
+  maskSize: '100% 100%',
+};
+
+type PanelCardProps = {
+  title: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  children: React.ReactNode;
+};
+
+function PanelCard({ title, icon: Icon, children }: PanelCardProps) {
+  return (
+    <Card className="border border-white/10 bg-transparent rounded-2xl shadow-none">
+      <CardHeader className="py-4">
+        <CardTitle className="text-white flex items-center gap-2 text-base">
+          {Icon ? <Icon className="h-4 w-4 text-white/70" /> : null}
+          <span className="truncate">{title}</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0 pb-5">{children}</CardContent>
+    </Card>
+  );
+}
+
+type InfoChipProps = {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+};
+
+function InfoChip({ icon: Icon, label, value }: InfoChipProps) {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+      <Icon className="h-4 w-4 text-white/70" />
+      <div className="min-w-0">
+        <div className="text-[11px] leading-4 text-white/60 truncate">{label}</div>
+        <div className="text-sm font-semibold text-white truncate">{value}</div>
+      </div>
+    </div>
+  );
+}
+
+type StatTileProps = {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  value: React.ReactNode;
+};
+
+function StatTile({ icon: Icon, title, value }: StatTileProps) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-xs text-white/60 truncate">{title}</div>
+          <div className="mt-1 text-2xl font-bold text-white truncate">{value}</div>
+        </div>
+        <div className="h-10 w-10 rounded-xl border border-white/10 bg-black/20 flex items-center justify-center shrink-0">
+          <Icon className="h-5 w-5 text-white/75" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface KidProfileClientProps {
   dictionary: Dictionary;
   locale: Locale;
@@ -482,66 +554,6 @@ export function KidProfileClient({
     }
   };
 
-  const PanelCard = ({
-    title,
-    icon: Icon,
-    children,
-  }: {
-    title: string;
-    icon?: React.ComponentType<{ className?: string }>;
-    children: React.ReactNode;
-  }) => (
-    <Card className="border border-white/10 bg-transparent rounded-2xl shadow-none">
-      <CardHeader className="py-4">
-        <CardTitle className="text-white flex items-center gap-2 text-base">
-          {Icon ? <Icon className="h-4 w-4 text-white/70" /> : null}
-          <span className="truncate">{title}</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-0 pb-5">{children}</CardContent>
-    </Card>
-  );
-
-  const InfoChip = ({
-    icon: Icon,
-    label,
-    value,
-  }: {
-    icon: React.ComponentType<{ className?: string }>;
-    label: string;
-    value: string;
-  }) => (
-    <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-      <Icon className="h-4 w-4 text-white/70" />
-      <div className="min-w-0">
-        <div className="text-[11px] leading-4 text-white/60 truncate">{label}</div>
-        <div className="text-sm font-semibold text-white truncate">{value}</div>
-      </div>
-    </div>
-  );
-
-  const StatTile = ({
-    icon: Icon,
-    title,
-    value,
-  }: {
-    icon: React.ComponentType<{ className?: string }>;
-    title: string;
-    value: React.ReactNode;
-  }) => (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <div className="text-xs text-white/60 truncate">{title}</div>
-          <div className="mt-1 text-2xl font-bold text-white truncate">{value}</div>
-        </div>
-        <div className="h-10 w-10 rounded-xl border border-white/10 bg-black/20 flex items-center justify-center shrink-0">
-          <Icon className="h-5 w-5 text-white/75" />
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
@@ -551,7 +563,10 @@ export function KidProfileClient({
       className="space-y-6 pb-28 lg:pb-0"
     >
       {/* Header */}
-      <Card className="border border-white/10 bg-transparent rounded-2xl shadow-none">
+      <Card
+        className="border border-white/10 bg-transparent rounded-2xl shadow-none"
+        style={TOP_RIGHT_NOTCH_MASK_STYLE}
+      >
         <CardContent className="p-4 sm:p-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div className="flex items-start gap-5 min-w-0">

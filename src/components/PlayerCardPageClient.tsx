@@ -3,7 +3,7 @@
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
@@ -25,13 +25,10 @@ import html2canvas from 'html2canvas';
 import toast from 'react-hot-toast';
 import {
   ArrowLeft,
-  Copy,
   Download,
   IdCard,
   Layers,
   Loader2,
-  Share2,
-  ShieldCheck,
 } from 'lucide-react';
 
 type CardStatus = 'current' | 'completed' | 'locked';
@@ -78,6 +75,37 @@ function clamp01(n: number) {
   return Math.max(0, Math.min(1, n));
 }
 
+async function waitForFontsReady() {
+  try {
+    const fonts = (document as any).fonts;
+    if (fonts?.ready) await fonts.ready;
+  } catch {
+    // Non-fatal: proceed without waiting.
+  }
+}
+
+async function waitForImagesReady(root: HTMLElement) {
+  const images = Array.from(root.querySelectorAll('img'));
+  if (images.length === 0) return;
+
+  await Promise.all(
+    images.map(
+      (img) =>
+        img.complete
+          ? Promise.resolve()
+          : new Promise<void>((resolve) => {
+              const done = () => {
+                img.removeEventListener('load', done);
+                img.removeEventListener('error', done);
+                resolve();
+              };
+              img.addEventListener('load', done);
+              img.addEventListener('error', done);
+            })
+    )
+  );
+}
+
 function safeNumber(n: unknown) {
   return typeof n === 'number' && Number.isFinite(n) ? n : 0;
 }
@@ -87,6 +115,13 @@ function downloadDataUrl(filename: string, dataUrl: string) {
   link.download = filename;
   link.href = dataUrl;
   link.click();
+}
+
+function getExportScale() {
+  // Higher scale = sharper exports (bigger files). Cap to avoid huge memory spikes.
+  if (typeof window === 'undefined') return 4;
+  const dpr = Number.isFinite(window.devicePixelRatio) ? window.devicePixelRatio : 1;
+  return Math.min(5, Math.max(3, Math.round(dpr * 3)));
 }
 
 function computeNaStats(sessions: DnaAssessmentSession[]) {
@@ -155,8 +190,8 @@ export function PlayerCardPageClient(props: {
 
   const subtitle = (props.dictionary as any).playerCardPage?.subtitle ?? '';
 
-  const t = (props.dictionary as any).playerCardPage ?? {};
-  const tCommon = (props.dictionary as any).common ?? {};
+  const t = useMemo(() => (props.dictionary as any).playerCardPage ?? {}, [props.dictionary]);
+  const tCommon = useMemo(() => (props.dictionary as any).common ?? {}, [props.dictionary]);
 
   const [loading, setLoading] = useState(true);
   const [cards, setCards] = useState<ProgramLevelCardModel[]>([]);
@@ -317,7 +352,7 @@ export function PlayerCardPageClient(props: {
     return () => {
       cancelled = true;
     };
-  }, [props.academyId, props.kid.id, props.locale]);
+  }, [props.academyId, props.kid.id, props.locale, t, tCommon]);
 
   const programs = useMemo(() => {
     const map = new Map<string, { programId: string; programName: string }>();
@@ -349,11 +384,24 @@ export function PlayerCardPageClient(props: {
     async (cardId: string, filename: string) => {
       const el = cardRefs.current[cardId];
       if (!el) throw new Error('Card not found');
+
+      await waitForFontsReady();
+      await waitForImagesReady(el);
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+
       const canvas = await html2canvas(el, {
-        scale: 3,
+        scale: getExportScale(),
         backgroundColor: '#ffffff',
         logging: false,
         useCORS: true,
+        onclone: (doc) => {
+          // Force light theme for clean, print-friendly exports.
+          doc.documentElement.classList.remove('dark');
+          const clone = doc.querySelector(`[data-card-root="${cardId}"]`);
+          if (clone instanceof HTMLElement) {
+            clone.style.setProperty('--card-export-bg', '#ffffff');
+          }
+        },
       });
       downloadDataUrl(filename, canvas.toDataURL('image/png'));
     },
@@ -365,11 +413,22 @@ export function PlayerCardPageClient(props: {
       const el = cardRefs.current[cardId];
       if (!el) throw new Error('Card not found');
 
+      await waitForFontsReady();
+      await waitForImagesReady(el);
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+
       const canvas = await html2canvas(el, {
-        scale: 3,
+        scale: getExportScale(),
         backgroundColor: '#ffffff',
         logging: false,
         useCORS: true,
+        onclone: (doc) => {
+          doc.documentElement.classList.remove('dark');
+          const clone = doc.querySelector(`[data-card-root="${cardId}"]`);
+          if (clone instanceof HTMLElement) {
+            clone.style.setProperty('--card-export-bg', '#ffffff');
+          }
+        },
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -395,11 +454,23 @@ export function PlayerCardPageClient(props: {
     // Render first card to set initial page size.
     const firstEl = cardRefs.current[visibleCards[0]!.id];
     if (!firstEl) throw new Error('Card not found');
+
+    await waitForFontsReady();
+    await waitForImagesReady(firstEl);
+    await new Promise<void>((r) => requestAnimationFrame(() => r()));
+
     const firstCanvas = await html2canvas(firstEl, {
-      scale: 3,
+      scale: getExportScale(),
       backgroundColor: '#ffffff',
       logging: false,
       useCORS: true,
+      onclone: (doc) => {
+        doc.documentElement.classList.remove('dark');
+        const clone = doc.querySelector(`[data-card-root="${visibleCards[0]!.id}"]`);
+        if (clone instanceof HTMLElement) {
+          clone.style.setProperty('--card-export-bg', '#ffffff');
+        }
+      },
     });
 
     const pdf = new jsPDF({
@@ -415,11 +486,22 @@ export function PlayerCardPageClient(props: {
       const c = visibleCards[i]!;
       const el = cardRefs.current[c.id];
       if (!el) continue;
+
+      await waitForImagesReady(el);
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+
       const canvas = await html2canvas(el, {
-        scale: 3,
+        scale: getExportScale(),
         backgroundColor: '#ffffff',
         logging: false,
         useCORS: true,
+        onclone: (doc) => {
+          doc.documentElement.classList.remove('dark');
+          const clone = doc.querySelector(`[data-card-root="${c.id}"]`);
+          if (clone instanceof HTMLElement) {
+            clone.style.setProperty('--card-export-bg', '#ffffff');
+          }
+        },
       });
 
       // Keep consistent page size; add image scaled to page.
@@ -439,10 +521,8 @@ export function PlayerCardPageClient(props: {
         const safeProgram = c.programName.replace(/[^a-z0-9-_]+/gi, '_');
         const safeLevel = `L${c.levelOrder}_${c.levelName}`.replace(/[^a-z0-9-_]+/gi, '_');
         const filename = `${props.kid.fullName || props.kid.username}-${safeProgram}-${safeLevel}.png`;
-        // eslint-disable-next-line no-await-in-loop
         await exportCardToPng(c.id, filename);
         // Give the browser a beat between downloads.
-        // eslint-disable-next-line no-await-in-loop
         await new Promise((r) => setTimeout(r, 250));
       }
       toast.success(t.allDownloaded || tCommon.success || 'Downloaded');
@@ -487,6 +567,14 @@ export function PlayerCardPageClient(props: {
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-extrabold text-[#262626] dark:text-white truncate">{title}</h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{subtitle}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center rounded-full border border-black/10 dark:border-white/10 bg-white/70 dark:bg-white/5 px-2.5 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200">
+                    {programsCount} {t.programsLabel || 'Programs'}
+                  </span>
+                  <span className="inline-flex items-center rounded-full border border-black/10 dark:border-white/10 bg-white/70 dark:bg-white/5 px-2.5 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200">
+                    {visibleCards.length} {t.cardsLabel || 'Cards'}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -495,7 +583,7 @@ export function PlayerCardPageClient(props: {
                 <Button
                   onClick={handleExportAllPng}
                   disabled={exportBusy || loading || visibleCards.length === 0}
-                  className="rounded-xl bg-linear-to-r from-[#FF5F02] via-[#FF7A2E] to-[#FF3D00] text-white shadow-lg shadow-orange-500/20 hover:shadow-orange-500/35"
+                  className="rounded-xl bg-[#FF5F02] text-white hover:bg-[#FF7A2E]"
                 >
                   {exportBusy ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
                   {t.downloadAllPng || 'Download all (PNG)'}
@@ -593,7 +681,7 @@ export function PlayerCardPageClient(props: {
             <Button
               onClick={handleExportAllPng}
               disabled={exportBusy || loading || visibleCards.length === 0}
-              className="flex-1 rounded-xl bg-linear-to-r from-[#FF5F02] via-[#FF7A2E] to-[#FF3D00] text-white shadow-lg shadow-orange-500/20"
+              className="flex-1 rounded-xl bg-[#FF5F02] text-white hover:bg-[#FF7A2E]"
             >
               {exportBusy ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
               {t.downloadAllPng || 'Download all (PNG)'}
@@ -629,9 +717,9 @@ export function PlayerCardPageClient(props: {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="rounded-2xl border border-white/10 bg-linear-to-br from-black/5 via-white/5 to-black/10 p-10 text-center"
+                className="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#0f0f12] p-10 text-center"
               >
-                <div className="mx-auto inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-linear-to-br from-[#FF5F02]/30 to-transparent border border-[#FF5F02]/30 mb-3">
+                <div className="mx-auto inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#FF5F02]/10 border border-[#FF5F02]/20 mb-3">
                   <IdCard className="h-6 w-6 text-[#FF5F02]" />
                 </div>
                 <div className="text-base font-semibold text-[#262626] dark:text-white">
@@ -746,10 +834,19 @@ const ProgramLevelCard = forwardRef<
 >(function ProgramLevelCardInner(props, ref) {
   const { player, model } = props;
   const t = (props.dictionary as any).playerCardPage ?? {};
-  const tCommon = (props.dictionary as any).common ?? {};
 
-  const sessionsProgress = model.requiredSessions > 0 ? clamp01(model.attendedSessions / model.requiredSessions) : 0;
-  const pointsProgress = model.requiredPoints > 0 ? clamp01(model.earnedPoints / model.requiredPoints) : 0;
+  const sessionsProgress =
+    model.requiredSessions > 0
+      ? clamp01(model.attendedSessions / model.requiredSessions)
+      : model.status === 'completed'
+        ? 1
+        : 0;
+  const pointsProgress =
+    model.requiredPoints > 0
+      ? clamp01(model.earnedPoints / model.requiredPoints)
+      : model.status === 'completed'
+        ? 1
+        : 0;
 
   const statusLabel =
     model.status === 'current'
@@ -758,183 +855,175 @@ const ProgramLevelCard = forwardRef<
         ? t.statusCompleted || 'Completed'
         : t.statusLocked || 'Locked';
 
-  const statusClass =
+  // Avoid Tailwind alpha colors in exported subtree (they compile to `color-mix(in oklab, ...)`).
+  const statusStyle: React.CSSProperties =
     model.status === 'current'
-      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'
+      ? {
+          backgroundColor: 'rgba(16, 185, 129, 0.14)',
+          borderColor: 'rgba(16, 185, 129, 0.32)',
+          color: '#065f46',
+        }
       : model.status === 'completed'
-        ? 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20'
-        : 'bg-gray-500/10 text-gray-700 dark:text-gray-300 border-gray-500/20';
+        ? {
+            backgroundColor: 'rgba(37, 99, 235, 0.14)',
+            borderColor: 'rgba(37, 99, 235, 0.32)',
+            color: '#1d4ed8',
+          }
+        : {
+            backgroundColor: 'rgba(107, 114, 128, 0.14)',
+            borderColor: 'rgba(107, 114, 128, 0.32)',
+            color: '#374151',
+          };
 
   const accent = model.levelColor || '#FF5F02';
   const safeAccent = /^#[0-9a-f]{6}$/i.test(accent) ? accent : '#FF5F02';
 
-  const imageSrc = model.programImage || player.profilePicture || '';
+  const imageSrc = player.profilePicture || model.programImage || '';
   const imageAlt = model.programName || (player.fullName || player.username) || 'Program';
 
   const sessionsPct = Math.round(sessionsProgress * 100);
   const pointsPct = Math.round(pointsProgress * 100);
 
-  const copyText = async (text: string) => {
-    // Avoid relying on global `navigator` typing (can be narrowed incorrectly in some TS setups).
-    const nav = (typeof window !== 'undefined' ? window.navigator : undefined) as any;
-    if (nav?.clipboard?.writeText) {
-      await nav.clipboard.writeText(text);
-      return;
-    }
-
-    // Fallback for older browsers: temporary textarea + execCommand.
-    const el = document.createElement('textarea');
-    el.value = text;
-    el.setAttribute('readonly', 'true');
-    el.style.position = 'fixed';
-    el.style.top = '0';
-    el.style.left = '0';
-    el.style.opacity = '0';
-    document.body.appendChild(el);
-    el.focus();
-    el.select();
-    const ok = document.execCommand('copy');
-    document.body.removeChild(el);
-    if (!ok) throw new Error('copy_failed');
-  };
-
-  const handleCopyLink = async () => {
-    try {
-      const url = typeof window !== 'undefined' ? window.location.href : '';
-      if (!url) return;
-      await copyText(url);
-      toast.success(tCommon.copied || 'Copied');
-    } catch {
-      toast.error(tCommon.error || 'Failed');
-    }
-  };
-
-  const handleShare = async () => {
-    try {
-      const url = typeof window !== 'undefined' ? window.location.href : '';
-      if (!url) return;
-
-      // Prefer the native share sheet on mobile when available.
-      const nav = (typeof window !== 'undefined' ? window.navigator : undefined) as any;
-      if (nav?.share) {
-        await nav.share({
-          title: player.fullName || player.username || 'Player',
-          url,
-        });
-        return;
-      }
-
-      await copyText(url);
-      toast.success(tCommon.copied || 'Copied');
-    } catch {
-      toast.error(tCommon.error || 'Failed');
-    }
-  };
+  // The global CSS policy disables gradients and shadows.
+  // Design this card using solid colors + borders so it stays readable and exportable.
+  const frameColor =
+    model.status === 'locked'
+      ? '#9CA3AF'
+      : model.status === 'completed'
+        ? '#2563EB'
+        : safeAccent;
 
   return (
-    <div ref={ref} className="relative rounded-[34px] p-4 bg-linear-to-br from-[#FF3D00] via-[#FF5F02] to-[#FF9A2E] shadow-2xl shadow-orange-500/25">
-      {/* Dark cutout accent (helps emulate the reference corner notch) */}
-      <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-black/35 blur-xl" />
-
-      <div className="relative rounded-[28px] overflow-hidden">
-        {/* Portrait area */}
-        <div className="relative h-64 sm:h-72 w-full flex items-end justify-center">
-          <div className="absolute inset-0 bg-black/15" />
-          {imageSrc ? (
-            <img
-              src={imageSrc}
-              alt={imageAlt}
-              crossOrigin="anonymous"
-              className="relative z-10 h-56 w-56 sm:h-64 sm:w-64 rounded-3xl object-cover shadow-2xl shadow-black/40 ring-1 ring-white/10"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          ) : (
-            <div className="relative z-10 h-56 w-56 sm:h-64 sm:w-64 rounded-3xl bg-black/25 ring-1 ring-white/10" />
-          )}
-
-          {/* Subtle top vignette */}
+    <div
+      ref={ref}
+      data-card-root={model.id}
+      className="relative rounded-[34px] border p-3 bg-white dark:bg-[#0f0f12]"
+      style={{ borderColor: safeAccent, borderWidth: 1.5 }}
+    >
+      <div
+        className="relative rounded-[28px] overflow-hidden border-2 bg-white dark:bg-[#0f0f12]"
+        style={{ borderColor: 'rgba(0,0,0,0.12)' }}
+      >
+        {/* Top stripe */}
+        <div
+          className="flex items-center justify-between gap-3 px-4 py-3 border-b"
+          style={{ borderColor: 'rgba(0,0,0,0.12)' }}
+        >
+          <div className="min-w-0">
+            <div className="text-xs font-semibold text-[#4B5563] dark:text-[#D1D5DB] truncate">
+              {t.programLabel || 'Program'}
+            </div>
+            <div className="text-base font-extrabold text-[#262626] dark:text-white truncate">{model.programName}</div>
+          </div>
           <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.0) 55%, rgba(0,0,0,0.55) 100%)',
-            }}
-          />
+            className="shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap"
+            style={statusStyle}
+          >
+            {statusLabel}
+          </div>
         </div>
 
-        {/* Floating glass panel */}
-        <div className="absolute left-4 right-4 bottom-4 rounded-[26px] bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/40">
-          <div className="p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-lg font-extrabold text-white truncate">
-                  {player.fullName || player.username || (t.playerLabel || 'Player')}
-                </div>
-                {player.username ? (
-                  <div className="text-sm font-semibold text-[#FF5F02] truncate">@{player.username}</div>
+        <div className="p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-[120px,1fr] gap-4 items-start">
+            <div className="flex items-start gap-3">
+              <div
+                className="h-[108px] w-[108px] rounded-3xl border-2 bg-[#f3f4f6] dark:bg-[#141417] overflow-hidden shrink-0"
+                style={{ borderColor: 'rgba(0,0,0,0.12)' }}
+              >
+                {imageSrc ? (
+                  <img
+                    src={imageSrc}
+                    alt={imageAlt}
+                    crossOrigin="anonymous"
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
                 ) : null}
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  className="h-10 w-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 grid place-items-center transition"
-                  aria-label={tCommon.share || 'Share'}
-                >
-                  <Share2 className="h-4 w-4 text-white/80" />
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="h-10 w-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 grid place-items-center transition"
-                  aria-label={tCommon.copy || 'Copy'}
-                >
-                  <Copy className="h-4 w-4 text-white/80" />
-                </button>
+              <div className="min-w-0">
+                <div className="text-lg font-extrabold text-[#262626] dark:text-white truncate">
+                  {player.fullName || player.username || (t.playerLabel || 'Player')}
+                </div>
+                {player.username ? (
+                  <div className="text-sm font-semibold text-[#4B5563] dark:text-[#D1D5DB] truncate">@{player.username}</div>
+                ) : null}
+
+                <div className="mt-2 flex items-center gap-2 text-xs text-[#4B5563] dark:text-[#D1D5DB]">
+                  <Layers className="h-4 w-4 shrink-0" />
+                  <span className="font-semibold whitespace-nowrap">
+                    {t.levelLabel || 'Level'} {model.levelOrder}
+                  </span>
+                  <span className="text-[#9CA3AF]">•</span>
+                  <span className="truncate">{model.levelName}</span>
+                </div>
               </div>
             </div>
 
-            <div className="mt-3 h-px w-full bg-white/10" />
-
-            <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <RingStat
                 label={t.sessionsLabel || 'Sessions'}
                 value={`${sessionsPct}%`}
-                color="#FF5F02"
+                color={frameColor}
                 percent={sessionsPct}
+                tone="light"
               />
               <RingStat
                 label={t.pointsLabel || 'Points'}
                 value={`${pointsPct}%`}
                 color={safeAccent}
                 percent={pointsPct}
+                tone="light"
               />
             </div>
+          </div>
 
-            <div className="mt-4 flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 text-xs text-white/70">
-                  <Layers className="h-4 w-4 shrink-0" />
-                  <span className="font-semibold whitespace-nowrap">
-                    {t.levelLabel || 'Level'} {model.levelOrder}
-                  </span>
-                  <span className="text-white/40">•</span>
-                  <span className="truncate">{model.levelName}</span>
-                </div>
-                <div className="mt-1 text-xs text-white/60 truncate">{t.programLabel || 'Program'}: {model.programName}</div>
-              </div>
+          <div className="mt-5 space-y-4">
+            <ProgressRow
+              label={t.sessionsProgress || t.sessionsLabel || 'Sessions'}
+              progress={sessionsProgress}
+              left={`${model.attendedSessions}`}
+              right={model.requiredSessions > 0 ? `${model.requiredSessions}` : `${model.attendedSessions}`}
+              color={frameColor}
+            />
+            <ProgressRow
+              label={t.pointsProgress || t.pointsLabel || 'Points'}
+              progress={pointsProgress}
+              left={`${Math.round(model.earnedPoints)}`}
+              right={model.requiredPoints > 0 ? `${Math.round(model.requiredPoints)}` : `${Math.round(model.earnedPoints)}`}
+              color={safeAccent}
+            />
+          </div>
 
-              <div className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap ${statusClass}`}>{statusLabel}</div>
-            </div>
+          <div className="mt-5 grid grid-cols-3 gap-3">
+            <MiniKpi
+              label={t.programPointsTotal || 'Program points'}
+              value={`${Math.round(model.programPointsTotal)}`}
+            />
+            <MiniKpi
+              label={t.latestNaScore || 'Latest NA'}
+              value={props.latestNaScore === null ? '—' : `${Math.round(props.latestNaScore)}`}
+            />
+            <MiniKpi
+              label={t.averageNaScore || 'Avg NA'}
+              value={props.averageNaScore === null ? '—' : `${Math.round(props.averageNaScore)}`}
+            />
+          </div>
+        </div>
 
-            {/* Extra compact KPIs */}
-            <div className="mt-4 grid grid-cols-3 gap-3">
-              <MiniKpiDark label={t.programPointsTotal || 'Program points'} value={`${Math.round(model.programPointsTotal)}`} />
-              <MiniKpiDark label={t.latestNaScore || 'Latest NA'} value={props.latestNaScore === null ? '—' : `${Math.round(props.latestNaScore)}`} />
-              <MiniKpiDark label={t.averageNaScore || 'Avg NA'} value={props.averageNaScore === null ? '—' : `${Math.round(props.averageNaScore)}`} />
-            </div>
+        <div
+          className="px-4 py-3 border-t"
+          style={{ borderColor: 'rgba(0,0,0,0.12)' }}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[#4B5563] dark:text-[#D1D5DB]">
+            <span className="truncate">
+              {t.programLabel || 'Program'}: <span className="font-semibold">{model.programName}</span>
+            </span>
+            <span className="truncate">
+              {t.levelLabel || 'Level'}: <span className="font-semibold">{model.levelOrder}</span>
+            </span>
           </div>
         </div>
       </div>
@@ -942,13 +1031,20 @@ const ProgramLevelCard = forwardRef<
   );
 });
 
-function RingStat(props: { label: string; value: string; percent: number; color: string }) {
+function RingStat(props: { label: string; value: string; percent: number; color: string; tone?: 'light' | 'dark' }) {
   const pct = Math.max(0, Math.min(100, Math.round(props.percent)));
+  const tone = props.tone ?? 'light';
+  const track = tone === 'dark' ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.12)';
+  const labelColor = tone === 'dark' ? 'rgba(255,255,255,0.60)' : '#4B5563';
+  const valueColor = tone === 'dark' ? '#FFFFFF' : '#111827';
+  const innerBg = tone === 'dark' ? 'rgba(0,0,0,0.75)' : '#FFFFFF';
+  const innerBorder = tone === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)';
+
   return (
     <div className="flex items-center gap-3">
       <div className="relative h-12 w-12">
         <svg viewBox="0 0 36 36" className="h-12 w-12">
-          <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="rgba(255,255,255,0.12)" strokeWidth="3.2" />
+          <circle cx="18" cy="18" r="15.915" fill="transparent" stroke={track} strokeWidth="3.2" />
           <circle
             cx="18"
             cy="18"
@@ -962,33 +1058,17 @@ function RingStat(props: { label: string; value: string; percent: number; color:
           />
         </svg>
         <div className="absolute inset-0 grid place-items-center">
-          <div className="h-9 w-9 rounded-full bg-black/75 border border-white/10" />
+          <div
+            className="h-9 w-9 rounded-full border"
+            style={{ backgroundColor: innerBg, borderColor: innerBorder }}
+          />
         </div>
       </div>
 
       <div className="min-w-0">
-        <div className="text-xs text-white/60 truncate">{props.label}</div>
-        <div className="text-base font-extrabold text-white">{props.value}</div>
+        <div className="text-xs truncate" style={{ color: labelColor }}>{props.label}</div>
+        <div className="text-base font-extrabold" style={{ color: valueColor }}>{props.value}</div>
       </div>
-    </div>
-  );
-}
-
-function MiniKpiDark(props: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-      <div className="text-[10px] uppercase tracking-wider text-white/60 truncate">{props.label}</div>
-      <div className="mt-1 text-base font-extrabold text-white truncate">{props.value}</div>
-    </div>
-  );
-}
-
-function KpiBlock(props: { label: string; value: string; hint: string }) {
-  return (
-    <div className="rounded-2xl border border-black/10 bg-gray-50/60 p-4 dark:border-white/10 dark:bg-white/5">
-      <div className="text-xs text-gray-600 dark:text-gray-400">{props.label}</div>
-      <div className="mt-1 text-2xl font-extrabold text-[#262626] dark:text-white">{props.value}</div>
-      <div className="mt-0.5 text-xs text-gray-600 dark:text-gray-400">{props.hint}</div>
     </div>
   );
 }
@@ -997,16 +1077,16 @@ function ProgressRow(props: { label: string; progress: number; left: string; rig
   const pct = Math.round(clamp01(props.progress) * 100);
   return (
     <div>
-      <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+      <div className="flex items-center justify-between text-xs text-[#4B5563] dark:text-[#9CA3AF]">
         <span className="truncate">{props.label}</span>
         <span className="shrink-0">
           {props.left} / {props.right} · {pct}%
         </span>
       </div>
-      <div className="mt-2 h-2.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+      <div className="mt-2 h-2.5 rounded-full bg-[#e5e7eb] dark:bg-[#2a2a2a] overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${props.color}, ${props.color}66)` }}
+          style={{ width: `${pct}%`, backgroundColor: props.color }}
         />
       </div>
     </div>
@@ -1015,8 +1095,8 @@ function ProgressRow(props: { label: string; progress: number; left: string; rig
 
 function MiniKpi(props: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-black/10 bg-gray-50/60 p-3 dark:border-white/10 dark:bg-white/5">
-      <div className="text-[10px] uppercase tracking-wider text-gray-600 dark:text-gray-400">{props.label}</div>
+    <div className="rounded-2xl border border-[#E5E7EB] bg-[#F9FAFB] p-3 dark:border-[#2a2a2a] dark:bg-[#141417]">
+      <div className="text-[10px] uppercase tracking-wider text-[#4B5563] dark:text-[#9CA3AF]">{props.label}</div>
       <div className="mt-1 text-base font-extrabold text-[#262626] dark:text-white">{props.value}</div>
     </div>
   );

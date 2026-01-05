@@ -74,6 +74,44 @@ import { useRouter } from 'next/navigation';
 import { DEFAULT_ACCENT_COLOR } from '@/lib/theme/accentColors';
 import { DnaCircularGauge } from '@/components/DnaCircularGauge';
 
+type PanelCardProps = {
+  title: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  children: React.ReactNode;
+};
+
+function PanelCard({ title, icon: Icon, children }: PanelCardProps) {
+  return (
+    <Card className="overflow-hidden rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-lg dark:border-[#000000] dark:bg-[#262626]">
+      <CardHeader className="py-4 bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000]">
+        <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2 text-base">
+          {Icon ? <Icon className="h-4 w-4 text-gray-600 dark:text-gray-300" /> : null}
+          <span className="truncate">{title}</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-5 pb-6">{children}</CardContent>
+    </Card>
+  );
+}
+
+type InfoChipProps = {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+};
+
+function InfoChip({ icon: Icon, label, value }: InfoChipProps) {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border-2 border-[#DDDDDD] bg-white px-3 py-2 dark:border-[#000000] dark:bg-[#1a1a1a]">
+      <Icon className="h-4 w-4 text-gray-700 dark:text-gray-200" />
+      <div className="min-w-0">
+        <div className="text-[11px] leading-4 text-gray-600 dark:text-gray-400 truncate">{label}</div>
+        <div className="text-sm font-semibold text-[#262626] dark:text-white truncate">{value}</div>
+      </div>
+    </div>
+  );
+}
+
 interface KidProfileClientProps {
   dictionary: Dictionary;
   locale: Locale;
@@ -89,6 +127,7 @@ export function KidProfileClient({
   currentUser,
   academyId,
 }: KidProfileClientProps) {
+  type ScrollPosition = { top: number; left: number };
   const NO_LEVEL_VALUE = '__none__';
   type EnrichedEnrollment = Enrollment & { course?: Course | null };
   type AssessmentFieldKey = 'speed' | 'agility' | 'balance' | 'power' | 'reaction' | 'coordination' | 'flexibility';
@@ -151,6 +190,43 @@ export function KidProfileClient({
 
   const orphanProgramCleanupAttemptedRef = useRef<Set<string>>(new Set());
   const programJourneyDialogScrollRef = useRef<{ top: number; left: number } | null>(null);
+
+  const assessmentDetailsDialogScrollRef = useRef<ScrollPosition | null>(null);
+  const programNoteDialogScrollRef = useRef<ScrollPosition | null>(null);
+  const programLevelDialogScrollRef = useRef<ScrollPosition | null>(null);
+  const assessmentDialogScrollRef = useRef<ScrollPosition | null>(null);
+  const badgeDialogScrollRef = useRef<ScrollPosition | null>(null);
+
+  const captureScrollPosition = (): ScrollPosition => {
+    const scrollingEl = document.scrollingElement || document.documentElement;
+    return {
+      top: scrollingEl.scrollTop,
+      left: scrollingEl.scrollLeft,
+    };
+  };
+
+  const usePreserveScrollOnDialogOpen = (open: boolean, ref: React.MutableRefObject<ScrollPosition | null>) => {
+    useEffect(() => {
+      if (!open) return;
+      const saved = ref.current;
+      if (!saved) return;
+
+      const scrollingEl = document.scrollingElement || document.documentElement;
+      const restore = () => {
+        try {
+          scrollingEl.scrollTop = saved.top;
+          scrollingEl.scrollLeft = saved.left;
+        } catch {
+          // No-op: best-effort only.
+        }
+      };
+
+      // Some scroll-lock/focus behaviors run after open; restore a few times to be safe.
+      requestAnimationFrame(restore);
+      setTimeout(restore, 0);
+      setTimeout(restore, 50);
+    }, [open, ref]);
+  };
   const [programLevelsByProgramId, setProgramLevelsByProgramId] = useState<Record<string, ProgramLevel[]>>({});
   const [programAttendanceByProgramId, setProgramAttendanceByProgramId] = useState<
     Record<string, { attended: number; marked: number }>
@@ -245,6 +321,12 @@ export function KidProfileClient({
   const [selectedBadgeId, setSelectedBadgeId] = useState<string>('');
   const [badgeNotes, setBadgeNotes] = useState('');
   const [badgeSubmitting, setBadgeSubmitting] = useState(false);
+
+  usePreserveScrollOnDialogOpen(assessmentDetailsOpen, assessmentDetailsDialogScrollRef);
+  usePreserveScrollOnDialogOpen(programNoteDialogOpen, programNoteDialogScrollRef);
+  usePreserveScrollOnDialogOpen(programLevelDialogOpen, programLevelDialogScrollRef);
+  usePreserveScrollOnDialogOpen(assessmentDialogOpen, assessmentDialogScrollRef);
+  usePreserveScrollOnDialogOpen(badgeDialogOpen, badgeDialogScrollRef);
 
   const router = useRouter();
 
@@ -978,44 +1060,6 @@ export function KidProfileClient({
         return status || (labels?.new ?? 'New');
     }
   };
-
-  const PanelCard = ({
-    title,
-    icon: Icon,
-    children,
-  }: {
-    title: string;
-    icon?: React.ComponentType<{ className?: string }>;
-    children: React.ReactNode;
-  }) => (
-    <Card className="overflow-hidden rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-lg dark:border-[#000000] dark:bg-[#262626]">
-      <CardHeader className="py-4 bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#DDDDDD] dark:border-[#000000]">
-        <CardTitle className="text-[#262626] dark:text-white flex items-center gap-2 text-base">
-          {Icon ? <Icon className="h-4 w-4 text-gray-600 dark:text-gray-300" /> : null}
-          <span className="truncate">{title}</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-5 pb-6">{children}</CardContent>
-    </Card>
-  );
-
-  const InfoChip = ({
-    icon: Icon,
-    label,
-    value,
-  }: {
-    icon: React.ComponentType<{ className?: string }>;
-    label: string;
-    value: string;
-  }) => (
-    <div className="flex items-center gap-2 rounded-xl border-2 border-[#DDDDDD] bg-white px-3 py-2 dark:border-[#000000] dark:bg-[#1a1a1a]">
-      <Icon className="h-4 w-4 text-gray-700 dark:text-gray-200" />
-      <div className="min-w-0">
-        <div className="text-[11px] leading-4 text-gray-600 dark:text-gray-400 truncate">{label}</div>
-        <div className="text-sm font-semibold text-[#262626] dark:text-white truncate">{value}</div>
-      </div>
-    </div>
-  );
 
   return (
     <motion.div
@@ -1987,6 +2031,9 @@ export function KidProfileClient({
         <Dialog
           open={assessmentDetailsOpen}
           onOpenChange={(open) => {
+            if (open) {
+              assessmentDetailsDialogScrollRef.current = captureScrollPosition();
+            }
             setAssessmentDetailsOpen(open);
             if (!open) {
               setSelectedAssessment(null);
@@ -1995,7 +2042,17 @@ export function KidProfileClient({
             }
           }}
         >
-          <DialogContent className="sm:max-w-[920px] w-[calc(100vw-1.5rem)] max-h-[calc(100vh-2rem)] overflow-hidden p-0">
+          <DialogContent
+            className="sm:max-w-[920px] w-[calc(100vw-1.5rem)] max-h-[calc(100vh-2rem)] overflow-hidden p-0"
+            onOpenAutoFocus={(event) => {
+              // Prevent focus from scrolling the underlying page.
+              event.preventDefault();
+            }}
+            onCloseAutoFocus={(event) => {
+              // Prevent restoring focus from shifting the page scroll position.
+              event.preventDefault();
+            }}
+          >
             <div className="flex max-h-[calc(100vh-2rem)] flex-col">
               <div className="px-6 pt-6">
                 <DialogHeader>
@@ -2210,11 +2267,22 @@ export function KidProfileClient({
       <Dialog
         open={programNoteDialogOpen}
         onOpenChange={(open) => {
+          if (open) {
+            programNoteDialogScrollRef.current = captureScrollPosition();
+          }
           setProgramNoteDialogOpen(open);
           if (!open) setProgramNoteTarget(null);
         }}
       >
-        <DialogContent className="sm:max-w-[680px] max-h-[90vh] overflow-y-auto">
+        <DialogContent
+          className="sm:max-w-[680px] max-h-[90vh] overflow-y-auto"
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+          }}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{dictionary.programs?.addNoteTitle ?? 'Add coach note'}</DialogTitle>
             <DialogDescription>
@@ -2261,6 +2329,9 @@ export function KidProfileClient({
       <Dialog
         open={programLevelDialogOpen}
         onOpenChange={(open) => {
+          if (open) {
+            programLevelDialogScrollRef.current = captureScrollPosition();
+          }
           setProgramLevelDialogOpen(open);
           if (!open) {
             setProgramLevelTargetProgramId('');
@@ -2271,7 +2342,15 @@ export function KidProfileClient({
           }
         }}
       >
-        <DialogContent className="sm:max-w-[760px] max-h-[90vh] overflow-y-auto">
+        <DialogContent
+          className="sm:max-w-[760px] max-h-[90vh] overflow-y-auto"
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+          }}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>
               {dictionary.playerProfile?.actions?.adjustProgramLevel ?? 'Adjust program level'}
@@ -2620,8 +2699,24 @@ export function KidProfileClient({
       </Dialog>
 
       {/* Assessment dialog */}
-      <Dialog open={assessmentDialogOpen} onOpenChange={setAssessmentDialogOpen}>
-        <DialogContent className="sm:max-w-[760px] max-h-[90vh] overflow-y-auto">
+      <Dialog
+        open={assessmentDialogOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            assessmentDialogScrollRef.current = captureScrollPosition();
+          }
+          setAssessmentDialogOpen(open);
+        }}
+      >
+        <DialogContent
+          className="sm:max-w-[760px] max-h-[90vh] overflow-y-auto"
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+          }}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{dictionary.playerProfile?.actions?.newAssessment ?? 'New Assessment'}</DialogTitle>
           </DialogHeader>
@@ -2781,8 +2876,24 @@ export function KidProfileClient({
       </Dialog>
 
       {/* Badge dialog */}
-      <Dialog open={badgeDialogOpen} onOpenChange={setBadgeDialogOpen}>
-        <DialogContent className="sm:max-w-[520px]">
+      <Dialog
+        open={badgeDialogOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            badgeDialogScrollRef.current = captureScrollPosition();
+          }
+          setBadgeDialogOpen(open);
+        }}
+      >
+        <DialogContent
+          className="sm:max-w-[520px]"
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+          }}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{dictionary.playerProfile?.actions?.grantBadge ?? 'Grant Badge'}</DialogTitle>
           </DialogHeader>
