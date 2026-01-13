@@ -54,7 +54,7 @@ export default function NewHomePage({ dictionary, locale, user }: NewHomePagePro
             >
               <div className="relative w-full max-w-[1200px]">
                 <Image
-                  src="/logo-white.png"
+                  src="/DNA-Logo-w.svg"
                   alt="DNA"
                   width={1600}
                   height={420}

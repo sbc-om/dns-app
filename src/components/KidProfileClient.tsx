@@ -4,7 +4,7 @@ import type { User } from '@/lib/db/repositories/userRepository';
 import type { AuthUser } from '@/lib/auth/auth';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
 import type { Locale } from '@/config/i18n';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -270,6 +270,37 @@ export function KidProfileClient({
 
   const [programJourneyDetailsOpen, setProgramJourneyDetailsOpen] = useState(false);
   const [programJourneyDetails, setProgramJourneyDetails] = useState<ProgramJourneyDetails | null>(null);
+
+  const [programHistoryOpenByEnrollmentId, setProgramHistoryOpenByEnrollmentId] = useState<Record<string, boolean>>({});
+  const lastAutoScrollProgramLevelSignatureRef = useRef<string>('');
+
+  useEffect(() => {
+    // Ensure the first visible item in each program journey slider is the current level.
+    const signature = programEnrollments
+      .map((e) => `${e.id}:${e.programId}:${e.currentLevelId ?? ''}:${(programLevelsByProgramId[e.programId] ?? []).length}`)
+      .join('|');
+
+    if (!signature || signature === lastAutoScrollProgramLevelSignatureRef.current) return;
+    lastAutoScrollProgramLevelSignatureRef.current = signature;
+
+    const alignToCurrent = (behavior: ScrollBehavior) => {
+      const sliders = document.querySelectorAll<HTMLElement>('[data-program-level-slider="true"]');
+      sliders.forEach((slider) => {
+        const current = slider.querySelector<HTMLElement>('[data-level-current="true"]');
+        if (!current) return;
+        try {
+          current.scrollIntoView({ behavior, inline: 'start', block: 'nearest' });
+        } catch {
+          // No-op: best-effort only.
+        }
+      });
+    };
+
+    // Run a few times to ensure layout/images/overflow containers settle.
+    requestAnimationFrame(() => alignToCurrent('auto'));
+    setTimeout(() => alignToCurrent('auto'), 60);
+    setTimeout(() => alignToCurrent('auto'), 220);
+  }, [programEnrollments, programLevelsByProgramId]);
 
   useEffect(() => {
     if (!programJourneyDetailsOpen) return;
@@ -1417,34 +1448,39 @@ export function KidProfileClient({
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {Object.keys(latestAssessment.tests).map((k, idx) => (
-                        <motion.div
-                          key={k}
-                          initial={{ opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: idx * 0.04, duration: 0.35 }}
-                          whileHover={{ scale: 1.02, rotateY: locale === 'ar' ? -4 : 4, rotateX: 2 }}
-                          style={{ transformStyle: 'preserve-3d' }}
-                          className="p-3 sm:p-4 rounded-2xl border-2 border-[#DDDDDD] bg-white shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]"
-                        >
-                          <div className="flex flex-col items-center justify-center gap-3">
-                            <div className="text-base sm:text-lg font-bold text-[#262626] dark:text-white text-center leading-tight">
-                              {categoryLabel(k)}
+                    <div className="relative">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-linear-to-r from-black/5 via-black/0 to-transparent dark:from-black/30 rtl:left-auto rtl:right-0 rtl:bg-linear-to-l" />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-linear-to-l from-black/5 via-black/0 to-transparent dark:from-black/30 rtl:right-auto rtl:left-0 rtl:bg-linear-to-r" />
+
+                      <div className="relative flex items-stretch gap-3 overflow-x-auto pb-2 scroll-smooth [-webkit-overflow-scrolling:touch] snap-x snap-mandatory scrollbar-custom-dark px-1 rtl:flex-row-reverse">
+                        {Object.keys(latestAssessment.tests).map((k, idx) => (
+                          <motion.div
+                            key={k}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.04, duration: 0.35 }}
+                            whileHover={{ scale: 1.02, rotateY: locale === 'ar' ? -4 : 4, rotateX: 2 }}
+                            style={{ transformStyle: 'preserve-3d' }}
+                            className="snap-start flex-none w-[calc((100%-2rem)/3)] md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)] rounded-2xl border-2 border-[#DDDDDD] bg-white p-3 sm:p-4 shadow-sm dark:border-[#000000] dark:bg-[#1a1a1a]"
+                          >
+                            <div className="flex flex-col items-center justify-center gap-3">
+                              <div className="text-sm sm:text-base font-bold text-[#262626] dark:text-white text-center leading-tight line-clamp-2">
+                                {categoryLabel(k)}
+                              </div>
+                              <DnaCircularGauge
+                                value={Math.round(insights?.scores?.[k] ?? 0)}
+                                max={100}
+                                size={82}
+                                strokeWidth={7}
+                                valueSuffix="%"
+                                showMaxValue={false}
+                                className="justify-center"
+                                ariaLabel={`${categoryLabel(k)} score`}
+                              />
                             </div>
-                            <DnaCircularGauge
-                              value={Math.round(insights?.scores?.[k] ?? 0)}
-                              max={100}
-                              size={86}
-                              strokeWidth={7}
-                              valueSuffix="%"
-                              showMaxValue={false}
-                              className="justify-center"
-                              ariaLabel={`${categoryLabel(k)} score`}
-                            />
-                          </div>
-                        </motion.div>
-                      ))}
+                          </motion.div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1473,33 +1509,7 @@ export function KidProfileClient({
                             <div className="font-bold text-[#262626] dark:text-white truncate">
                               {e.program ? (locale === 'ar' ? e.program.nameAr : e.program.name) : e.programId}
                             </div>
-                            <div className="mt-1 flex flex-wrap items-center gap-2">
-                              {e.currentLevel ? (
-                                <Badge className="bg-gray-100 text-gray-800 border-0 dark:bg-white/10 dark:text-white dark:border-0">
-                                  {dictionary.programs?.currentLevelLabel ?? 'Level'}: {locale === 'ar' ? e.currentLevel.nameAr : e.currentLevel.name}
-                                </Badge>
-                              ) : (
-                                <Badge className="bg-gray-100 text-gray-700 border-0 dark:bg-white/10 dark:text-white/70 dark:border-0">
-                                  {dictionary.programs?.noLevel || 'No level'}
-                                </Badge>
-                              )}
-                              <Badge className="bg-blue-50 text-blue-700 border-0 dark:bg-blue-600/15 dark:text-blue-200 dark:border-0">
-                                {dictionary.programs?.pointsLabel ?? 'Points'}: {e.pointsTotal}
-                              </Badge>
-                              <Badge className="bg-emerald-50 text-emerald-700 border-0 dark:bg-emerald-600/15 dark:text-emerald-200 dark:border-0">
-                                {dictionary.programs?.sessionsAttendedLabel ?? 'Sessions attended'}: {programAttendanceByProgramId[e.programId]?.attended ?? 0}
-                              </Badge>
-                              <Badge className="bg-gray-100 text-gray-700 border-0 dark:bg-white/10 dark:text-white/70 dark:border-0">
-                                {dictionary.programs?.notesLabel ?? 'Notes'}: {e.coachNotes?.length ?? 0}
-                              </Badge>
-                            </div>
-
-                            {e.coachNotes?.[0]?.comment ? (
-                              <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                                <span className="font-semibold text-[#262626] dark:text-white">{dictionary.programs?.latestNoteLabel ?? 'Latest'}:</span>{' '}
-                                {e.coachNotes[0].comment}
-                              </div>
-                            ) : null}
+                            {/* Intentionally hidden: program summary chips (level/points/sessions/notes/latest) */}
                           </div>
 
                           {canManage && (
@@ -1541,7 +1551,7 @@ export function KidProfileClient({
 
                             return (
                               <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-linear-to-br from-black/5 via-white/5 to-black/5 p-3 dark:from-white/5 dark:via-white/5 dark:to-black/10">
-                                <div className="absolute inset-0 pointer-events-none">
+                                <div className="absolute pointer-events-none">
                                   <div
                                     className="absolute -top-16 -left-16 h-48 w-48 rounded-full blur-3xl opacity-30"
                                     style={{ backgroundColor: `${accentColor}55` }}
@@ -1552,8 +1562,15 @@ export function KidProfileClient({
                                   />
                                 </div>
 
-                                <div className="relative flex items-stretch gap-3 overflow-x-auto pb-2">
-                                  {levels.map((lvl, idx) => {
+                                <div className="relative">
+                                  <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-linear-to-r from-black/10 via-black/0 to-transparent dark:from-black/35 rtl:left-auto rtl:right-0 rtl:bg-linear-to-l" />
+                                  <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-linear-to-l from-black/10 via-black/0 to-transparent dark:from-black/35 rtl:right-auto rtl:left-0 rtl:bg-linear-to-r" />
+
+                                  <div
+                                    className="relative flex items-stretch gap-4 overflow-x-auto pb-3 scroll-smooth [-webkit-overflow-scrolling:touch] snap-x snap-mandatory scrollbar-custom-dark px-1 rtl:flex-row-reverse"
+                                    data-program-level-slider="true"
+                                  >
+                                    {levels.map((lvl, idx) => {
                                     const status = statusFor(lvl);
                                     const isCurrent = status === 'in_progress';
                                     const isCompleted = status === 'completed';
@@ -1582,11 +1599,12 @@ export function KidProfileClient({
                                         style={{ transformStyle: 'preserve-3d' }}
                                         className={
                                           isCurrent
-                                            ? 'relative w-[300px] shrink-0 rounded-2xl border border-white/20 bg-white/10 p-4 shadow-lg'
+                                            ? 'relative flex-none w-full lg:w-[calc(50%-0.5rem)] snap-start rounded-2xl border border-white/20 bg-white/10 p-4 shadow-lg'
                                             : isCompleted
-                                              ? 'relative w-[300px] shrink-0 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4'
-                                              : 'relative w-[300px] shrink-0 rounded-2xl border border-white/10 bg-white/5 p-4 opacity-80'
+                                              ? 'relative flex-none w-full lg:w-[calc(50%-0.5rem)] snap-start rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4'
+                                              : 'relative flex-none w-full lg:w-[calc(50%-0.5rem)] snap-start rounded-2xl border border-white/10 bg-white/5 p-4 opacity-80'
                                         }
+                                        data-level-current={isCurrent ? 'true' : undefined}
                                         role="button"
                                         tabIndex={0}
                                         onClick={() => {
@@ -1780,11 +1798,57 @@ export function KidProfileClient({
                                         </div>
                                       </motion.div>
                                     );
-                                  })}
+                                    })}
+                                  </div>
                                 </div>
 
                                 {/* Visited history */}
                                 <div className="mt-3">
+                                  <div
+                                    className={`flex flex-wrap items-center justify-between gap-x-3 gap-y-2 ${
+                                      locale === 'ar' ? 'flex-row-reverse' : ''
+                                    }`}
+                                  >
+                                    <div className="text-sm font-semibold text-[#262626] dark:text-white">
+                                      {dictionary.programs?.historyTitle ?? 'History'}
+                                    </div>
+
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        setProgramHistoryOpenByEnrollmentId((prev) => ({
+                                          ...prev,
+                                          [e.id]: !prev[e.id],
+                                        }))
+                                      }
+                                      className="shrink-0 border-2 border-[#DDDDDD] bg-white text-[#262626] hover:bg-gray-50 dark:border-[#000000] dark:bg-[#1a1a1a] dark:text-white dark:hover:bg-[#111114]"
+                                    >
+                                      <motion.span
+                                        className="inline-flex items-center"
+                                        animate={{ rotate: programHistoryOpenByEnrollmentId[e.id] ? 90 : 0 }}
+                                        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+                                      >
+                                        <ChevronRight className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                                      </motion.span>
+                                      {programHistoryOpenByEnrollmentId[e.id]
+                                        ? (dictionary.common?.hide ?? 'Hide')
+                                        : (dictionary.common?.show ?? 'Show')}{' '}
+                                      {dictionary.programs?.historyTitle ?? 'History'}
+                                    </Button>
+                                  </div>
+
+                                  <AnimatePresence initial={false}>
+                                    {programHistoryOpenByEnrollmentId[e.id] ? (
+                                      <motion.div
+                                        key="history"
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.35, type: 'spring', stiffness: 160, damping: 22 }}
+                                        className="mt-3 overflow-hidden"
+                                      >
                                   {(() => {
                                     const levels = programLevelsByProgramId[e.programId] ?? [];
                                     const levelHistory = e.levelHistory ?? [];
@@ -1946,6 +2010,9 @@ export function KidProfileClient({
                                       </div>
                                     );
                                   })()}
+                                      </motion.div>
+                                    ) : null}
+                                  </AnimatePresence>
                                 </div>
                               </div>
                             );

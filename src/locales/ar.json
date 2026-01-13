@@ -46,6 +46,8 @@
     "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
     "confirmContinue": "هل أنت متأكد أنك تريد المتابعة؟",
     "done": "تم",
+    "show": "عرض",
+    "hide": "إخفاء",
     "academy": "أكاديمية",
     "language": "اللغة",
     "languageDesc": "اختر EN / AR",
