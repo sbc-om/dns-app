@@ -27,55 +27,13 @@ export default function ContactPageClient({
   const phone = d.info.phone;
   const address = d.info.address;
 
-  // Floating particles for background
-  const particles = Array.from({ length: 15 }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-    delay: Math.random() * 5,
-    duration: 15 + Math.random() * 10,
-  }));
-
   return (
     <div className="min-h-screen flex flex-col bg-[#0a0a0a]" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <Header dictionary={dictionary} locale={locale} user={user} />
 
       <main className="flex-1 overflow-hidden">
         {/* Hero */}
-        <section className="relative px-4 pt-24 pb-12 overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute inset-0 bg-black" />
-            <motion.div
-              className="absolute -top-48 -left-48 h-[600px] w-[600px] rounded-full bg-blue-500/20 blur-3xl"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <motion.div
-              className="absolute -bottom-48 -right-48 h-[600px] w-[600px] rounded-full bg-purple-500/20 blur-3xl"
-              animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.5, 0.3] }}
-              transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:28px_28px] opacity-10" />
-
-            {/* Floating particles */}
-            {particles.map((particle) => (
-              <motion.div
-                key={particle.id}
-                className="absolute w-2 h-2 rounded-full bg-white/20"
-                style={{ left: particle.left, top: particle.top }}
-                animate={{
-                  y: [-20, 20],
-                  opacity: [0.2, 0.5, 0.2],
-                }}
-                transition={{
-                  duration: particle.duration,
-                  repeat: Infinity,
-                  delay: particle.delay,
-                  ease: 'easeInOut',
-                }}
-              />
-            ))}
-          </div>
+        <section className="px-4 pt-16 pb-10">
 
           <div className="mx-auto max-w-5xl text-center">
             <motion.div
@@ -99,15 +57,13 @@ export default function ContactPageClient({
               transition={{ duration: 0.6, type: 'spring', stiffness: 260, damping: 24 }}
               className="text-4xl md:text-6xl font-black"
             >
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                {d.title}
-              </span>
+              <span className="text-white">{d.title}</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.05 }}
-              className="mt-4 text-lg md:text-xl text-gray-300"
+              className="mt-4 text-base md:text-lg text-white/70"
             >
               {d.subtitle}
             </motion.p>
@@ -140,7 +96,7 @@ export default function ContactPageClient({
                           whileHover={{ scale: 1.05 }}
                           className="flex items-center gap-2 p-3 rounded-2xl bg-white/5 border border-white/10"
                         >
-                          <CheckCircle2 className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                          <CheckCircle2 className="h-4 w-4 text-blue-400 shrink-0" />
                           <span className="text-white text-sm font-semibold">{type}</span>
                         </motion.div>
                       ))}
@@ -177,7 +133,7 @@ export default function ContactPageClient({
                       whileHover={{ scale: 1.02, y: -2 }}
                       className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-4 hover:bg-black/30 transition-colors"
                     >
-                      <div className="h-12 w-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
+                      <div className="h-12 w-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center shrink-0">
                         <Mail className="h-6 w-6 text-blue-400" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -195,7 +151,7 @@ export default function ContactPageClient({
                       whileHover={{ scale: 1.02, y: -2 }}
                       className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-4 hover:bg-black/30 transition-colors"
                     >
-                      <div className="h-12 w-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                      <div className="h-12 w-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0">
                         <Phone className="h-6 w-6 text-purple-400" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -209,7 +165,7 @@ export default function ContactPageClient({
                     whileHover={{ scale: 1.02, y: -2 }}
                     className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-4"
                   >
-                    <div className="h-12 w-12 rounded-2xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-center flex-shrink-0">
+                    <div className="h-12 w-12 rounded-2xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-center shrink-0">
                       <MapPin className="h-6 w-6 text-pink-400" />
                     </div>
                     <div className="min-w-0 flex-1">

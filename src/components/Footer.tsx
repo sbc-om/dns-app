@@ -20,17 +20,8 @@ export function Footer({ dictionary, locale }: FooterProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.6, type: 'spring', stiffness: 260, damping: 24 }}
-      className="relative bg-black border-t border-white/10 pb-20 md:pb-0 overflow-hidden"
+      className="bg-black border-t border-white/10 pb-20 md:pb-0"
     >
-      {/* Dark-only background (avoid gradients to prevent initial color flash). */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-black" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-size-[28px_28px] opacity-[0.08]" />
-      </div>
-
-      {/* Top separator line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-white/10" />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 items-start">
           {/* Brand */}
