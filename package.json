@@ -13,6 +13,9 @@
     "migrate:kid-to-player": "tsx scripts/migrate-kid-to-player.ts",
     "db:check-migration": "tsx scripts/check-migration.ts",
     "create-admin": "tsx scripts/create-admin.ts",
+    "icons": "node scripts/generate-all-icons.js",
+    "favicon": "node scripts/generate-favicon.js",
+    "assets": "npm run icons && npm run favicon",
     "generate-icons": "node scripts/generate-icons.js",
     "generate-favicon": "node scripts/generate-favicon.js",
     "generate-all-assets": "npm run generate-icons && npm run generate-favicon"
