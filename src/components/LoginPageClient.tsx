@@ -3,12 +3,11 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Globe } from 'lucide-react';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import { LoginForm } from '@/components/LoginForm';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface LoginPageClientProps {
   dictionary: Dictionary;
@@ -17,56 +16,84 @@ interface LoginPageClientProps {
 
 export default function LoginPageClient({ dictionary, locale }: LoginPageClientProps) {
   return (
-    <div className="min-h-screen bg-black">
-      <div className="mx-auto flex min-h-screen w-full max-w-5xl items-center px-4 py-10">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, type: 'spring', stiffness: 220, damping: 22 }}
-          className="w-full"
-        >
-          <div className="mb-6 flex items-center justify-between">
-            <Link href={`/${locale}`} className="inline-flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white">
-              <motion.span
-                whileHover={{ x: -2 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 18 }}
-                className="inline-flex items-center gap-2"
-              >
-                <ArrowLeft className="h-5 w-5" />
-                {dictionary.nav.home}
-              </motion.span>
-            </Link>
+    <div
+      className="relative min-h-screen w-full overflow-hidden"
+      style={{
+        background: 'linear-gradient(180deg, #FF4A1F 0%, #FF6B47 55%, #FF8A5B 100%)',
+      }}
+    >
+
+      {/* Top Navigation Bar */}
+      <div
+        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-6"
+        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+      >
+        {/* Language Switcher */}
+        <LanguageSwitcher variant="light" />
+
+        {/* Globe Icon - Link to Home */}
+        <Link href={`/${locale}`}>
+          <div
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-transparent backdrop-blur-xl border-2 border-white"
+          >
+            <Globe className="h-6 w-6 text-white" />
+          </div>
+        </Link>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-md items-center justify-center px-6 py-12">
+        <div className="w-full">
+          {/* Title and Description */}
+          <div className="mb-12 text-left">
+            <h1
+              className="mb-6 text-5xl font-black uppercase leading-[1.1] tracking-tight text-white"
+              style={{ 
+                textShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                letterSpacing: '0.02em'
+              }}
+            >
+              {dictionary.auth.championTitle}
+            </h1>
+            <p
+              className="text-sm font-normal leading-relaxed text-white/90"
+              style={{ textShadow: '0 2px 10px rgba(0,0,0,0.2)' }}
+            >
+              {dictionary.auth.championSubtitle}
+            </p>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="mx-auto w-full max-w-lg"
-          >
-            <Card className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-              <CardHeader className="border-b border-white/10 px-6 py-6">
-                <div className="flex items-center gap-3">
-                  <Image src="/logo-white.png" alt="DNA" width={48} height={48} priority className="shrink-0" />
-                  <div>
-                    <CardTitle className="text-lg font-semibold tracking-tight text-white">
-                      {dictionary.auth.loginTitle}
-                    </CardTitle>
-                    <CardDescription className="text-sm font-medium text-white/60">
-                      {dictionary.auth.loginSubtitle}
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
+          {/* Login Form */}
+          <div>
+            <Suspense fallback={
+              <div className="text-center">
+                <p className="text-sm text-white/60">{dictionary.common.loading}</p>
+              </div>
+            }>
+              <LoginForm dictionary={dictionary} locale={locale} />
+            </Suspense>
+          </div>
 
-              <CardContent className="px-6 py-6">
-                <Suspense fallback={<div className="text-center text-sm text-white/60">{dictionary.common.loading}</div>}>
-                  <LoginForm dictionary={dictionary} locale={locale} />
-                </Suspense>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </motion.div>
+          {/* Logo + Bottom Text */}
+          <div className="mt-10 text-center">
+            <Link href={`/${locale}`} className="inline-flex flex-col items-center gap-4">
+              <Image
+                src="/logo-white.png"
+                alt="DNA"
+                width={64}
+                height={64}
+                priority
+                className="drop-shadow-[0_6px_16px_rgba(0,0,0,0.25)]"
+              />
+              <span
+                className="text-sm font-bold uppercase tracking-[0.15em] text-white/95"
+                style={{ textShadow: '0 6px 18px rgba(0,0,0,0.35)' }}
+              >
+                DISCOVER NATURAL ABILITY
+              </span>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

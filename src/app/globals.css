@@ -82,6 +82,15 @@
   /* Dynamic per-level accent (can be overridden at runtime per user/page) */
   --dna-accent: #FF5F02;
   
+  /* DNA Brand Gradient Colors - Orange/Red Champion Theme */
+  --dna-orange-start: #FF6B35;
+  --dna-orange-mid: #FF5722;
+  --dna-orange-end: #FF4500;
+  --dna-red-dark: #CC3300;
+  --dna-champion-gradient-from: #FF6B35;
+  --dna-champion-gradient-via: #FF5722;
+  --dna-champion-gradient-to: #CC3300;
+  
   /* Chart colors */
   --grid-color: #374151;
   --text-secondary: #9ca3af;
@@ -123,6 +132,15 @@
 
   /* Dynamic per-level accent (can be overridden at runtime per user/page) */
   --dna-accent: #FF5F02;
+  
+  /* DNA Brand Gradient Colors - Orange/Red Champion Theme */
+  --dna-orange-start: #FF6B35;
+  --dna-orange-mid: #FF5722;
+  --dna-orange-end: #FF4500;
+  --dna-red-dark: #CC3300;
+  --dna-champion-gradient-from: #FF6B35;
+  --dna-champion-gradient-via: #FF5722;
+  --dna-champion-gradient-to: #CC3300;
   
   /* Chart colors for dark mode */
   --grid-color: #374151;
@@ -166,28 +184,52 @@
   }
 }
 
-/* Visual policy: disable shadows and gradients */
-*,
-*::before,
-*::after {
+/* Visual policy: disable shadows and gradients EXCEPT for champion theme */
+*:not(.champion-gradient):not(.champion-shadow):not(.champion-glow):not(.particle-effect),
+*:not(.champion-gradient):not(.champion-shadow):not(.champion-glow):not(.particle-effect)::before,
+*:not(.champion-gradient):not(.champion-shadow):not(.champion-glow):not(.particle-effect)::after {
   box-shadow: none !important;
 }
 
-[class*="drop-shadow"],
+[class*="drop-shadow"]:not(.champion-shadow),
 [class*="filter"].drop-shadow-none {
   filter: none !important;
 }
 
-/* Disable Tailwind gradient backgrounds (including new `bg-linear-to-*` utilities). */
-[class*="bg-gradient-to-"],
-[class*="bg-linear-to-"] {
+/* Disable Tailwind gradient backgrounds EXCEPT for champion theme */
+[class*="bg-gradient-to-"]:not(.champion-gradient),
+[class*="bg-linear-to-"]:not(.champion-gradient) {
   background-image: none !important;
 }
 
-/* Prevent invisible text when a gradient text pattern (`bg-clip-text text-transparent`) is used. */
-[class*="bg-gradient-to-"].text-transparent,
-[class*="bg-linear-to-"].text-transparent {
+/* Prevent invisible text when a gradient text pattern is used */
+[class*="bg-gradient-to-"].text-transparent:not(.champion-gradient),
+[class*="bg-linear-to-"].text-transparent:not(.champion-gradient) {
   color: inherit !important;
+}
+
+/* Champion Gradient Utilities - ALLOWED gradients */
+.champion-gradient {
+  background: linear-gradient(135deg, var(--dna-champion-gradient-from), var(--dna-champion-gradient-via), var(--dna-champion-gradient-to)) !important;
+}
+
+.champion-gradient-radial {
+  background: radial-gradient(circle at top, var(--dna-champion-gradient-from), var(--dna-champion-gradient-via) 50%, var(--dna-red-dark)) !important;
+}
+
+.champion-text-gradient {
+  background: linear-gradient(135deg, var(--dna-orange-start), var(--dna-orange-end)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.champion-shadow {
+  box-shadow: 0 20px 60px -15px rgba(255, 87, 34, 0.5) !important;
+}
+
+.champion-glow {
+  box-shadow: 0 0 40px rgba(255, 107, 53, 0.4), 0 0 80px rgba(255, 87, 34, 0.2) !important;
 }
 
 /* Keep keyboard focus visible without box-shadows. */

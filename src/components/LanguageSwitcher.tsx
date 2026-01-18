@@ -12,9 +12,11 @@ type LanguageSwitcherProps = {
   /** Render as a full-width menu item button (useful inside dropdowns). */
   fullWidth?: boolean;
   className?: string;
+  /** Variant for light/orange backgrounds */
+  variant?: 'default' | 'light';
 };
 
-export function LanguageSwitcher({ fullWidth, className }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ fullWidth, className, variant = 'default' }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -44,6 +46,8 @@ export function LanguageSwitcher({ fullWidth, className }: LanguageSwitcherProps
     router.push(newPathname);
   };
 
+  const isLight = variant === 'light';
+
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
@@ -55,12 +59,18 @@ export function LanguageSwitcher({ fullWidth, className }: LanguageSwitcherProps
         size="sm"
         onClick={switchLocale}
         className={cn(
-          'h-11 gap-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all backdrop-blur-xl',
+          'h-11 gap-2 rounded-xl backdrop-blur-xl transition-all',
+          isLight 
+            ? 'bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30' 
+            : 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20',
           fullWidth ? 'w-full justify-between px-3' : undefined
         )}
       >
         <div className="flex items-center gap-2 min-w-0">
-          <Languages className="h-5 w-5 text-blue-400 shrink-0" />
+          <Languages className={cn(
+            'h-5 w-5 shrink-0',
+            isLight ? 'text-white' : 'text-blue-400'
+          )} />
           <span className="text-sm font-semibold text-white truncate">
             {localeNames[otherLocale]}
           </span>
