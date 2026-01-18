@@ -13,6 +13,8 @@ import {
   Settings,
   Layers,
   MessageCircle,
+  Stethoscope,
+  Medal,
   
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -57,6 +59,20 @@ const menuItems: MenuItem[] = [
     labelKey: 'academies',
     href: '/dashboard/academies',
     icon: Building2,
+  },
+  {
+    key: 'health-tests',
+    resourceKey: 'dashboard.healthTests',
+    labelKey: 'healthTests',
+    href: '/dashboard/health-tests',
+    icon: Stethoscope,
+  },
+  {
+    key: 'medal-requests',
+    resourceKey: 'dashboard.medalRequests',
+    labelKey: 'medalRequests',
+    href: '/dashboard/medal-requests',
+    icon: Medal,
   },
   {
     key: 'programs',

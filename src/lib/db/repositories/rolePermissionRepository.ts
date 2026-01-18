@@ -14,6 +14,8 @@ export interface RolePermission {
     canManageUsers: boolean;
     canManageRoles: boolean;
     canManageAcademies: boolean;
+    canManageHealthTests: boolean;
+    canManageMedalRequests: boolean;
     canViewReports: boolean;
     canManageSchedules: boolean;
     canManageAppointments: boolean;
@@ -44,6 +46,8 @@ const DEFAULT_PERMISSIONS: Record<UserRole, RolePermission['permissions']> = {
     canManageUsers: true,
     canManageRoles: true,
     canManageAcademies: true,
+    canManageHealthTests: true,
+    canManageMedalRequests: true,
     canViewReports: true,
     canManageSchedules: true,
     canManageAppointments: true,
@@ -66,6 +70,8 @@ const DEFAULT_PERMISSIONS: Record<UserRole, RolePermission['permissions']> = {
     canManageUsers: true,
     canManageRoles: true,
     canManageAcademies: false,
+    canManageHealthTests: false,
+    canManageMedalRequests: false,
     canViewReports: true,
     canManageSchedules: true,
     canManageAppointments: true,
@@ -88,6 +94,8 @@ const DEFAULT_PERMISSIONS: Record<UserRole, RolePermission['permissions']> = {
     canManageUsers: false,
     canManageRoles: false,
     canManageAcademies: false,
+    canManageHealthTests: false,
+    canManageMedalRequests: false,
     canViewReports: true,
     canManageSchedules: true,
     canManageAppointments: true,
@@ -110,6 +118,8 @@ const DEFAULT_PERMISSIONS: Record<UserRole, RolePermission['permissions']> = {
     canManageUsers: false,
     canManageRoles: false,
     canManageAcademies: false,
+    canManageHealthTests: false,
+    canManageMedalRequests: false,
     canViewReports: false,
     canManageSchedules: false,
     canManageAppointments: true,
@@ -132,6 +142,8 @@ const DEFAULT_PERMISSIONS: Record<UserRole, RolePermission['permissions']> = {
     canManageUsers: false,
     canManageRoles: false,
     canManageAcademies: false,
+    canManageHealthTests: false,
+    canManageMedalRequests: false,
     canViewReports: false,
     canManageSchedules: false,
     canManageAppointments: false,

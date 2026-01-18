@@ -64,6 +64,12 @@ export default async function DashboardLayout({
   if (permissions?.canManageAcademies) {
     accessibleResources.push('dashboard.academies');
   }
+  if (permissions?.canManageHealthTests) {
+    accessibleResources.push('dashboard.healthTests');
+  }
+  if (permissions?.canManageMedalRequests) {
+    accessibleResources.push('dashboard.medalRequests');
+  }
 
   // Transform user for DashboardHeader
   const headerUser = {

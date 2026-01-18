@@ -10,10 +10,12 @@ import { findAcademyById } from '@/lib/db/repositories/academyRepository';
 import { getAllCourses } from '@/lib/db/repositories/courseRepository';
 import { getAllEnrollments } from '@/lib/db/repositories/enrollmentRepository';
 import { DashboardHomeClient } from '@/components/DashboardHomeClient';
+import { AdminOverview } from '@/components/AdminOverview';
 import { type AcademyAdminDashboardData, type AcademyAdminPlayerRow } from '@/components/AcademyAdminDashboardHomeClient';
 import { KidProfileClient } from '@/components/KidProfileClient';
 import { requireUserInAcademy } from '@/lib/academies/academyGuards';
 import { daysBetweenIso } from '@/lib/utils/date';
+import { getAllAcademies } from '@/lib/db/repositories/academyRepository';
 
 export default async function DashboardPage({
   params,
@@ -68,6 +70,29 @@ export default async function DashboardPage({
   // Fetch statistics for admin
   let stats = null;
   if (user.role === 'admin') {
+    const academies = await getAllAcademies();
+    
+    // Mock data for now - replace with real counts from LMDB
+    const pendingHealthTests = 2; // TODO: Get from LMDB
+    const pendingMedalRequests = 3; // TODO: Get from LMDB
+    
+    return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl space-y-6 overflow-x-hidden">
+        <AdminOverview
+          dictionary={dictionary}
+          locale={locale}
+          stats={{
+            totalAcademies: academies.length,
+            pendingHealthTests,
+            pendingMedalRequests,
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Original admin stats for fallback (if needed elsewhere)
+  if (user.role === 'admin-old') {
     const users = await listUsers();
     const courses = await getAllCourses();
     const enrollments = await getAllEnrollments();

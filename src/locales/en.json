@@ -77,7 +77,9 @@
     "payments": "Payments",
     "settings": "Settings",
     "academies": "Academies",
-    "programs": "Programs"
+    "programs": "Programs",
+    "healthTests": "Health Tests",
+    "medalRequests": "Medal Requests"
   },
   "footer": {
     "description": "Be a Champion!",
@@ -218,7 +220,6 @@
   "dashboard": {
     "title": "Dashboard",
     "welcomeMessage": "Welcome to your dashboard",
-    "overview": "System Overview",
     "statistics": "Statistics",
     "totalUsers": "Total Users",
     "totalCourses": "Total Courses",
@@ -243,6 +244,12 @@
     "parentAccess": "Welcome parent! You can view and manage appointments for your children.",
     "playerAccess": "Welcome! You can view your schedule and activities.",
     "quickActions": "Quick Actions",
+    "quickActionsDesc": "Common administrative tasks",
+    "overview": "Overview",
+    "adminOverviewDesc": "Monitor and manage system-wide activities",
+    "totalRegisteredAcademies": "Total registered academies",
+    "pendingHealthTestRequests": "Pending health test requests",
+    "pendingMedalRequests": "Pending medal requests",
     "manageUsers": "Manage Users",
     "viewAppointments": "View Appointments",
     "manageSchedules": "Manage Schedules",

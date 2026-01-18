@@ -77,7 +77,9 @@
     "payments": "المدفوعات",
     "settings": "الإعدادات",
     "academies": "الأكاديميات",
-    "programs": "البرامج"
+    "programs": "البرامج",
+    "healthTests": "اختبارات الصحة",
+    "medalRequests": "طلبات الميداليات"
   },
   "footer": {
     "description": "كن بطلاً!",
@@ -218,7 +220,6 @@
   "dashboard": {
     "title": "لوحة التحكم",
     "welcomeMessage": "مرحباً بك في لوحة التحكم",
-    "overview": "نظرة عامة على النظام",
     "statistics": "الإحصائيات",
     "totalUsers": "إجمالي المستخدمين",
     "totalCourses": "إجمالي الدورات",
@@ -243,6 +244,12 @@
     "parentAccess": "مرحباً أيها الوالد! يمكنك عرض وإدارة مواعيد أطفالك.",
     "playerAccess": "مرحباً! يمكنك عرض جدولك وأنشطتك.",
     "quickActions": "إجراءات سريعة",
+    "quickActionsDesc": "المهام الإدارية الشائعة",
+    "overview": "نظرة عامة",
+    "adminOverviewDesc": "مراقبة وإدارة الأنشطة على مستوى النظام",
+    "totalRegisteredAcademies": "إجمالي الأكاديميات المسجلة",
+    "pendingHealthTestRequests": "طلبات اختبارات الصحة المعلقة",
+    "pendingMedalRequests": "طلبات الميداليات المعلقة",
     "manageUsers": "إدارة المستخدمين",
     "viewAppointments": "عرض المواعيد",
     "manageSchedules": "إدارة الجداول",
