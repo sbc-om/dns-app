@@ -27,7 +27,6 @@ import {
   Clock, 
   XCircle, 
   Trophy, 
-  Sparkles,
   Eye,
   MoreHorizontal,
   Calendar,
@@ -180,12 +179,7 @@ export function MedalRequestsClient({ dictionary, locale, requests, academies }:
             />
             <div className="relative">
               <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-amber-600 via-yellow-600 to-orange-600 bg-clip-text text-transparent flex items-center gap-3">
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                >
-                  <Sparkles className="h-8 w-8 text-amber-600" />
-                </motion.div>
+                <Medal className="h-8 w-8 text-amber-600" />
                 {medalRequestsDict.title || dictionary.nav?.medalRequests || 'Medal Requests'}
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">

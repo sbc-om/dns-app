@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
 import type { Locale } from '@/config/i18n';
-import { Sparkles, Users, GraduationCap, User, Trophy, BookOpen, ArrowRight } from 'lucide-react';
+import { Users, GraduationCap, User, Trophy, BookOpen, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatedDashboardClient } from '@/components/AnimatedDashboardClient';
 import {
@@ -90,13 +90,6 @@ export function DashboardHomeClient({
             />
             <div className="relative">
               <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                  aria-hidden
-                >
-                  <Sparkles className="h-8 w-8 text-purple-600" />
-                </motion.div>
                 {title}
               </h1>
               <p className={`mt-2 ${subtleText}`}>{subtitle}</p>

@@ -27,7 +27,6 @@ import {
   CheckCircle, 
   Clock, 
   XCircle, 
-  Sparkles,
   Eye,
   MoreHorizontal,
   CalendarCheck
@@ -168,12 +167,7 @@ export function HealthTestsClient({ dictionary, locale, requests, academies }: H
             />
             <div className="relative">
               <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent flex items-center gap-3">
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                >
-                  <Sparkles className="h-8 w-8 text-emerald-600" />
-                </motion.div>
+                <Stethoscope className="h-8 w-8 text-emerald-600" />
                 {healthTestsDict.title || dictionary.nav?.healthTests || 'Health Tests'}
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">

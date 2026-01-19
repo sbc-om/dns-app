@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Plus, Pencil, Trash2, ArrowUp, ArrowDown, Layers, Sparkles, ShieldCheck, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, ArrowUp, ArrowDown, Layers, ShieldCheck, Search } from 'lucide-react';
 import Link from 'next/link';
 import type { Locale } from '@/config/i18n';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
@@ -618,7 +618,6 @@ export default function ProgramsManagementClient({ locale, dict }: ProgramsManag
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       <span className="font-semibold">{t?.createProgram || dict.common?.create || 'Create'}</span>
-                      <Sparkles className="h-4 w-4 ml-2 text-white/80" />
                     </Button>
                   </div>
 
@@ -904,7 +903,6 @@ export default function ProgramsManagementClient({ locale, dict }: ProgramsManag
                             >
                               <Plus className="h-4 w-4 mr-2" />
                               <span className="font-semibold">{t?.createLevel || 'Create Level'}</span>
-                              <Sparkles className="h-4 w-4 ml-2 text-white/80" />
                             </Button>
                           </div>
                         </div>
@@ -1277,7 +1275,7 @@ export default function ProgramsManagementClient({ locale, dict }: ProgramsManag
           <Card className="rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-50 dark:bg-[#1a1a1a]">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Sparkles className="h-4 w-4" />
+                <Target className="h-4 w-4" />
                 {t?.rulesTitle || 'Pass Rules'}
               </CardTitle>
               <CardDescription>

@@ -11,7 +11,6 @@ import {
   Zap,
   Target,
   Medal,
-  Sparkles,
   ArrowLeft,
   Crown,
   Gift,
@@ -280,12 +279,6 @@ export function AchievementsStatsClient({
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <Trophy className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                >
-                  <Sparkles className="h-5 w-5 text-yellow-500" />
-                </motion.div>
               </div>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col justify-end">

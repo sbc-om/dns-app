@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Save, Calendar as CalendarIcon, Edit3, Plus, Sparkles, ChevronLeft } from 'lucide-react';
+import { Save, Calendar as CalendarIcon, Edit3, Plus, ChevronLeft } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
@@ -221,13 +221,9 @@ export default function EditCourseClient({ locale, dict, course }: EditCourseCli
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <motion.div
-                animate={{ rotate: [0, -6, 6, -6, 0] }}
-                transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2.5 }}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15"
-              >
-                <Sparkles className="h-5 w-5 text-[#FF5F02]" />
-              </motion.div>
+              <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15">
+                <Edit3 className="h-5 w-5 text-[#FF5F02]" />
+              </div>
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-white">
                   {dict.courses?.editCourse || 'Edit Course'}

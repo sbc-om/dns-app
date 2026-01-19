@@ -1,6 +1,6 @@
 'use client';
 
-import { Building2, Stethoscope, Medal, Sparkles } from 'lucide-react';
+import { Building2, Stethoscope, Medal } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
 import Link from 'next/link';
@@ -55,10 +55,7 @@ export function AdminOverview({ dictionary, locale, stats }: AdminOverviewProps)
       {/* Page Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div className="relative">
-          <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 border-2 border-blue-200 dark:border-blue-800 shadow-lg">
-              <Sparkles className="h-8 w-8 text-white" />
-            </div>
+          <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
             {dictionary.common?.overview || 'Overview'}
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-2">
@@ -94,7 +91,6 @@ export function AdminOverview({ dictionary, locale, stats }: AdminOverviewProps)
       <Card className="border-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
             {dictionary.common?.quickActions || 'Quick Actions'}
           </CardTitle>
           <CardDescription>

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, Clock, Users, Search, Filter, Sparkles, Trophy } from 'lucide-react';
+import { Plus, Edit, Trash2, Clock, Users, Search, Filter, Trophy } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -188,7 +188,6 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
           >
             <Plus className="h-4 w-4 mr-2" />
             <span className="font-semibold">{dict.courses?.createCourse || dict.common?.create || 'Create'}</span>
-            <Sparkles className="h-4 w-4 ml-2 text-white/80" />
           </Button>
         </div>
       </div>

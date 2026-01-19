@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Building2, Plus, UserPlus, CheckCircle2, Edit, Trash2, Image as ImageIcon, Sparkles, Search } from 'lucide-react';
+import { Building2, Plus, UserPlus, CheckCircle2, Edit, Trash2, Image as ImageIcon, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -386,13 +386,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
               />
               <div className="relative">
                 <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
-                  <motion.div
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                    aria-hidden
-                  >
-                    <Sparkles className="h-8 w-8 text-purple-600" />
-                  </motion.div>
+                  <Building2 className="h-8 w-8 text-purple-600" />
                   {title}
                 </h1>
                 <p className={`mt-2 ${subtleText}`}>{t.subtitle || 'Manage academies and assign managers'}</p>

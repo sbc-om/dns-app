@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calendar, Clock, Plus, Trash2, Sparkles } from 'lucide-react';
+import { Calendar, Clock, Plus, Trash2 } from 'lucide-react';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import toast from 'react-hot-toast';
@@ -147,12 +147,6 @@ export function SchedulesClient({ dictionary, locale }: SchedulesClientProps) {
               <div>
                 <h1 className="text-2xl sm:text-3xl font-black text-[#262626] dark:text-white flex items-center gap-2">
                   {dictionary.nav?.schedules || 'Schedules'}
-                  <motion.div
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                  >
-                    <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600 dark:text-purple-400" />
-                  </motion.div>
                 </h1>
                 <p className={`${subtleText} mt-2`}>Manage available appointment times</p>
               </div>
@@ -240,7 +234,6 @@ export function SchedulesClient({ dictionary, locale }: SchedulesClientProps) {
                   <span className="font-semibold">
                     {isCreating ? (dictionary.common?.loading || 'Creating...') : (dictionary.appointment?.createSchedule || 'Create Schedule')}
                   </span>
-                  <Sparkles className="h-4 w-4 ml-2 text-white/80" />
                 </Button>
               </div>
             </div>

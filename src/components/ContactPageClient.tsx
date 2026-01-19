@@ -7,7 +7,7 @@ import { ContactForm } from '@/components/ContactForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
 import type { Locale } from '@/config/i18n';
-import { Mail, Phone, MapPin, Building2, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Building2, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
@@ -42,12 +42,7 @@ export default function ContactPageClient({
               transition={{ duration: 0.6, type: 'spring', stiffness: 200 }}
               className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur-xl mb-6"
             >
-              <motion.div
-                animate={{ rotate: [0, -10, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-              >
-                <Sparkles className="h-5 w-5 text-blue-400" />
-              </motion.div>
+              <Building2 className="h-5 w-5 text-blue-400" />
               <span className="text-sm font-bold text-white/90">{d.clarification?.title || 'Partnership'}</span>
             </motion.div>
 

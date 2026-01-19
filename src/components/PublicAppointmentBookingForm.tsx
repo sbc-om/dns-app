@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Clock, User, Mail, Phone, CheckCircle2, MessageSquare, Sparkles, Zap } from 'lucide-react';
+import { Calendar, Clock, User, Mail, Phone, CheckCircle2, MessageSquare, Zap } from 'lucide-react';
 
 interface PublicAppointmentBookingFormProps {
   dictionary: Dictionary;
@@ -211,11 +211,11 @@ export function PublicAppointmentBookingForm({ dictionary, locale }: PublicAppoi
 
             <div className="flex items-center gap-2 text-xs text-white/60">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-1.5">
-                <Zap className="h-4 w-4" />
+                <Calendar className="h-4 w-4" />
                 <span>{dictionary.appointments?.preferredDate || 'Preferred Date'}</span>
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-1.5">
-                <Sparkles className="h-4 w-4" />
+                <Clock className="h-4 w-4" />
                 <span>{dictionary.appointments?.preferredTime || 'Preferred Time'}</span>
               </span>
             </div>

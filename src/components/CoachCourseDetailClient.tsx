@@ -14,8 +14,7 @@ import {
   UserCircle,
   Star,
   Plus,
-  ChevronRight,
-  Sparkles
+  ChevronRight
 } from 'lucide-react';
 import { StudentAttendanceDialog } from './StudentAttendanceDialog';
 import { getCourseAttendanceAction } from '@/lib/actions/attendanceActions';
@@ -163,13 +162,6 @@ export function CoachCourseDetailClient({
           <CardHeader className="relative">
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-3">
-                <motion.div
-                  animate={{ rotate: [0, -6, 6, -6, 0] }}
-                  transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2.5 }}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15"
-                >
-                  <Sparkles className="h-5 w-5 text-[#FF5F02]" />
-                </motion.div>
                 <div className="min-w-0">
                   <h1 className="text-2xl md:text-3xl font-bold text-white line-clamp-1">{courseName}</h1>
                   {courseDescription ? (

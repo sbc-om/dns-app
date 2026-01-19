@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Award, Sparkles } from 'lucide-react';
+import { Award } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getStudentMedalsAction, getStudentCourseMedalsAction } from '@/lib/actions/medalActions';
 import type { StudentMedal, Medal } from '@/lib/db/repositories/medalRepository';
@@ -161,7 +161,7 @@ export function StudentMedalsDisplay({
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}
               >
-                <Sparkles
+                <Award
                   className={
                     isAcademy ? 'w-8 h-8 text-gray-500 dark:text-gray-400' : 'w-8 h-8 text-white/70'
                   }

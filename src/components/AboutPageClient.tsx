@@ -7,7 +7,7 @@ import { Footer } from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
 import type { Locale } from '@/config/i18n';
-import { Target, TrendingUp, Award, Sparkles, Users } from 'lucide-react';
+import { Target, TrendingUp, Award, Users } from 'lucide-react';
 
 type SessionUser = {
   fullName?: string;
@@ -79,12 +79,7 @@ export default function AboutPageClient({ dictionary, locale, user }: AboutPageC
               transition={{ duration: 0.6, type: 'spring', stiffness: 260, damping: 24 }}
               className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 mb-6"
             >
-              <motion.div
-                animate={{ rotate: [0, -6, 6, -6, 0] }}
-                transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 2.4 }}
-              >
-                <Sparkles className="h-4 w-4 text-blue-300" />
-              </motion.div>
+              <Target className="h-4 w-4 text-blue-300" />
               <span className="text-sm font-semibold text-white/90">{d.mission.title}</span>
             </motion.div>
 

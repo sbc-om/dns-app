@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Send, Users, MessageSquare, CheckCircle, XCircle, AlertCircle, Save, Trash2, Pencil, UsersIcon, Folder, Sparkles } from 'lucide-react';
+import { Loader2, Send, Users, MessageSquare, CheckCircle, XCircle, AlertCircle, Save, Trash2, Pencil, UsersIcon, Folder } from 'lucide-react';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 
 interface User {
@@ -518,12 +518,7 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
           />
           <div className="relative">
             <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-green-600 via-emerald-600 to-cyan-600 bg-clip-text text-transparent flex items-center gap-3">
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-              >
-                <Sparkles className="h-8 w-8 text-green-600" />
-              </motion.div>
+              <MessageSquare className="h-8 w-8 text-green-600" />
               {t?.title || 'WhatsApp Messaging'}
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">

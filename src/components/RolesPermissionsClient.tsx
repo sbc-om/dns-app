@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { updateRolePermissionsAction } from '@/lib/actions/rolePermissionActions';
-import { CheckCircle2, Save, Shield, RotateCcw, Sparkles, Users } from 'lucide-react';
+import { CheckCircle2, Save, Shield, RotateCcw, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import type { Locale } from '@/config/i18n';
@@ -292,12 +292,7 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
             />
             <div className="relative">
               <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                >
-                  <Sparkles className="h-8 w-8 text-purple-600" />
-                </motion.div>
+                <Shield className="h-8 w-8 text-purple-600" />
                 {dictionary.roles?.title || dictionary.nav.roles}
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">{subtitle}</p>

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
-import { Award, Calendar, CheckCircle2, Star, Users, XCircle, Sparkles, Trophy, Target, Medal, Zap, Clock, Check } from 'lucide-react';
+import { Award, Calendar, CheckCircle2, Star, Users, XCircle, Trophy, Target, Medal, Zap, Clock, Check } from 'lucide-react';
 import type { Locale } from '@/config/i18n';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
 import type { Program } from '@/lib/db/repositories/programRepository';

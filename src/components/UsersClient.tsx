@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
 import type { User } from '@/lib/db/repositories/userRepository';
 import { Button } from '@/components/ui/button';
-import { Plus, Shield, Sparkles, UserPlus } from 'lucide-react';
+import { Plus, Shield, UserPlus } from 'lucide-react';
 import { UsersTable } from '@/components/UsersTable';
 import { CreateUserDialog } from '@/components/CreateUserDialog';
 import type { Locale } from '@/config/i18n';
@@ -150,12 +150,7 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
             />
             <div className="relative">
               <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                >
-                  <Sparkles className="h-8 w-8 text-purple-600" />
-                </motion.div>
+                <Shield className="h-8 w-8 text-purple-600" />
                 {dictionary.users.title}
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">{dictionary.users.userList}</p>

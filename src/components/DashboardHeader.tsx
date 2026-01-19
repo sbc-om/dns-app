@@ -1,6 +1,6 @@
 'use client';
 
-import { LogOut, User, Menu, X, Download, Bell, Globe, ArrowLeft, Sparkles, Shield } from 'lucide-react';
+import { LogOut, User, Menu, X, Download, Bell, Globe, ArrowLeft, Shield } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useEffect, useState } from 'react';
@@ -272,7 +272,7 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                 <div className="px-2 py-2">
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="h-4 w-4" />
+                      <Globe className="h-4 w-4" />
                       <span className="text-xs font-semibold">{dictionary.common.language}</span>
                     </div>
                     <span className="text-[11px] text-muted-foreground">{dictionary.common.languageDesc}</span>

@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Award, Plus, Edit, Trash2, Sparkles } from 'lucide-react';
+import { Award, Plus, Edit, Trash2 } from 'lucide-react';
 import type { Medal } from '@/lib/db/repositories/medalRepository';
 import { getMedalsAction, createMedalAction, updateMedalAction, deleteMedalAction } from '@/lib/actions/medalActions';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -182,12 +182,6 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
               <div>
                 <h1 className="text-2xl sm:text-3xl font-black text-[#262626] dark:text-white flex items-center gap-2">
                   {dictionary.settings.medals}
-                  <motion.div
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                  >
-                    <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600 dark:text-purple-400" />
-                  </motion.div>
                 </h1>
                 <p className={`${subtleText} mt-2`}>Manage achievement medals and rewards</p>
               </div>
@@ -207,7 +201,6 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     <span className="font-semibold">{dictionary.settings.createMedal}</span>
-                    <Sparkles className="h-4 w-4 ml-2 text-white/80" />
                   </Button>
                 </div>
               </div>

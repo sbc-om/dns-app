@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Trophy, Activity, Star, Target, CheckCircle, XCircle, CalendarDays, Sparkles } from 'lucide-react';
+import { Calendar, Trophy, Activity, Star, Target, CheckCircle, XCircle, CalendarDays } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getStudentCourseAttendanceAction } from '@/lib/actions/attendanceActions';
 import { getSessionPlansAction } from '@/lib/actions/sessionPlanActions';
@@ -124,13 +124,9 @@ export function CourseDetailClient({
             <div className="flex flex-col gap-4">
               <div>
                 <div className="flex items-center gap-3">
-                  <motion.div
-                    animate={{ rotate: [0, -6, 6, -6, 0] }}
-                    transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 2.5 }}
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15"
-                  >
-                    <Sparkles className="h-5 w-5 text-[#FF5F02]" />
-                  </motion.div>
+                  <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15">
+                    <Trophy className="h-5 w-5 text-[#FF5F02]" />
+                  </div>
                   <div className="min-w-0">
                     <h1 className="text-2xl sm:text-3xl font-bold text-white line-clamp-1">
                       {locale === 'ar' ? course.nameAr || course.name : course.name}

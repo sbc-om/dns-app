@@ -56,14 +56,12 @@ export function DashboardLayoutClient({
 
   return (
     <div
-      className="flex h-screen overflow-hidden relative bg-linear-to-br from-slate-950 via-indigo-950 to-purple-950"
+      className="flex h-screen overflow-hidden relative"
       dir={direction}
     >
-      {/* Game-like background */}
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute -top-32 -left-32 h-120 w-120 rounded-full bg-orange-500/15 blur-3xl" />
-        <div className="absolute -bottom-40 -right-32 h-136 w-136 rounded-full bg-fuchsia-500/15 blur-3xl" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.12),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.10),transparent_55%)]" />
+      {/* Clean professional background with subtle center gradient */}
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[#0a0f1c]">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),rgba(139,92,246,0.03),transparent_70%)]" />
       </div>
 
       {/* Initialize Push Notifications (only on supported devices) */}

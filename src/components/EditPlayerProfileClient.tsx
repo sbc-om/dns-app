@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Save, User as UserIcon, Mail, Phone, IdCard, Sparkles, Building2 } from 'lucide-react';
+import { Save, User as UserIcon, Mail, Phone, IdCard, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -81,9 +81,6 @@ export function EditKidProfileClient({
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-black/5 dark:bg-white/5 rounded-xl">
-                <Sparkles className="h-6 w-6 text-gray-700 dark:text-gray-200" />
-              </div>
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold text-[#262626] dark:text-white">
                   {dictionary.users?.editUser || 'Edit Profile'}

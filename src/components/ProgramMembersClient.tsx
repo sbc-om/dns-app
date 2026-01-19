@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Plus, Users, Trash2, Search, ShieldCheck, MessageSquare, Star, Sparkles } from 'lucide-react';
+import { Plus, Users, Trash2, Search, ShieldCheck, MessageSquare, Star } from 'lucide-react';
 import type { Locale } from '@/config/i18n';
 import type { Dictionary } from '@/lib/i18n/getDictionary';
 import type { Program } from '@/lib/db/repositories/programRepository';
@@ -328,7 +328,7 @@ export default function ProgramMembersClient({ locale, dict }: ProgramMembersCli
         <CardContent className="relative space-y-5">
           {programs.length === 0 ? (
             <div className="rounded-2xl border-2 border-dashed border-[#DDDDDD] dark:border-white/10 p-6 text-sm text-muted-foreground flex items-start gap-3">
-              <Sparkles className="h-5 w-5 mt-0.5" />
+              <Users className="h-5 w-5 mt-0.5" />
               <div>
                 <div className="font-semibold text-[#262626] dark:text-white">
                   {t?.noPrograms || 'No programs available'}
