@@ -91,24 +91,6 @@ export default async function DashboardPage({
     );
   }
 
-  // Original admin stats for fallback (if needed elsewhere)
-  if (user.role === 'admin-old') {
-    const users = await listUsers();
-    const courses = await getAllCourses();
-    const enrollments = await getAllEnrollments();
-    
-    stats = {
-      totalUsers: users.length,
-      activeUsers: users.filter(u => u.isActive).length,
-      totalCourses: courses.length,
-      activeCourses: courses.filter(c => c.isActive).length,
-      totalEnrollments: enrollments.length,
-      paidEnrollments: enrollments.filter(e => e.paymentStatus === 'paid').length,
-      totalCoaches: users.filter(u => u.role === 'coach').length,
-      totalPlayers: users.filter(u => u.role === 'player').length,
-    };
-  }
-
   // Academy Admin (manager) dashboard overview
   let managerDashboard: AcademyAdminDashboardData | null = null;
   if (user.role === 'manager') {
