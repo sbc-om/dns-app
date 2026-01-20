@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
 import { getUnreadCountAction } from '@/lib/actions/notificationActions';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -177,6 +178,8 @@ export function DashboardHeader({ dictionary, user, onMobileMenuToggle }: Dashbo
                 )}
               </Button>
             </Link>
+
+            <ThemeToggle />
 
             {/* User Menu - Avatar */}
             <DropdownMenu>

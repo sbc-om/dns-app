@@ -60,7 +60,7 @@ export function DashboardLayoutClient({
       dir={direction}
     >
       {/* Clean professional background with subtle center gradient */}
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[#0a0f1c]">
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-background">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),rgba(139,92,246,0.03),transparent_70%)]" />
       </div>
 
@@ -70,7 +70,7 @@ export function DashboardLayoutClient({
       {/* Mobile Overlay with smooth fade */}
       {isMobileSidebarOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40 animate-in fade-in duration-300"
+          className="lg:hidden fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm z-40 animate-in fade-in duration-300"
           onClick={() => setIsMobileSidebarOpen(false)}
           role="button"
           aria-label="Close menu"

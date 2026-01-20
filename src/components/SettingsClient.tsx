@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, Database, Download, Upload, Clock, Bell, UserCog, Award, Building2 } from 'lucide-react';
+import { Settings, Database, Download, Upload, Clock, Bell, UserCog, Award, Building2, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,6 +14,7 @@ import type { RolePermission } from '@/lib/db/repositories/rolePermissionReposit
 import AdminSettingsClient from '@/components/AdminSettingsClient';
 import { MedalsManagement } from '@/components/MedalsManagement';
 import { AcademiesManagement } from '@/components/AcademiesManagement';
+import { useTheme } from '@/components/ThemeProvider';
 
 interface SettingsClientProps {
   dictionary: Dictionary;
@@ -31,6 +32,7 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
   const [loading, setLoading] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const { confirm, ConfirmDialog } = useConfirm();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     loadBackups();
@@ -401,6 +403,60 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4 bg-white dark:bg-[#262626]">
+                {/* Theme */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  whileHover={{ rotateY: 1, rotateX: 1 }}
+                  className="transform-3d"
+                >
+                  <div className="p-5 bg-white dark:bg-[#1a1a1a] rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div className="space-y-1 flex-1">
+                        <h3 className="font-bold text-[#262626] dark:text-white">
+                          {dictionary.settings?.theme || 'Theme'}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {dictionary.settings?.themeDesc || 'Choose light or dark appearance'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <motion.button
+                          whileHover={{ scale: 1.04 }}
+                          whileTap={{ scale: 0.96 }}
+                          onClick={() => setTheme('light')}
+                          className={`h-10 px-3 rounded-lg border-2 text-sm font-semibold flex items-center gap-2 transition-all ${
+                            theme === 'light'
+                              ? 'border-[#262626] bg-[#262626] text-white dark:border-white dark:bg-white dark:text-[#262626]'
+                              : 'border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-white/5 text-[#262626] dark:text-white'
+                          }`}
+                          type="button"
+                          aria-pressed={theme === 'light'}
+                        >
+                          <Sun className="h-4 w-4" />
+                          {dictionary.settings?.light || 'Light'}
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.04 }}
+                          whileTap={{ scale: 0.96 }}
+                          onClick={() => setTheme('dark')}
+                          className={`h-10 px-3 rounded-lg border-2 text-sm font-semibold flex items-center gap-2 transition-all ${
+                            theme === 'dark'
+                              ? 'border-[#262626] bg-[#262626] text-white dark:border-white dark:bg-white dark:text-[#262626]'
+                              : 'border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-white/5 text-[#262626] dark:text-white'
+                          }`}
+                          type="button"
+                          aria-pressed={theme === 'dark'}
+                        >
+                          <Moon className="h-4 w-4" />
+                          {dictionary.settings?.dark || 'Dark'}
+                        </motion.button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
                 {/* Language Settings */}
                 <div className="p-5 bg-white dark:bg-[#1a1a1a] rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
                   <div className="flex items-center justify-between">

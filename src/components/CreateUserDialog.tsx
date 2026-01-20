@@ -512,12 +512,23 @@ export function CreateUserDialog({
                 </div>
 
                 <DialogFooter className="px-6 py-5 border-t border-black/10 dark:border-white/10">
-                  <Button asChild type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="rounded-xl">
+                  <Button
+                    asChild
+                    type="button"
+                    variant="outline"
+                    onClick={() => onOpenChange(false)}
+                    className="h-11 rounded-xl border-2 border-[#DDDDDD]/80 bg-white/80 px-5 font-semibold text-[#262626] shadow-sm hover:bg-white dark:border-[#000000] dark:bg-white/5 dark:text-white"
+                  >
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                       {dictionary.common.cancel}
                     </motion.button>
                   </Button>
-                  <Button asChild type="submit" disabled={isSubmitting} className="rounded-xl bg-[#262626] text-white hover:bg-black dark:bg-white dark:text-[#262626] dark:hover:bg-gray-100">
+                  <Button
+                    asChild
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="h-11 rounded-xl bg-[#262626] px-6 font-semibold text-white shadow-lg shadow-black/15 hover:bg-black dark:bg-white dark:text-[#262626] dark:hover:bg-gray-100"
+                  >
                     <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                       {isSubmitting ? dictionary.common.loading : dictionary.common.create}
                     </motion.button>

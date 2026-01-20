@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Plus, Pencil, Trash2, ArrowUp, ArrowDown, Layers, ShieldCheck, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, ArrowUp, ArrowDown, Layers, ShieldCheck, Search, Target } from 'lucide-react';
 import Link from 'next/link';
 import type { Locale } from '@/config/i18n';
 import type { Dictionary } from '@/lib/i18n/getDictionary';

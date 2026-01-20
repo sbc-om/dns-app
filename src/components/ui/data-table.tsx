@@ -70,8 +70,8 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="w-full rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] overflow-hidden">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-4 py-4 border-b-2 border-[#DDDDDD] dark:border-[#000000]">
+    <div className="w-full rounded-md border overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-4 py-4 border-b">
         {searchKey && (
           <Input
             placeholder={searchPlaceholder}
@@ -79,14 +79,14 @@ export function DataTable<TData, TValue>({
             onChange={(event) =>
               table.getColumn(searchKey)?.setFilterValue(event.target.value)
             }
-            className="h-10 w-full sm:max-w-sm bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-black/30 dark:focus:border-white/20"
+            className="h-10 w-full sm:max-w-sm"
           />
         )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="h-10 w-full sm:w-auto sm:ml-auto border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#262626] hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
+              className="h-10 w-full sm:w-auto sm:ml-auto"
             >
               Columns <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
@@ -111,21 +111,15 @@ export function DataTable<TData, TValue>({
         </DropdownMenu>
       </div>
       <Table>
-        <TableHeader className="bg-gray-50 dark:bg-[#262626]">
+        <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
-              className="border-b-2 border-[#DDDDDD] dark:border-[#000000] hover:bg-transparent"
             >
-              {headerGroup.headers.map((header, index) => {
-                const isLast = index === headerGroup.headers.length - 1;
+              {headerGroup.headers.map((header) => {
                 return (
                   <TableHead
                     key={header.id}
-                    className={
-                      'h-12 px-4 font-bold text-[#262626] dark:text-white ' +
-                      (isLast ? '' : 'border-r border-[#DDDDDD] dark:border-[#000000]')
-                    }
                   >
                     {header.isPlaceholder
                       ? null
@@ -142,17 +136,11 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
-                className="border-b border-[#DDDDDD] dark:border-[#000000] hover:bg-gray-50 dark:hover:bg-[#262626] data-[state=selected]:bg-gray-50 dark:data-[state=selected]:bg-[#262626]"
               >
-                {row.getVisibleCells().map((cell, index) => {
-                  const isLast = index === row.getVisibleCells().length - 1;
+                {row.getVisibleCells().map((cell) => {
                   return (
                     <TableCell
                       key={cell.id}
-                      className={
-                        'px-4 py-3 align-middle ' +
-                        (isLast ? '' : 'border-r border-[#DDDDDD] dark:border-[#000000]')
-                      }
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
@@ -161,8 +149,8 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ))
           ) : (
-            <TableRow className="hover:bg-transparent">
-              <TableCell colSpan={columns.length} className="h-24 text-center text-sm text-gray-600 dark:text-gray-400">
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
                 No results.
               </TableCell>
             </TableRow>
@@ -170,8 +158,8 @@ export function DataTable<TData, TValue>({
         </TableBody>
       </Table>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-4 border-t-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-50 dark:bg-[#262626]">
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-4 border-t">
+        <div className="text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
@@ -181,7 +169,6 @@ export function DataTable<TData, TValue>({
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] hover:bg-gray-50 dark:hover:bg-[#1f1f1f]"
           >
             Previous
           </Button>
@@ -190,7 +177,6 @@ export function DataTable<TData, TValue>({
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#1a1a1a] hover:bg-gray-50 dark:hover:bg-[#1f1f1f]"
           >
             Next
           </Button>

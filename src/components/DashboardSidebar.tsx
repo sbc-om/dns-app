@@ -133,14 +133,14 @@ const SidebarContent = ({
 }: SidebarContentProps) => (
   <div className="flex flex-col h-full relative overflow-hidden">
     {/* Animated Background Gradient */}
-    <div className="absolute inset-0 bg-linear-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5 animate-pulse animation-duration-[8s]" />
+    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5 animate-pulse animation-duration-[8s] dark:from-blue-600/10 dark:via-purple-600/10 dark:to-pink-600/10" />
     
     {/* Logo/Brand - Hidden on mobile */}
     <motion.div 
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "hidden lg:block p-6 border-b border-white/10 relative z-10 backdrop-blur-sm",
+        "hidden lg:block p-6 border-b border-border relative z-10 backdrop-blur-sm",
         isCollapsed && "lg:px-3"
       )}
     >
@@ -167,10 +167,10 @@ const SidebarContent = ({
               exit={{ opacity: 0, x: -10 }}
               className="flex-1 min-w-0"
             >
-              <h2 className="text-xl font-bold truncate bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <h2 className="text-xl font-bold truncate bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                 DNA
               </h2>
-              <p className="text-xs font-medium text-white/60 truncate">Discover Natural Ability</p>
+              <p className="text-xs font-medium text-muted-foreground truncate">Discover Natural Ability</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -223,8 +223,8 @@ const SidebarContent = ({
                     "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm relative overflow-hidden",
                     "min-h-12",
                     isActive 
-                      ? "bg-linear-to-r from-blue-600/20 to-purple-600/20 text-white border-2 border-blue-500/50 shadow-lg shadow-blue-500/20"
-                      : "text-white/70 hover:text-white hover:bg-white/5 border-2 border-white/5 hover:border-white/10",
+                      ? "bg-gradient-to-r from-blue-600/20 to-purple-600/20 text-foreground border-2 border-blue-500/50 shadow-lg shadow-blue-500/20 dark:from-blue-600/30 dark:to-purple-600/30"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50 border-2 border-border hover:border-accent-foreground/20",
                     isCollapsed && "lg:justify-center lg:px-3"
                   )}
                 >
@@ -233,7 +233,7 @@ const SidebarContent = ({
                     <motion.div
                       layoutId="activeIndicator"
                       className={cn(
-                        "absolute top-0 bottom-0 w-1 bg-linear-to-b from-blue-400 via-purple-500 to-pink-500",
+                        "absolute top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500",
                         isRTL ? "right-0 rounded-l-full" : "left-0 rounded-r-full"
                       )}
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
@@ -286,19 +286,19 @@ const SidebarContent = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "p-4 border-t border-white/10 relative z-10 backdrop-blur-sm",
+        "p-4 border-t border-border relative z-10 backdrop-blur-sm",
         isCollapsed && "lg:px-2"
       )}
     >
       <div className={cn(
-        "text-xs text-center text-white/50",
+        "text-xs text-center text-muted-foreground",
         isCollapsed && "lg:hidden"
       )}>
         <p>© 2025 DNA</p>
         <p className="mt-1 font-mono">v1.0.0</p>
       </div>
       {isCollapsed && (
-        <div className="hidden lg:block text-xs text-center text-white/50 font-mono">
+        <div className="hidden lg:block text-xs text-center text-muted-foreground font-mono">
           v1.0
         </div>
       )}
@@ -333,12 +333,12 @@ export function DashboardSidebar({
     <>
       {/* Desktop Sidebar */}
       <aside className={cn(
-        "hidden lg:flex flex-col bg-linear-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460] border-white/10 transition-all duration-500 relative shadow-2xl",
+        "hidden lg:flex flex-col bg-gradient-to-b from-muted/50 to-background/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-border transition-all duration-500 relative shadow-2xl backdrop-blur-md",
         isRTL ? "border-l" : "border-r",
         isCollapsed ? "w-20" : "w-72"
       )}>
         {/* Animated mesh gradient overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)] opacity-50" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)] opacity-50 dark:opacity-30" />
         
         <SidebarContent 
           isCollapsed={isCollapsed}
@@ -356,7 +356,7 @@ export function DashboardSidebar({
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={cn(
-            "absolute top-20 -right-3 h-8 w-8 rounded-full bg-linear-to-br from-blue-600 to-purple-600 border-2 border-white/20 flex items-center justify-center hover:from-blue-500 hover:to-purple-500 transition-all duration-300 z-50 text-white shadow-lg shadow-blue-500/50",
+            "absolute top-20 -right-3 h-8 w-8 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 border-2 border-border flex items-center justify-center hover:from-blue-500 hover:to-purple-500 transition-all duration-300 z-50 text-white shadow-lg shadow-blue-500/50",
             isRTL && "-left-3 right-auto"
           )}
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -384,7 +384,7 @@ export function DashboardSidebar({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onMobileClose}
-              className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+              className="lg:hidden fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm z-40"
             />
             
             {/* Sidebar */}
@@ -394,7 +394,7 @@ export function DashboardSidebar({
               exit={{ x: isRTL ? '100%' : '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className={cn(
-                "lg:hidden fixed top-0 bottom-0 z-50 bg-linear-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460] border-white/10 flex flex-col shadow-2xl",
+                "lg:hidden fixed top-0 bottom-0 z-50 bg-gradient-to-b from-background/95 to-muted/95 dark:from-slate-900/95 dark:via-slate-800/95 dark:to-slate-900/95 border-border backdrop-blur-xl flex flex-col shadow-2xl",
                 isRTL ? "border-l" : "border-r",
                 "w-[85vw] max-w-[320px] sm:w-80",
                 isRTL ? "right-0" : "left-0"
@@ -403,13 +403,13 @@ export function DashboardSidebar({
               aria-label="Navigation menu"
             >
               {/* Animated mesh gradient overlay */}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)] opacity-50" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)] opacity-50 dark:opacity-30" />
               
               {/* Mobile Header with Close Button */}
               <motion.div 
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between p-4 border-b border-white/10 lg:hidden relative z-10 backdrop-blur-sm"
+                className="flex items-center justify-between p-4 border-b border-border lg:hidden relative z-10 backdrop-blur-sm"
               >
                 <div className="flex items-center gap-3">
                   <motion.div
@@ -423,15 +423,15 @@ export function DashboardSidebar({
                     />
                   </motion.div>
                   <div>
-                    <h2 className="text-lg font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">DNA</h2>
-                    <p className="text-xs text-white/60">Menu</p>
+                    <h2 className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">DNA</h2>
+                    <p className="text-xs text-muted-foreground">Menu</p>
                   </div>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.1, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={onMobileClose}
-                  className="h-10 w-10 rounded-lg flex items-center justify-center text-white hover:bg-white/10 transition-colors"
+                  className="h-10 w-10 rounded-lg flex items-center justify-center text-foreground hover:bg-accent transition-colors"
                   aria-label="Close menu"
                 >
                   ✕

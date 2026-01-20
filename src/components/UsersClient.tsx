@@ -122,12 +122,12 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.6, type: 'spring', stiffness: 240, damping: 22 }}
       className="space-y-6"
     >
-      {/* Animated Header */}
+      {/* Game-like Header */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -137,7 +137,7 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="relative">
             <motion.div
-              className="absolute -inset-4 bg-linear-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-2xl blur-xl"
+              className="absolute -inset-4 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-2xl blur-xl"
               animate={{
                 opacity: [0.5, 0.8, 0.5],
                 scale: [1, 1.05, 1],
@@ -149,7 +149,7 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
               }}
             />
             <div className="relative">
-              <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
                 <Shield className="h-8 w-8 text-purple-600" />
                 {dictionary.users.title}
               </h1>
@@ -159,18 +159,18 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
 
           {/* Mobile-first toolbar: role filter + add user in the same row */}
           <div className="w-full sm:w-auto">
-            <div className="relative overflow-hidden rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#262626]/80 backdrop-blur-xl shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl bg-white/70 dark:bg-[#1a1a1a]/70 backdrop-blur-xl shadow-lg">
               <motion.div
-                className="absolute inset-0 bg-linear-to-r from-blue-600/8 via-purple-600/8 to-pink-600/8"
+                className="absolute inset-0 bg-gradient-to-r from-blue-600/8 via-purple-600/8 to-pink-600/8"
                 animate={{ opacity: [0.35, 0.6, 0.35] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               />
               <div className="relative p-2">
-                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border-2 border-black/60 bg-[#0b0b0f] text-white shadow-lg shadow-black/30">
+                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl bg-[#0b0b0f]/90 text-white shadow-lg shadow-black/25">
                   <div className="flex-1 min-w-0 h-full">
                     <Select value={selectedRole} onValueChange={setSelectedRole}>
                       <SelectTrigger
-                        className="h-full! w-full rounded-none border-0 bg-transparent px-4 py-0! text-white hover:bg-[#14141a]"
+                        className="h-full w-full rounded-none border-0 bg-transparent px-4 py-0 text-white/90 hover:text-white hover:bg-[#14141a]"
                       >
                         <div className="flex h-full w-full items-center gap-2 min-w-0">
                           <Shield className="h-4 w-4 text-white/90 shrink-0" />
@@ -198,7 +198,7 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
                     {currentUserRole === 'manager' ? (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button className="h-full rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]">
+                          <Button className="h-full rounded-none border-0 bg-transparent px-4 text-white/90 hover:text-white hover:bg-[#14141a]">
                             <UserPlus className="h-4 w-4 mr-2" />
                             <span className="font-semibold">{dictionary.common.add}</span>
                           </Button>
@@ -217,7 +217,7 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
                     ) : (
                       <Button
                         onClick={() => setIsCreatePlayerDialogOpen(true)}
-                        className="h-full rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]"
+                        className="h-full rounded-none border-0 bg-transparent px-4 text-white/90 hover:text-white hover:bg-[#14141a]"
                       >
                         <UserPlus className="h-4 w-4 mr-2" />
                         <span className="font-semibold">{dictionary.users.createUser}</span>

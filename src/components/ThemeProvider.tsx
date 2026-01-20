@@ -19,28 +19,53 @@ export function ThemeProvider({
   children: React.ReactNode;
   forcedTheme?: Theme;
 }) {
-  const effectiveTheme = useMemo<Theme>(() => forcedTheme ?? 'dark', [forcedTheme]);
-  const [theme, setThemeState] = useState<Theme>(effectiveTheme);
+  const effectiveTheme = useMemo<Theme | undefined>(() => forcedTheme, [forcedTheme]);
+  const [theme, setThemeState] = useState<Theme>('light');
 
   useEffect(() => {
-    setThemeState(effectiveTheme);
+    const applyTheme = (nextTheme: Theme) => {
+      const root = document.documentElement;
+      root.classList.toggle('dark', nextTheme === 'dark');
+      root.dataset.theme = nextTheme;
+    };
 
-    // Dark-only: never remove `dark` (avoids a brief light-mode paint).
-    document.documentElement.classList.remove('light');
-    document.documentElement.classList.add('dark');
+    if (effectiveTheme) {
+      setThemeState(effectiveTheme);
+      applyTheme(effectiveTheme);
+      return;
+    }
+
+    const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('dna-theme') : null;
+    const systemPrefersDark =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    const initialTheme: Theme =
+      storedTheme === 'light' || storedTheme === 'dark'
+        ? (storedTheme as Theme)
+        : systemPrefersDark
+          ? 'dark'
+          : 'light';
+
+    setThemeState(initialTheme);
+    applyTheme(initialTheme);
   }, [effectiveTheme]);
 
   const setTheme = (newTheme: Theme) => {
-    // Dark-only.
-    if (newTheme !== 'dark') return;
-    setThemeState('dark');
-    document.documentElement.classList.remove('light');
-    document.documentElement.classList.add('dark');
+    if (effectiveTheme) return;
+    setThemeState(newTheme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dna-theme', newTheme);
+    }
+    const root = document.documentElement;
+    root.classList.toggle('dark', newTheme === 'dark');
+    root.dataset.theme = newTheme;
   };
 
   const toggleTheme = () => {
-    // Dark-only.
-    return;
+    if (effectiveTheme) return;
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (

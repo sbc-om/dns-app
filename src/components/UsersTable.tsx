@@ -222,9 +222,9 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
 
   if (users.length === 0) {
     return (
-      <div className="text-center py-16 px-4 bg-white dark:bg-[#262626] rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000]">
+      <div className="text-center py-16 px-4 bg-white dark:bg-[#1a1a1a] rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000]">
         <div className="max-w-md mx-auto">
-          <div className="h-16 w-16 rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-50 dark:bg-[#1a1a1a] flex items-center justify-center mx-auto mb-4">
+          <div className="h-16 w-16 rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-gray-50 dark:bg-[#262626] flex items-center justify-center mx-auto mb-4">
             <svg
               className="h-8 w-8 text-purple-600"
               fill="none"
