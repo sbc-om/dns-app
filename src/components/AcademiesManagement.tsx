@@ -395,17 +395,17 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
 
             {/* Quick action (single grouped control) */}
             <div className="w-full lg:w-auto">
-              <div className="relative overflow-hidden rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#262626]/80 backdrop-blur-xl shadow-lg">
+              <div className="relative overflow-hidden rounded-2xl border border-border bg-background/80 backdrop-blur-xl shadow-lg">
                 <motion.div
                   className="absolute inset-0 bg-linear-to-r from-blue-600/8 via-purple-600/8 to-pink-600/8"
                   animate={{ opacity: [0.35, 0.6, 0.35] }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 />
                 <div className="relative p-2">
-                  <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border-2 border-black/60 bg-[#0b0b0f] text-white shadow-lg shadow-black/30">
+                  <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border border-border bg-background text-foreground shadow-lg shadow-black/10 dark:shadow-black/40">
                     <Button
                       onClick={() => setCreateDialogOpen(true)}
-                      className="h-full w-full rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]"
+                      className="h-full w-full rounded-none border-0 bg-transparent px-4 text-foreground hover:bg-accent"
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       <span className="font-semibold">{t.createAcademy || 'Create academy'}</span>
@@ -675,7 +675,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
             <Button
               onClick={handleCreateAcademy}
               disabled={creating || createImageUploading}
-              className="h-12 bg-[#0b0b0f] text-white hover:bg-[#14141a]"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {creating
                 ? (t.creating || 'Creating...')
@@ -749,7 +749,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
             <Button
               onClick={handleAssignManager}
               disabled={assigning || !selectedManagerUserId}
-              className="h-12 bg-[#0b0b0f] text-white hover:bg-[#14141a]"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {assigning ? (t.assigning || 'Assigning...') : (t.assignManagerCta || 'Assign manager')}
             </Button>
@@ -847,7 +847,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
             <Button
               onClick={handleUpdateAcademy}
               disabled={editing || editImageUploading}
-              className="h-12 bg-[#0b0b0f] text-white hover:bg-[#14141a]"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {editing
                 ? (t.updating || 'Updating...')

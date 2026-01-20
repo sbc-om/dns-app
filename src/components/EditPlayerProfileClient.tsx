@@ -288,7 +288,7 @@ export function EditKidProfileClient({
             </Button>
             <Button
               type="submit"
-              className="bg-[#262626] hover:bg-black text-white dark:bg-white dark:hover:bg-gray-200 dark:text-black h-12 px-8 font-semibold transition-colors disabled:opacity-50"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-8 font-semibold transition-colors disabled:opacity-50"
               disabled={loading}
             >
               <Save className="h-4 w-4 mr-2" />

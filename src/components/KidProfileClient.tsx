@@ -1238,7 +1238,7 @@ export function KidProfileClient({
                 <Button
                   type="button"
                   onClick={() => router.push(`/${locale}/dashboard/players/${currentKid.id}/edit`)}
-                  className="w-full h-11 border-2 border-[#DDDDDD] bg-[#0b0b0f] text-white hover:bg-[#14141a] dark:border-[#000000] justify-start ltr:text-left rtl:text-right"
+                  className="w-full h-11 border-2 border-border bg-primary text-primary-foreground hover:bg-primary/90 justify-start ltr:text-left rtl:text-right"
                 >
                   <Edit className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
                   {actionLabel.editProfile}
@@ -1307,7 +1307,7 @@ export function KidProfileClient({
                     type="button"
                     size="sm"
                     onClick={() => router.push(`/${locale}/dashboard/players/${currentKid.id}/edit`)}
-                    className="shrink-0 h-11 rounded-xl border-2 border-[#DDDDDD] bg-[#0b0b0f] text-white hover:bg-[#14141a] dark:border-[#000000]"
+                    className="shrink-0 h-11 rounded-xl border-2 border-border bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     <Edit className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
                     <span className="text-xs font-semibold whitespace-nowrap">{actionLabel.editProfile}</span>
@@ -2935,7 +2935,7 @@ export function KidProfileClient({
             >
               {dictionary.common.cancel}
             </Button>
-            <Button className="bg-[#262626] hover:bg-black text-white" disabled={assessmentSubmitting} onClick={handleCreateAssessment}>
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={assessmentSubmitting} onClick={handleCreateAssessment}>
               {assessmentSubmitting ? dictionary.common.loading : dictionary.common.save}
             </Button>
           </DialogFooter>
@@ -2993,7 +2993,7 @@ export function KidProfileClient({
             >
               {dictionary.common.cancel}
             </Button>
-            <Button className="bg-[#262626] hover:bg-black text-white" disabled={badgeSubmitting || !selectedBadgeId} onClick={handleGrantBadge}>
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={badgeSubmitting || !selectedBadgeId} onClick={handleGrantBadge}>
               {badgeSubmitting ? dictionary.common.loading : dictionary.common.save}
             </Button>
           </DialogFooter>

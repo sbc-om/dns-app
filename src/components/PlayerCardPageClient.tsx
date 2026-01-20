@@ -213,7 +213,7 @@ export function PlayerCardPageClient(props: {
   const outlineButtonClass =
     'h-11 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#111114] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1d]';
   const ctaButtonClass =
-    'h-11 rounded-xl bg-[#0b0b0f] text-white hover:bg-[#14141a] disabled:opacity-60 disabled:hover:bg-[#0b0b0f]';
+    'h-11 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 disabled:hover:bg-primary/90';
 
   // Store refs by card id so we can export each card.
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});

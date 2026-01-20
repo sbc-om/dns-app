@@ -603,28 +603,28 @@ export default function ProgramsManagementClient({ locale, dict }: ProgramsManag
           </div>
 
           <div className="w-full sm:w-auto">
-            <div className="relative overflow-hidden rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#262626]/80 backdrop-blur-xl shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-background/80 backdrop-blur-xl shadow-lg">
               <motion.div
                 className="absolute inset-0 bg-linear-to-r from-blue-600/8 via-purple-600/8 to-pink-600/8"
                 animate={{ opacity: [0.35, 0.6, 0.35] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               />
               <div className="relative p-2">
-                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border-2 border-black/60 bg-[#0b0b0f] text-white shadow-lg shadow-black/30">
+                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border border-border bg-background text-foreground shadow-lg shadow-black/10 dark:shadow-black/40">
                   <div className="flex-1 min-w-0 h-full">
                     <Button
                       onClick={openCreateProgram}
-                      className="h-full w-full justify-center rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]"
+                      className="h-full w-full justify-center rounded-none border-0 bg-transparent px-4 text-foreground hover:bg-accent"
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       <span className="font-semibold">{t?.createProgram || dict.common?.create || 'Create'}</span>
                     </Button>
                   </div>
 
-                  <div className="w-px bg-white/10" />
+                  <div className="w-px bg-border" />
 
                   <div className="shrink-0">
-                    <Button asChild className="h-full rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]">
+                    <Button asChild className="h-full rounded-none border-0 bg-transparent px-4 text-foreground hover:bg-accent">
                       <Link href={`/${locale}/dashboard/programs/members`}>
                         <ShieldCheck className="h-4 w-4 mr-2" />
                         <span className="font-semibold">{t?.membersTitle || 'Members'}</span>
@@ -889,17 +889,17 @@ export default function ProgramsManagementClient({ locale, dict }: ProgramsManag
                     </div>
 
                     <div className="w-full lg:w-auto">
-                      <div className="relative overflow-hidden rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#262626]/80 backdrop-blur-xl shadow-lg">
+                      <div className="relative overflow-hidden rounded-2xl border border-border bg-background/80 backdrop-blur-xl shadow-lg">
                         <motion.div
                           className="absolute inset-0 bg-linear-to-r from-blue-600/8 via-purple-600/8 to-pink-600/8"
                           animate={{ opacity: [0.35, 0.6, 0.35] }}
                           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                         />
                         <div className="relative p-2">
-                          <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border-2 border-black/60 bg-[#0b0b0f] text-white shadow-lg shadow-black/30">
+                          <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border border-border bg-background text-foreground shadow-lg shadow-black/10 dark:shadow-black/40">
                             <Button
                               onClick={openCreateLevel}
-                              className="h-full w-full justify-center rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]"
+                              className="h-full w-full justify-center rounded-none border-0 bg-transparent px-4 text-foreground hover:bg-accent"
                             >
                               <Plus className="h-4 w-4 mr-2" />
                               <span className="font-semibold">{t?.createLevel || 'Create Level'}</span>
@@ -1161,7 +1161,7 @@ export default function ProgramsManagementClient({ locale, dict }: ProgramsManag
             <Button
               onClick={() => void saveProgram()}
               disabled={programImageUploading}
-              className="h-12 bg-[#0b0b0f] text-white hover:bg-[#14141a]"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {dict.common?.save || 'Save'}
             </Button>
@@ -1314,7 +1314,7 @@ export default function ProgramsManagementClient({ locale, dict }: ProgramsManag
             <Button
               onClick={() => void saveLevel()}
               disabled={levelImageUploading}
-              className="h-12 bg-[#0b0b0f] text-white hover:bg-[#14141a]"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {dict.common?.save || 'Save'}
             </Button>

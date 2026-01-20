@@ -623,7 +623,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button 
-                            className="w-full h-10 bg-[#262626] hover:bg-black text-white dark:bg-white dark:hover:bg-gray-200 dark:text-black active:scale-95 transition-transform"
+                            className="w-full h-10 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-transform"
                           >
                             <MoreVertical className="w-4 h-4 mr-2" />
                             {locale === 'ar' ? 'تغيير الحالة' : 'Change Status'}
@@ -847,7 +847,7 @@ export default function PaymentsClient({ locale, dict, currentUser }: PaymentsCl
                     ? 'bg-green-600 hover:bg-green-700 text-white'
                     : newStatus === 'rejected'
                     ? 'bg-red-600 hover:bg-red-700 text-white'
-                    : 'bg-[#262626] hover:bg-black text-white dark:bg-white dark:hover:bg-gray-200 dark:text-black'
+                    : 'bg-primary text-primary-foreground hover:bg-primary/90'
                 }`}
               >
                 {updating ? (

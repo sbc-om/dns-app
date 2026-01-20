@@ -295,7 +295,7 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
               asChild
               onClick={handleSave}
               disabled={saving}
-              className="h-12 bg-[#262626] hover:bg-black text-white dark:bg-white dark:hover:bg-gray-200 dark:text-black"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
                 <Save className="h-4 w-4 mr-2" />
@@ -334,7 +334,7 @@ export default function AdminSettingsClient({ locale, dict }: AdminSettingsClien
                     className="h-12 bg-white dark:bg-[#262626] border-2 border-[#DDDDDD] dark:border-[#000000] focus:border-gray-400 dark:focus:border-gray-600 text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
-                <Button asChild onClick={handleAddCategory} disabled={addingCategory} className="h-12 bg-[#262626] hover:bg-black text-white dark:bg-white dark:hover:bg-gray-200 dark:text-black">
+                <Button asChild onClick={handleAddCategory} disabled={addingCategory} className="h-12 bg-primary text-primary-foreground hover:bg-primary/90">
                   <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
                     <Plus className="w-4 h-4 mr-2" />
                     {addingCategory ? (dict.adminSettings?.addingCategory || dict.common?.loading || 'Loading...') : (dict.adminSettings?.addCategory || 'Add')}

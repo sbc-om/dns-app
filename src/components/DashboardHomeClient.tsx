@@ -98,38 +98,38 @@ export function DashboardHomeClient({
 
           {/* Quick actions (role-aware) */}
           <div className="w-full lg:w-auto">
-            <div className="relative overflow-hidden rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#262626]/80 backdrop-blur-xl shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl border-2 border-border bg-background/80 backdrop-blur-xl shadow-lg">
               <motion.div
                 className="absolute inset-0 bg-linear-to-r from-blue-600/8 via-purple-600/8 to-pink-600/8"
                 animate={{ opacity: [0.35, 0.6, 0.35] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               />
               <div className="relative p-2">
-                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border-2 border-black/60 bg-[#0b0b0f] text-white shadow-lg shadow-black/30">
+                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border-2 border-border bg-background text-foreground shadow-lg shadow-black/10 dark:shadow-black/40">
                   {user.role === 'admin' ? (
                     <Link href={`/${locale}/dashboard/users`} className="h-full w-full">
-                      <Button className="h-full w-full rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]">
+                      <Button className="h-full w-full rounded-none border-0 bg-transparent px-4 text-foreground hover:bg-accent">
                         <Users className="h-4 w-4 mr-2" />
                         <span className="font-semibold">{dictionary.nav?.users || 'Users'}</span>
                       </Button>
                     </Link>
                   ) : user.role === 'manager' ? (
                     <Link href={`/${locale}/dashboard/users`} className="h-full w-full">
-                      <Button className="h-full w-full rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]">
+                      <Button className="h-full w-full rounded-none border-0 bg-transparent px-4 text-foreground hover:bg-accent">
                         <Users className="h-4 w-4 mr-2" />
                         <span className="font-semibold">{dictionary.nav?.users || 'Users'}</span>
                       </Button>
                     </Link>
                   ) : user.role === 'coach' ? (
                     <Link href={`/${locale}/dashboard/programs`} className="h-full w-full">
-                      <Button className="h-full w-full rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]">
+                      <Button className="h-full w-full rounded-none border-0 bg-transparent px-4 text-foreground hover:bg-accent">
                         <BookOpen className="h-4 w-4 mr-2" />
                         <span className="font-semibold">{dictionary.nav?.programs || 'Programs'}</span>
                       </Button>
                     </Link>
                   ) : (
                     <Link href={`/${locale}/dashboard/profile`} className="h-full w-full">
-                      <Button className="h-full w-full rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]">
+                      <Button className="h-full w-full rounded-none border-0 bg-transparent px-4 text-foreground hover:bg-accent">
                         <User className="h-4 w-4 mr-2" />
                         <span className="font-semibold">{dictionary.nav?.settings || 'Settings'}</span>
                       </Button>

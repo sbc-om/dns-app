@@ -300,23 +300,23 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
           </div>
 
           <div className="w-full lg:w-auto">
-            <div className="relative overflow-hidden rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#262626]/80 backdrop-blur-xl shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-background/80 backdrop-blur-xl shadow-lg">
               <motion.div
                 className="absolute inset-0 bg-linear-to-r from-blue-600/8 via-purple-600/8 to-pink-600/8"
                 animate={{ opacity: [0.35, 0.6, 0.35] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               />
               <div className="relative p-2">
-                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border-2 border-black/60 bg-[#0b0b0f] text-white shadow-lg shadow-black/30">
+                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border border-border bg-background text-foreground shadow-lg shadow-black/10 dark:shadow-black/40">
                   <div className="flex-1 min-w-0 h-full">
                     <Select value={activeRole} onValueChange={(v) => setActiveRole(v as UserRole)}>
-                      <SelectTrigger className="h-full! w-full rounded-none border-0 bg-transparent px-4 py-0! text-white hover:bg-[#14141a]">
+                      <SelectTrigger className="h-full! w-full rounded-none border-0 bg-transparent px-4 py-0! text-foreground hover:bg-accent">
                         <div className="flex h-full w-full items-center gap-2 min-w-0">
-                          <Shield className="h-4 w-4 text-white/90 shrink-0" />
+                          <Shield className="h-4 w-4 text-foreground shrink-0" />
                           <SelectValue placeholder={dictionary.roles?.filterByRole || 'Filter by role'} className="leading-none" />
                         </div>
                       </SelectTrigger>
-                      <SelectContent align="start" className="rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
+                      <SelectContent align="start" className="rounded-xl border border-border bg-popover text-popover-foreground">
                         {roleOptions.map((opt) => {
                           const dirty = isRoleDirty(opt.key);
                           return (
@@ -337,11 +337,11 @@ export function RolesPermissionsClient({ dictionary, initialRolePermissions, loc
                     </Select>
                   </div>
 
-                  <div className="w-px bg-white/10" />
+                  <div className="w-px bg-border" />
 
                   <div className="shrink-0">
                     <Link href={`/${locale}/dashboard/users`} className="h-full">
-                      <Button className="h-full rounded-none border-0 bg-transparent px-4 text-white hover:bg-[#14141a]">
+                      <Button className="h-full rounded-none border-0 bg-transparent px-4 text-foreground hover:bg-accent">
                         <Users className="mr-2 h-4 w-4" />
                         <span className="font-semibold">{dictionary.nav.users}</span>
                       </Button>

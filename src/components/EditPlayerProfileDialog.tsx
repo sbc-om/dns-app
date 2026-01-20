@@ -388,7 +388,7 @@ export function EditKidProfileDialog({
                       {dictionary.common.cancel}
                     </motion.button>
                   </Button>
-                  <Button asChild type="submit" disabled={loading} className="rounded-xl bg-[#0b0b0f] text-white hover:bg-[#14141a]">
+                  <Button asChild type="submit" disabled={loading} className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
                     <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="h-12">
                       {loading ? dictionary.common.loading : dictionary.common.save}
                     </motion.button>

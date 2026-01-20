@@ -228,7 +228,7 @@ export function SchedulesClient({ dictionary, locale }: SchedulesClientProps) {
                 <Button
                   type="submit"
                   disabled={isCreating}
-                  className="h-12 w-full md:w-auto justify-center rounded-xl border-2 border-black/60 bg-[#0b0b0f] text-white hover:bg-[#14141a] px-6"
+                  className="h-12 w-full md:w-auto justify-center rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 px-6"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   <span className="font-semibold">

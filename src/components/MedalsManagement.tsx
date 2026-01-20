@@ -197,7 +197,7 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
                 <div className="relative p-2">
                   <Button
                     onClick={() => handleOpenDialog()}
-                    className="h-12 w-full justify-center rounded-xl border-2 border-black/60 bg-[#0b0b0f] text-white hover:bg-[#14141a] px-6"
+                    className="h-12 w-full justify-center rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 px-6"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     <span className="font-semibold">{dictionary.settings.createMedal}</span>
@@ -410,7 +410,7 @@ export function MedalsManagement({ dictionary }: MedalsManagementProps) {
             <Button
               onClick={handleSave}
               disabled={!formData.name || !formData.nameAr || saving}
-              className="h-12 bg-[#0b0b0f] text-white hover:bg-[#14141a]"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {saving ? (dictionary.common?.loading || 'Saving...') : (dictionary.common.save)}
             </Button>

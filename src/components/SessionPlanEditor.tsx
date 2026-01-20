@@ -343,7 +343,7 @@ export function SessionPlanEditor({
         <div>
           <div className="flex items-center justify-between mb-2">
             <Label>{dictionary.courses?.activities || 'Activities'}</Label>
-            <Button type="button" size="sm" onClick={addActivity} className="bg-[#FF5F02] hover:bg-[#262626] text-white">
+            <Button type="button" size="sm" onClick={addActivity} className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Plus className="w-4 h-4 mr-1" />
               {dictionary.common?.add || 'Add'}
             </Button>

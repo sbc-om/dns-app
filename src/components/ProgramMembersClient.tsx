@@ -64,7 +64,7 @@ export default function ProgramMembersClient({ locale, dict }: ProgramMembersCli
     'h-12 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white dark:bg-[#111114] text-[#262626] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500';
   const outlineButtonClass =
     'h-11 rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#111114] text-[#262626] dark:text-white hover:bg-gray-50 dark:hover:bg-[#1a1a1d]';
-  const ctaButtonClass = 'h-11 rounded-xl bg-[#0b0b0f] text-white hover:bg-[#14141a]';
+  const ctaButtonClass = 'h-11 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90';
 
   const [programs, setPrograms] = useState<Program[]>([]);
   const [selectedProgramId, setSelectedProgramId] = useState<string>('');
@@ -554,7 +554,7 @@ export default function ProgramMembersClient({ locale, dict }: ProgramMembersCli
                         </div>
                         <div className="text-xs text-muted-foreground truncate">{p.email}</div>
                       </div>
-                      <Button asChild className="h-10 rounded-xl bg-[#0b0b0f] text-white hover:bg-[#14141a]">
+                      <Button asChild className="h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
                         <motion.button type="button" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => void addPlayer(p.id)}>
                           <Plus className="h-4 w-4 mr-2" />
                           {dict.common?.add || 'Add'}

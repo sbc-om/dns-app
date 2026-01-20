@@ -329,7 +329,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
               <Button
                 onClick={handleCreateAcademy}
                 disabled={creating}
-                className="h-12 bg-[#262626] hover:bg-black text-white active:scale-95 transition-colors"
+                className="h-12 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-colors"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 {creating ? (dictionary.common?.loading || 'Loading...') : 'Create Academy'}
@@ -404,7 +404,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
 
                   <Button
                     onClick={() => void openAssignManager(a.id)}
-                    className="h-10 bg-[#262626] hover:bg-black text-white active:scale-95 transition-colors"
+                    className="h-10 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-colors"
                   >
                     <UserPlus className="h-4 w-4 mr-2" />
                     Assign Manager
@@ -480,7 +480,7 @@ export function AcademiesManagement(props: { locale: string; dictionary: any }) 
             <Button
               onClick={handleAssignManager}
               disabled={assigning}
-              className="h-12 bg-[#262626] hover:bg-black text-white active:scale-95 transition-colors"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-colors"
             >
               {assigning ? (dictionary.common?.loading || 'Loading...') : 'Assign'}
             </Button>

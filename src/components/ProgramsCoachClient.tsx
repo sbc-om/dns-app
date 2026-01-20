@@ -400,7 +400,7 @@ export default function ProgramsCoachClient({ locale, dict }: ProgramsCoachClien
               <Button
                 onClick={() => void saveAttendance()}
                 disabled={!selectedProgramId || attendanceSaving || attendanceLoading}
-                className="h-12 rounded-xl bg-[#0b0b0f] text-white hover:bg-[#14141a]"
+                className="h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <Save className="h-4 w-4 mr-2" />
                 {dict.common.save}
@@ -694,7 +694,7 @@ export default function ProgramsCoachClient({ locale, dict }: ProgramsCoachClien
             <Button variant="outline" className="h-12 border-2" onClick={() => setNoteDialogOpen(false)}>
               {dict.common.cancel}
             </Button>
-            <Button className="h-12 bg-[#0b0b0f] text-white hover:bg-[#14141a]" onClick={() => void submitNote()} disabled={noteSubmitting}>
+            <Button className="h-12 bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => void submitNote()} disabled={noteSubmitting}>
               {dict.common.save}
             </Button>
           </DialogFooter>
@@ -736,7 +736,7 @@ export default function ProgramsCoachClient({ locale, dict }: ProgramsCoachClien
               {dict.common.cancel}
             </Button>
             <Button
-              className="h-12 bg-[#0b0b0f] text-white hover:bg-[#14141a]"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={() => void submitBadge()}
               disabled={badgeSubmitting || !selectedBadgeId}
             >

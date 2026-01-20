@@ -159,25 +159,25 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
 
           {/* Mobile-first toolbar: role filter + add user in the same row */}
           <div className="w-full sm:w-auto">
-            <div className="relative overflow-hidden rounded-2xl bg-white/70 dark:bg-[#1a1a1a]/70 backdrop-blur-xl shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-background/70 backdrop-blur-xl shadow-lg">
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-blue-600/8 via-purple-600/8 to-pink-600/8"
                 animate={{ opacity: [0.35, 0.6, 0.35] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               />
               <div className="relative p-2">
-                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl bg-[#0b0b0f]/90 text-white shadow-lg shadow-black/25">
+                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border border-border bg-background text-foreground shadow-lg shadow-black/10 dark:shadow-black/40">
                   <div className="flex-1 min-w-0 h-full">
                     <Select value={selectedRole} onValueChange={setSelectedRole}>
                       <SelectTrigger
-                        className="h-full w-full rounded-none border-0 bg-transparent px-4 py-0 text-white/90 hover:text-white hover:bg-[#14141a]"
+                        className="h-full w-full rounded-none border-0 bg-transparent px-4 py-0 text-foreground hover:bg-accent"
                       >
                         <div className="flex h-full w-full items-center gap-2 min-w-0">
-                          <Shield className="h-4 w-4 text-white/90 shrink-0" />
+                          <Shield className="h-4 w-4 text-foreground shrink-0" />
                           <SelectValue placeholder={dictionary.users.filterByRole} className="leading-none" />
                         </div>
                       </SelectTrigger>
-                      <SelectContent align="start" className="rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
+                      <SelectContent align="start" className="rounded-xl border border-border bg-popover text-popover-foreground">
                         {roleOptions.map((opt) => (
                           <SelectItem key={opt.key} value={opt.key}>
                             <span className="flex w-full items-center justify-between gap-3">
@@ -192,18 +192,18 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
                     </Select>
                   </div>
 
-                  <div className="w-px bg-white/10" />
+                  <div className="w-px bg-border" />
 
                   <div className="shrink-0">
                     {currentUserRole === 'manager' ? (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button className="h-full rounded-none border-0 bg-transparent px-4 text-white/90 hover:text-white hover:bg-[#14141a]">
+                          <Button className="h-full rounded-none border-0 bg-transparent px-4 text-foreground hover:bg-accent">
                             <UserPlus className="h-4 w-4 mr-2" />
                             <span className="font-semibold">{dictionary.common.add}</span>
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
+                        <DropdownMenuContent align="end" className="rounded-xl border border-border bg-popover text-popover-foreground">
                           <DropdownMenuItem onClick={() => setIsCreatePlayerDialogOpen(true)} className="cursor-pointer">
                             <Plus className="mr-2 h-4 w-4" />
                             {dictionary.users.addPlayer}
@@ -217,7 +217,7 @@ export function UsersClient({ dictionary, initialUsers, locale, currentUserRole 
                     ) : (
                       <Button
                         onClick={() => setIsCreatePlayerDialogOpen(true)}
-                        className="h-full rounded-none border-0 bg-transparent px-4 text-white/90 hover:text-white hover:bg-[#14141a]"
+                        className="h-full rounded-none border-0 bg-transparent px-4 text-foreground hover:bg-accent"
                       >
                         <UserPlus className="h-4 w-4 mr-2" />
                         <span className="font-semibold">{dictionary.users.createUser}</span>

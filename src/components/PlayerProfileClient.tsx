@@ -793,13 +793,13 @@ export function KidProfileClient({
             >
               <div className="pb-1">
                 <TabsList
-                  className={`inline-flex w-max min-w-full items-center gap-1 rounded-xl border-2 border-black/60 bg-[#0b0b0f] p-1 shadow-lg shadow-black/30 ${
+                  className={`inline-flex w-max min-w-full items-center gap-1 rounded-xl border border-border bg-background/90 p-1 shadow-lg shadow-black/10 dark:shadow-black/40 ${
                     locale === 'ar' ? 'flex-row-reverse justify-end' : 'justify-start'
                   }`}
                 >
                   <TabsTrigger
                     value="overview"
-                    className={`gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15 ${
+                    className={`gap-2 whitespace-nowrap border border-transparent text-foreground/70 hover:bg-accent hover:text-foreground data-[state=active]:bg-accent data-[state=active]:text-foreground data-[state=active]:border-border ${
                       locale === 'ar' ? 'flex-row-reverse' : ''
                     }`}
                   >
@@ -808,7 +808,7 @@ export function KidProfileClient({
                   </TabsTrigger>
                   <TabsTrigger
                     value="assessments"
-                    className={`gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15 ${
+                    className={`gap-2 whitespace-nowrap border border-transparent text-foreground/70 hover:bg-accent hover:text-foreground data-[state=active]:bg-accent data-[state=active]:text-foreground data-[state=active]:border-border ${
                       locale === 'ar' ? 'flex-row-reverse' : ''
                     }`}
                   >
@@ -817,7 +817,7 @@ export function KidProfileClient({
                   </TabsTrigger>
                   <TabsTrigger
                     value="badges"
-                    className={`gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15 ${
+                    className={`gap-2 whitespace-nowrap border border-transparent text-foreground/70 hover:bg-accent hover:text-foreground data-[state=active]:bg-accent data-[state=active]:text-foreground data-[state=active]:border-border ${
                       locale === 'ar' ? 'flex-row-reverse' : ''
                     }`}
                   >
@@ -826,7 +826,7 @@ export function KidProfileClient({
                   </TabsTrigger>
                   <TabsTrigger
                     value="achievements"
-                    className={`gap-2 whitespace-nowrap border border-transparent text-white/80 hover:bg-[#14141a] hover:text-white data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:border-white/15 ${
+                    className={`gap-2 whitespace-nowrap border border-transparent text-foreground/70 hover:bg-accent hover:text-foreground data-[state=active]:bg-accent data-[state=active]:text-foreground data-[state=active]:border-border ${
                       locale === 'ar' ? 'flex-row-reverse' : ''
                     }`}
                   >
@@ -1312,7 +1312,7 @@ export function KidProfileClient({
             >
               {dictionary.common.cancel}
             </Button>
-            <Button className="bg-[#262626] hover:bg-black text-white" disabled={assessmentSubmitting} onClick={handleCreateAssessment}>
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={assessmentSubmitting} onClick={handleCreateAssessment}>
               {assessmentSubmitting ? dictionary.common.loading : dictionary.common.save}
             </Button>
           </DialogFooter>
@@ -1354,7 +1354,7 @@ export function KidProfileClient({
             >
               {dictionary.common.cancel}
             </Button>
-            <Button className="bg-[#262626] hover:bg-black text-white" disabled={badgeSubmitting || !selectedBadgeId} onClick={handleGrantBadge}>
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={badgeSubmitting || !selectedBadgeId} onClick={handleGrantBadge}>
               {badgeSubmitting ? dictionary.common.loading : dictionary.common.save}
             </Button>
           </DialogFooter>

@@ -788,7 +788,7 @@ export default function CoachProgramsViewProfessional({ locale, dict }: Programs
               {dict.common?.cancel || 'Cancel'}
             </Button>
             <Button
-              className="h-12 bg-[#0b0b0f] text-white hover:bg-[#14141a]"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={() => void submitNote()}
               disabled={noteSubmitting}
             >
@@ -838,7 +838,7 @@ export default function CoachProgramsViewProfessional({ locale, dict }: Programs
               {dict.common?.cancel || 'Cancel'}
             </Button>
             <Button
-              className="h-12 bg-[#0b0b0f] text-white hover:bg-[#14141a]"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={() => void submitBadge()}
               disabled={badgeSubmitting || !selectedBadgeId}
             >

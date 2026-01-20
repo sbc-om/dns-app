@@ -154,9 +154,14 @@ const SidebarContent = ({
           className="shrink-0 relative"
         >
           <img 
+            src="/logo-black.png" 
+            alt="DNA Logo" 
+            className="h-16 w-auto object-contain dark:hidden"
+          />
+          <img 
             src="/logo-white.png" 
             alt="DNA Logo" 
-            className="h-16 w-auto object-contain"
+            className="h-16 w-auto object-contain hidden dark:block"
           />
         </motion.div>
         <AnimatePresence>
@@ -417,9 +422,14 @@ export function DashboardSidebar({
                     whileTap={{ scale: 0.95 }}
                   >
                     <img 
+                      src="/logo-black.png" 
+                      alt="DNA Logo" 
+                      className="h-14 w-auto object-contain dark:hidden"
+                    />
+                    <img 
                       src="/logo-white.png" 
                       alt="DNA Logo" 
-                      className="h-14 w-auto object-contain"
+                      className="h-14 w-auto object-contain hidden dark:block"
                     />
                   </motion.div>
                   <div>

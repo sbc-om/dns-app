@@ -435,7 +435,7 @@ export function EditUserDialog({
                       {dictionary.common.cancel}
                     </motion.button>
                   </Button>
-                  <Button asChild type="submit" disabled={isSubmitting} className="rounded-xl bg-[#262626] text-white hover:bg-black dark:bg-white dark:text-[#262626] dark:hover:bg-gray-100">
+                  <Button asChild type="submit" disabled={isSubmitting} className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
                     <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                       {isSubmitting ? dictionary.common.loading : dictionary.common.save}
                     </motion.button>

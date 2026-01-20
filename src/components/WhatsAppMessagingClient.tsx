@@ -757,7 +757,7 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
                     <Button variant="outline" onClick={() => setProfileDialogOpen(false)} className="border-2">
                       {t?.cancel || 'Cancel'}
                     </Button>
-                    <Button onClick={handleSaveProfile} disabled={isSavingProfile} className="bg-[#262626] hover:bg-[#1f1f1f] text-white">
+                    <Button onClick={handleSaveProfile} disabled={isSavingProfile} className="bg-primary text-primary-foreground hover:bg-primary/90">
                       {isSavingProfile ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin mr-2 rtl:mr-0 rtl:ml-2" />
@@ -1072,7 +1072,7 @@ export default function WhatsAppMessagingClient({ dictionary, locale }: WhatsApp
                       <Button variant="outline" onClick={() => setGroupDialogOpen(false)} className="border-2">
                         {t?.cancel || 'Cancel'}
                       </Button>
-                      <Button onClick={handleSaveGroup} disabled={isSavingGroup} className="bg-green-600 hover:bg-green-700 text-white">
+                      <Button onClick={handleSaveGroup} disabled={isSavingGroup} className="bg-primary text-primary-foreground hover:bg-primary/90">
                         {isSavingGroup ? (
                           <>
                             <Loader2 className="h-4 w-4 animate-spin mr-2 rtl:mr-0 rtl:ml-2" />

@@ -178,23 +178,23 @@ export function HealthTestsClient({ dictionary, locale, requests, academies }: H
 
           {/* Professional Filter Controls */}
           <div className="w-full sm:w-auto">
-            <div className="relative overflow-hidden rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000] bg-white/80 dark:bg-[#262626]/80 backdrop-blur-xl shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-background/80 backdrop-blur-xl shadow-lg">
               <motion.div
                 className="absolute inset-0 bg-linear-to-r from-green-600/8 via-emerald-600/8 to-teal-600/8"
                 animate={{ opacity: [0.35, 0.6, 0.35] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               />
               <div className="relative p-2">
-                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border-2 border-black/60 bg-[#0b0b0f] text-white shadow-lg shadow-black/30">
+                <div className="flex h-12 w-full items-stretch overflow-hidden rounded-xl border border-border bg-background text-foreground shadow-lg shadow-black/10 dark:shadow-black/40">
                   <div className="flex-1 min-w-0 h-full">
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="h-full! w-full rounded-none border-0 bg-transparent px-4 py-0! text-white hover:bg-[#14141a]">
+                      <SelectTrigger className="h-full! w-full rounded-none border-0 bg-transparent px-4 py-0! text-foreground hover:bg-accent">
                         <div className={`flex h-full w-full items-center gap-2 min-w-0 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
-                          <Stethoscope className="h-4 w-4 text-white/90 shrink-0" />
+                          <Stethoscope className="h-4 w-4 text-foreground shrink-0" />
                           <SelectValue placeholder={healthTestsDict.filterByStatus || 'Filter by status'} className="leading-none" />
                         </div>
                       </SelectTrigger>
-                      <SelectContent align="start" className="rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
+                      <SelectContent align="start" className="rounded-xl border border-border bg-popover text-popover-foreground">
                         {statusOptions.map((opt) => (
                           <SelectItem key={opt.key} value={opt.key}>
                             <span className={`flex w-full items-center justify-between gap-3 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
@@ -209,17 +209,17 @@ export function HealthTestsClient({ dictionary, locale, requests, academies }: H
                     </Select>
                   </div>
 
-                  <div className="w-px bg-white/10" />
+                  <div className="w-px bg-border" />
 
                   <div className="flex-1 min-w-0 h-full">
                     <Select value={selectedAcademy} onValueChange={setSelectedAcademy}>
-                      <SelectTrigger className="h-full! w-full rounded-none border-0 bg-transparent px-4 py-0! text-white hover:bg-[#14141a]">
+                      <SelectTrigger className="h-full! w-full rounded-none border-0 bg-transparent px-4 py-0! text-foreground hover:bg-accent">
                         <div className={`flex h-full w-full items-center gap-2 min-w-0 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
-                          <Building2 className="h-4 w-4 text-white/90 shrink-0" />
+                          <Building2 className="h-4 w-4 text-foreground shrink-0" />
                           <SelectValue placeholder={healthTestsDict.filterByAcademy || 'Filter by academy'} className="leading-none" />
                         </div>
                       </SelectTrigger>
-                      <SelectContent align="start" className="rounded-xl border-2 border-[#DDDDDD] dark:border-[#000000]">
+                      <SelectContent align="start" className="rounded-xl border border-border bg-popover text-popover-foreground">
                         {academyOptions.map((opt) => (
                           <SelectItem key={opt.key} value={opt.key}>
                             <span className={`flex w-full items-center justify-between gap-3 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>

@@ -188,7 +188,7 @@ export function ParentProfileClient({
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Button
                 onClick={() => setAddChildOpen(true)}
-                className="h-12 px-5 bg-[#0b0b0f] text-white hover:bg-[#14141a] border-2 border-transparent font-bold shadow-lg"
+                className="h-12 px-5 bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-transparent font-bold shadow-lg"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 {dictionary.users.addChild || 'Add Child'}

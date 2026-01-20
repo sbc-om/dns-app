@@ -279,7 +279,7 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
                     asChild
                     onClick={handleCreateBackup}
                     disabled={loading}
-                    className="h-12 px-6 bg-[#262626] hover:bg-black text-white disabled:opacity-50 dark:bg-white dark:text-[#262626] dark:hover:bg-gray-100"
+                    className="h-12 px-6 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                   >
                     <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
                       <Download className="mr-2 h-4 w-4" />
@@ -303,7 +303,7 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
                     asChild
                     onClick={handleRestoreBackup}
                     disabled={restoring}
-                    className="h-12 px-6 bg-[#262626] hover:bg-black text-white disabled:opacity-50 dark:bg-white dark:text-[#262626] dark:hover:bg-gray-100"
+                    className="h-12 px-6 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                   >
                     <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
                       <Upload className="mr-2 h-4 w-4" />
@@ -349,7 +349,7 @@ export function SettingsClient({ dictionary, locale, permissions }: SettingsClie
                             asChild
                             size="sm"
                             onClick={() => handleDownloadBackup(backup.filename)}
-                            className="h-10 bg-[#262626] hover:bg-black text-white dark:bg-white dark:text-[#262626] dark:hover:bg-gray-100"
+                            className="h-10 bg-primary text-primary-foreground hover:bg-primary/90"
                           >
                             <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
                               <Download className="h-4 w-4" />
