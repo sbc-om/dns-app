@@ -15,6 +15,7 @@ import {
   MessageCircle,
   Stethoscope,
   Medal,
+  BookOpen,
   
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -80,6 +81,13 @@ const menuItems: MenuItem[] = [
     labelKey: 'programs',
     href: '/dashboard/programs',
     icon: Layers,
+  },
+  {
+    key: 'courses',
+    resourceKey: 'dashboard.courses',
+    labelKey: 'courses',
+    href: '/dashboard/courses',
+    icon: BookOpen,
   },
   {
     key: 'messages',

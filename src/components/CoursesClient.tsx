@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit, Trash2, Clock, Users, Search, Filter, Trophy } from 'lucide-react';
@@ -70,10 +70,25 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
   // Use all available categories for filtering
   const filterOptions = [ALL_CATEGORIES, ...categories.map((c) => c.name)];
 
+  const categoryCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const course of courses) {
+      const key = course.category || '';
+      if (!key) continue;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    return counts;
+  }, [courses]);
+
   const getCategoryLabel = (name: string) => {
     if (name === ALL_CATEGORIES) return dict.courses?.allCategories || 'All';
     const category = categories.find(c => c.name === name);
     return category ? (locale === 'ar' ? category.nameAr : category.name) : name;
+  };
+
+  const getCategoryCount = (name: string) => {
+    if (name === ALL_CATEGORIES) return courses.length;
+    return categoryCounts.get(name) || 0;
   };
 
   const filteredCourses = courses.filter(course => {
@@ -192,67 +207,137 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
         </div>
       </div>
 
-      {/* Search and Filter Bar */}
-      <Card className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl shadow-black/30">
-        <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-white/5 via-transparent to-white/5" />
-        <CardContent className="relative pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search Input */}
-            <div className="relative flex-1">
-              <Search
-                className={`absolute top-3.5 h-5 w-5 text-[#FF5F02] ${locale === 'ar' ? 'right-3' : 'left-3'}`}
-              />
-              <Input
-                placeholder={dict.courses?.searchPlaceholder || dict.common?.search || 'Search'}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`${locale === 'ar' ? 'pr-10' : 'pl-10'} h-12 rounded-2xl bg-black/20 border border-white/10 text-white placeholder:text-white/40 focus-visible:ring-0 focus-visible:border-[#FF5F02]/60`}
-              />
-            </div>
-
-            {/* Category Filter Select */}
-            <div className="w-full md:w-72 flex items-center gap-3">
-              <div className="p-2 rounded-2xl bg-white/10 ring-1 ring-white/10">
-                <Filter className="h-5 w-5 text-[#FF5F02]" />
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Categories Sidebar */}
+        <aside className="lg:w-72">
+          <Card className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl shadow-black/30">
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10" />
+            <CardHeader className="relative pb-4">
+              <div className="flex items-center gap-3">
+                <motion.div
+                  animate={{ rotate: [0, -8, 8, -8, 0] }}
+                  transition={{ duration: 1.4, repeat: Infinity, repeatDelay: 3 }}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15"
+                >
+                  <Filter className="h-5 w-5 text-[#FF5F02]" />
+                </motion.div>
+                <div>
+                  <CardTitle className="text-lg text-white">
+                    {dict.courses?.categoriesTitle || 'Categories'}
+                  </CardTitle>
+                  <CardDescription className="text-white/60">
+                    {dict.courses?.categoriesSubtitle || 'Filter products by category'}
+                  </CardDescription>
+                </div>
               </div>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full h-12 rounded-2xl bg-black/20 border border-white/10 text-white hover:bg-white/5 focus:ring-0 focus:border-[#FF5F02]/60">
-                  <SelectValue placeholder={dict.courses?.selectCategory || ''} />
-                </SelectTrigger>
-                <SelectContent className="bg-[#0b0b10] border border-white/10 text-white">
-                  {filterOptions.map((option) => (
-                    <SelectItem
+            </CardHeader>
+            <CardContent className="relative space-y-2">
+              {filterOptions.length === 1 ? (
+                <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-white/60">
+                  {dict.courses?.noCategories || 'No categories available'}
+                </div>
+              ) : (
+                filterOptions.map((option, index) => {
+                  const isActive = selectedCategory === option;
+                  return (
+                    <motion.button
                       key={option}
-                      value={option}
-                      className="cursor-pointer text-white hover:bg-white/10 focus:bg-white/10"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                      whileHover={{ scale: 1.02, x: locale === 'ar' ? -4 : 4 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setSelectedCategory(option)}
+                      className={`w-full flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left transition-all ${
+                        isActive
+                          ? 'border-[#FF5F02]/60 bg-[#FF5F02]/15 text-white shadow-lg shadow-orange-500/20'
+                          : 'border-white/10 bg-black/20 text-white/70 hover:border-white/20 hover:text-white'
+                      }`}
                     >
-                      {getCategoryLabel(option)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+                      <span className="truncate text-sm font-semibold">
+                        {getCategoryLabel(option)}
+                      </span>
+                      <motion.span
+                        animate={isActive ? { scale: [1, 1.15, 1] } : {}}
+                        transition={{ duration: 1.8, repeat: Infinity }}
+                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                          isActive
+                            ? 'bg-white/10 text-white'
+                            : 'bg-white/5 text-white/60'
+                        }`}
+                      >
+                        {getCategoryCount(option)}
+                      </motion.span>
+                    </motion.button>
+                  );
+                })
+              )}
+            </CardContent>
+          </Card>
+        </aside>
 
-          {/* Results Summary */}
-          <div className="mt-4 flex items-center gap-3 rounded-2xl border border-[#FF5F02]/20 bg-[#FF5F02]/10 px-4 py-2">
-            <motion.div
-              animate={{ scale: [1, 1.25, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="h-2.5 w-2.5 rounded-full bg-[#FF5F02]"
-            />
-            <span className="text-sm font-medium text-white/90">
-              {(dict.courses?.showingResults || 'Showing {shown} of {total} courses')
-                .replace('{shown}', String(filteredCourses.length))
-                .replace('{total}', String(courses.length))}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
+        <div className="flex-1 space-y-6">
+          {/* Search and Filter Bar */}
+          <Card className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl shadow-black/30">
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-white/5 via-transparent to-white/5" />
+            <CardContent className="relative pt-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Search Input */}
+                <div className="relative flex-1">
+                  <Search
+                    className={`absolute top-3.5 h-5 w-5 text-[#FF5F02] ${locale === 'ar' ? 'right-3' : 'left-3'}`}
+                  />
+                  <Input
+                    placeholder={dict.courses?.searchPlaceholder || dict.common?.search || 'Search'}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={`${locale === 'ar' ? 'pr-10' : 'pl-10'} h-12 rounded-2xl bg-black/20 border border-white/10 text-white placeholder:text-white/40 focus-visible:ring-0 focus-visible:border-[#FF5F02]/60`}
+                  />
+                </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <AnimatePresence>
-          {filteredCourses.map((course, index) => {
+                {/* Category Filter Select (mobile) */}
+                <div className="w-full md:w-72 flex items-center gap-3 lg:hidden">
+                  <div className="p-2 rounded-2xl bg-white/10 ring-1 ring-white/10">
+                    <Filter className="h-5 w-5 text-[#FF5F02]" />
+                  </div>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-full h-12 rounded-2xl bg-black/20 border border-white/10 text-white hover:bg-white/5 focus:ring-0 focus:border-[#FF5F02]/60">
+                      <SelectValue placeholder={dict.courses?.selectCategory || ''} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#0b0b10] border border-white/10 text-white">
+                      {filterOptions.map((option) => (
+                        <SelectItem
+                          key={option}
+                          value={option}
+                          className="cursor-pointer text-white hover:bg-white/10 focus:bg-white/10"
+                        >
+                          {getCategoryLabel(option)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Results Summary */}
+              <div className="mt-4 flex items-center gap-3 rounded-2xl border border-[#FF5F02]/20 bg-[#FF5F02]/10 px-4 py-2">
+                <motion.div
+                  animate={{ scale: [1, 1.25, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="h-2.5 w-2.5 rounded-full bg-[#FF5F02]"
+                />
+                <span className="text-sm font-medium text-white/90">
+                  {(dict.courses?.showingResults || 'Showing {shown} of {total} courses')
+                    .replace('{shown}', String(filteredCourses.length))
+                    .replace('{total}', String(courses.length))}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <AnimatePresence>
+              {filteredCourses.map((course, index) => {
             const courseName = locale === 'ar' ? course.nameAr || course.name : course.name;
             const courseDescription = locale === 'ar' ? course.descriptionAr || course.description : course.description;
 
@@ -384,8 +469,10 @@ export default function CoursesClient({ locale, dict }: CoursesClientProps) {
                 </Card>
               </div>
             );
-          })}
-        </AnimatePresence>
+              })}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
