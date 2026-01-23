@@ -1,6 +1,6 @@
 import { getDictionary } from '@/lib/i18n/getDictionary';
 import { Locale } from '@/config/i18n';
-import { getUsersByIds, listUsers } from '@/lib/db/repositories/userRepository';
+import { listUsersByIdsPage, listUsersPage, countUsers } from '@/lib/db/repositories/userRepository';
 import { UsersClient } from '@/components/UsersClient';
 import { requireRole } from '@/lib/auth/auth';
 import { ROLES } from '@/config/roles';
@@ -19,26 +19,39 @@ export default async function UsersPage({
   
   const dictionary = await getDictionary(locale);
 
-  let users =
-    currentUser.role === ROLES.ADMIN
-      ? await listUsers()
-      : await (async () => {
-          const ctx = await requireAcademyContext(locale);
-          const members = await listAcademyMembers(ctx.academyId);
-          const ids = Array.from(new Set(members.map((m) => m.userId)));
-          return getUsersByIds(ids);
-        })();
+  const pageSize = 25;
 
-  // Filter: managers should only see parent, coach, and player roles
-  if (currentUser.role === ROLES.MANAGER) {
-    users = users.filter(u => u.role === ROLES.PARENT || u.role === ROLES.COACH || u.role === ROLES.PLAYER);
+  let initialUsers: any[] = [];
+  let totalUsers = 0;
+
+  if (currentUser.role === ROLES.ADMIN) {
+    const [usersPage, total] = await Promise.all([
+      listUsersPage({ offset: 0, limit: pageSize }),
+      countUsers(),
+    ]);
+    initialUsers = usersPage;
+    totalUsers = total;
+  } else {
+    const ctx = await requireAcademyContext(locale);
+    const members = await listAcademyMembers(ctx.academyId);
+    const ids = Array.from(new Set(members.map((m) => m.userId)));
+    const allowedRoles = [ROLES.PARENT, ROLES.COACH, ROLES.PLAYER];
+    const result = await listUsersByIdsPage(ids, {
+      offset: 0,
+      limit: pageSize,
+      allowedRoles,
+    });
+    initialUsers = result.users;
+    totalUsers = result.total;
   }
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
       <UsersClient
         dictionary={dictionary}
-        initialUsers={users}
+        initialUsers={initialUsers}
+        initialTotal={totalUsers}
+        initialPageSize={pageSize}
         locale={locale}
         currentUserRole={currentUser.role}
       />

@@ -122,6 +122,12 @@ const USERS_PREFIX = 'users:';
 const USERS_BY_EMAIL_PREFIX = 'users_by_email:';
 const USERS_BY_USERNAME_PREFIX = 'users_by_username:';
 
+export interface UserListFilters {
+  role?: UserRole;
+  search?: string;
+  allowedRoles?: UserRole[];
+}
+
 /**
  * Hash a password using bcrypt
  */
@@ -370,6 +376,112 @@ export async function listUsers(): Promise<User[]> {
   return users;
 }
 
+function normalizeSearchValue(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function matchesUserSearch(user: User, search?: string): boolean {
+  if (!search) return true;
+  const query = normalizeSearchValue(search);
+  if (!query) return true;
+
+  const haystack = [
+    user.email,
+    user.username,
+    user.fullName || '',
+    user.phoneNumber || '',
+  ]
+    .join(' ')
+    .toLowerCase();
+
+  return haystack.includes(query);
+}
+
+function matchesRoleFilters(user: User, filters?: UserListFilters): boolean {
+  if (!filters) return true;
+  if (filters.allowedRoles && !filters.allowedRoles.includes(user.role)) {
+    return false;
+  }
+  if (filters.role && user.role !== filters.role) {
+    return false;
+  }
+  return true;
+}
+
+export async function countUsers(filters?: UserListFilters): Promise<number> {
+  const db = getDatabase();
+  const hasFilters = !!filters?.role || !!filters?.search || !!filters?.allowedRoles?.length;
+
+  if (!hasFilters) {
+    return db.getCount({
+      start: USERS_PREFIX,
+      end: `${USERS_PREFIX}\xFF`,
+    });
+  }
+
+  let count = 0;
+  for await (const { key, value } of db.getRange({
+    start: USERS_PREFIX,
+    end: `${USERS_PREFIX}\xFF`,
+  })) {
+    const keyStr = String(key);
+    if (!keyStr.startsWith(USERS_PREFIX)) continue;
+    const user = value as User;
+    if (!matchesRoleFilters(user, filters)) continue;
+    if (!matchesUserSearch(user, filters?.search)) continue;
+    count += 1;
+  }
+
+  return count;
+}
+
+export async function listUsersPage(params: {
+  offset: number;
+  limit: number;
+} & UserListFilters): Promise<User[]> {
+  const db = getDatabase();
+  const users: User[] = [];
+  const hasFilters = !!params.role || !!params.search || !!params.allowedRoles?.length;
+
+  if (!hasFilters) {
+    for await (const { key, value } of db.getRange({
+      start: USERS_PREFIX,
+      end: `${USERS_PREFIX}\xFF`,
+      offset: params.offset,
+      limit: params.limit,
+    })) {
+      const keyStr = String(key);
+      if (keyStr.startsWith(USERS_PREFIX)) {
+        users.push(value as User);
+      }
+    }
+
+    return users;
+  }
+
+  let matchedIndex = 0;
+  for await (const { key, value } of db.getRange({
+    start: USERS_PREFIX,
+    end: `${USERS_PREFIX}\xFF`,
+  })) {
+    const keyStr = String(key);
+    if (!keyStr.startsWith(USERS_PREFIX)) continue;
+    const user = value as User;
+    if (!matchesRoleFilters(user, params)) continue;
+    if (!matchesUserSearch(user, params.search)) continue;
+
+    if (matchedIndex >= params.offset && users.length < params.limit) {
+      users.push(user);
+    }
+    matchedIndex += 1;
+    if (users.length >= params.limit && matchedIndex >= params.offset + params.limit) {
+      break;
+    }
+  }
+
+  return users;
+}
+
 // Get all coaches
 export async function getCoaches(): Promise<User[]> {
   const allUsers = await listUsers();
@@ -387,6 +499,33 @@ export async function getUsersByIds(ids: string[]): Promise<User[]> {
   const idSet = new Set(ids);
   const allUsers = await listUsers();
   return allUsers.filter(user => idSet.has(user.id));
+}
+
+export async function listUsersByIdsPage(
+  ids: string[],
+  params: { offset: number; limit: number } & UserListFilters
+): Promise<{ users: User[]; total: number }> {
+  const db = getDatabase();
+  const users: User[] = [];
+  let total = 0;
+
+  if (!ids || ids.length === 0) {
+    return { users, total };
+  }
+
+  for (const id of ids) {
+    const user = (await db.get(`${USERS_PREFIX}${id}`)) as User | undefined;
+    if (!user) continue;
+    if (!matchesRoleFilters(user, params)) continue;
+    if (!matchesUserSearch(user, params.search)) continue;
+
+    if (total >= params.offset && users.length < params.limit) {
+      users.push(user);
+    }
+    total += 1;
+  }
+
+  return { users, total };
 }
 
 /**

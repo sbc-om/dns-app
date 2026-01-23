@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { ArrowUpDown, Loader2, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import type { User } from '@/lib/db/repositories/userRepository';
 import { Dictionary } from '@/lib/i18n/getDictionary';
 import { Button } from '@/components/ui/button';
@@ -25,9 +25,11 @@ export interface UsersTableProps {
   dictionary: Dictionary;
   onUsersChange: (users: User[]) => void;
   locale: string;
+  isLoading?: boolean;
+  parents?: User[];
 }
 
-export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTableProps) {
+export function UsersTable({ users, dictionary, onUsersChange, locale, isLoading, parents = [] }: UsersTableProps) {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
@@ -220,6 +222,17 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="w-full rounded-2xl border border-border bg-background/70 backdrop-blur-xl p-10">
+        <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span className="text-sm font-medium">{dictionary.common.loading}</span>
+        </div>
+      </div>
+    );
+  }
+
   if (users.length === 0) {
     return (
       <div className="text-center py-16 px-4 bg-white dark:bg-[#1a1a1a] rounded-2xl border-2 border-[#DDDDDD] dark:border-[#000000]">
@@ -250,8 +263,7 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
       <DataTable
         columns={columns}
         data={users}
-        searchKey="email"
-        searchPlaceholder={`${dictionary.common.search} ${dictionary.common.email.toLowerCase()}...`}
+        showFooter={false}
       />
 
       {editingUser && (
@@ -261,7 +273,7 @@ export function UsersTable({ users, dictionary, onUsersChange, locale }: UsersTa
           onOpenChange={(open: boolean) => !open && setEditingUser(null)}
           dictionary={dictionary}
           locale={locale}
-          parents={users.filter(u => u.role === 'parent')}
+          parents={parents}
           players={users.filter(u => u.role === 'player')}
           onUserUpdated={(updatedUser: User) => {
             onUsersChange(
